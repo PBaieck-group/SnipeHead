@@ -164,5 +164,6 @@ Built using the latest OpenZeppelin libraries and tested with `viem`, `node:test
 ---
 
 🔗 **Project Website**: [https://www.snipehead.xyz](https://www.snipehead.xyz)  
-📄 **License**: MIT  
+📄 **License**: This project is licensed under the MIT License. See the LICENSE file for details.
+✅ **Disclaimer**: This contract is provided as-is. Interacting with smart contracts involves risk; always verify code and test thoroughly. The SnipeHead project is not responsible for any losses.
 🛡 Built with ❤️ by the SnipeHead Team
