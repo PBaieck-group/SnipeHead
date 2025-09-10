@@ -130,11 +130,22 @@
             .nav-menu a:last-child {
                 border-bottom: none;
             }
+            #contract-address {
+                display: inline-block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100px;
+                vertical-align: middle;
+            }
         }
         @media (max-width: 400px) {
             .nav-menu a {
                 font-size: 0.9rem;
                 padding: 0.5rem;
+            }
+            #contract-address {
+                max-width: 80px;
             }
         }
     </style>
@@ -205,12 +216,27 @@
 
         <section class="mb-12">
             <h3 class="text-2xl font-semibold text-[#00ffcc] mb-4">PulseChain Network Details</h3>
-            <div class="bg-[#1a1a2e] p-6 rounded-lg neon-glow">
+            <div class="bg-[#1a1a2e] p-6 rounded-lg neon-glow mb-6">
                 <p class="text-lg"><strong>Network Name:</strong> PulseChain</p>
-                <p class="text-lg"><strong>RPC URL:</strong> <a class="text-[#00ffcc] hover:underline">https://rpc.pulsechain.com</a></p>
+                <p class="text-lg"><strong>RPC URL:</strong> <a href="https://rpc.pulsechain.com" class="text-[#00ffcc] hover:underline">https://rpc.pulsechain.com</a></p>
                 <p class="text-lg"><strong>Chain ID:</strong> 369</p>
                 <p class="text-lg"><strong>Currency Symbol:</strong> PLS</p>
                 <p class="text-lg"><strong>Block Explorer URL:</strong> <a href="https://ipfs.scan.pulsechain.com" class="text-[#00ffcc] hover:underline">https://ipfs.scan.pulsechain.com</a></p>
+            </div>
+            <h4 class="text-xl font-semibold text-[#00ffcc] mb-4">SnipeHead Token Details</h4>
+            <div class="bg-[#1a1a2e] p-6 rounded-lg neon-glow">
+                <p class="text-lg"><strong>Token Name:</strong> SnipeHead</p>
+                <p class="text-lg"><strong>Token Symbol:</strong> SHD</p>
+                <p class="text-lg"><strong>Total Supply:</strong> 21,000,000,000 SHD - (21 Billion)</p>
+                <p class="text-lg"><strong>Decimals:</strong> 18</p>
+                <p class="text-lg"><strong>Contract Address:</strong> 
+                    <span id="contract-address" class="text-[#00ffcc] font-mono">0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d</span>
+                    <button onclick="copyContractAddress()" class="ml-2 bg-[#00ffcc] text-black font-semibold py-1 px-2 rounded hover:bg-[#00ccaa] transition hover-scale">Copy</button>
+                </p>
+                <p class="text-lg"><strong>Contract Type:</strong> ERC20 with Permit</p>
+                <p class="text-lg">
+                    <a href="https://ipfs.scan.pulsechain.com/address/0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d?tab=contract" class="text-[#00ffcc] hover:underline">View Contract on PulseScan</a>
+                </p>
             </div>
         </section>
 
@@ -250,6 +276,17 @@
         window.addEventListener('resize', () => {
             console.log(`Window size: ${window.innerWidth} x ${window.innerHeight}`);
         });
+
+        // Copy contract address to clipboard
+        function copyContractAddress() {
+            const contractAddress = '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d';
+            navigator.clipboard.writeText(contractAddress).then(() => {
+                alert('Contract address copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy contract address:', err);
+                alert('Failed to copy contract address.');
+            });
+        }
 
         // Fetch SnipeHead (SHD) price and market cap from DexScreener
         fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd')
