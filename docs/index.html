@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
+    <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SnipeHead - Built on PulseChain">
+    <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
+    <meta property="og:url" content="https://snipehead.xyz/">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon.png">
     <title>SnipeHead - PulseChain</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -62,14 +70,12 @@
         #pulseswap-embed.fallback .widget-fallback {
             display: block;
         }
-        /* Price truncation for small screens */
         #shd-price {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 100%; /* Ensure it stays within the parent box */
+            max-width: 100%;
         }
-        /* Hamburger menu styles */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -100,45 +106,44 @@
         }
         @media (min-width: 768px) and (max-width: 900px) {
             .nav-menu a {
-                font-size: 1rem; /* text-base */
+                font-size: 1rem;
                 margin: 0.25rem;
             }
             .nav-menu {
                 gap: 0.5rem;
             }
         }
-        /* Fix for 768px-850px range to prevent nav overlap with title */
         @media (min-width: 768px) and (max-width: 850px) {
             .nav-menu {
-                gap: 0.25rem; /* Tighter gaps */
+                gap: 0.25rem;
                 flex-wrap: wrap;
-                justify-content: flex-end; /* Push links to the right */
+                justify-content: flex-end;
             }
             .nav-menu a {
-                font-size: 0.875rem; /* text-sm, smaller than text-base */
-                padding: 0.25rem 0.5rem; /* Add minimal padding for touch */
-                white-space: nowrap; /* Prevent link text wrapping */
+                font-size: 0.875rem;
+                padding: 0.25rem 0.5rem;
+                white-space: nowrap;
             }
             h1 {
-                font-size: 1.5rem !important; /* text-2xl, reduce title size slightly */
+                font-size: 1.5rem !important;
             }
-            .flex.items-center.space-x-4 > div:first-child { /* Target logo/title container */
-                max-width: 50%; /* Limit left side width to force better distribution */
+            .flex.items-center.space-x-4 > div:first-child {
+                max-width: 50%;
             }
         }
         @media (max-width: 767px) {
             .hamburger {
                 display: flex;
                 position: absolute;
-                top: 1rem; /* Align with reduced header padding */
-                right: 1rem; /* Pin to top-right corner */
+                top: 1rem;
+                right: 1rem;
             }
             .nav-menu {
                 display: none;
                 flex-direction: column;
                 width: 100%;
                 position: absolute;
-                top: 210px; /* Adjusted for ~200px logo + padding */
+                top: 210px;
                 left: 0;
                 background: #1a1a2e;
                 padding: 1.5rem;
@@ -167,21 +172,19 @@
                 max-width: 100px;
                 vertical-align: middle;
             }
-            /* Mobile-specific fixes for header alignment */
             header {
-                padding-top: 1rem; /* Reduced for mobile */
+                padding-top: 1rem;
                 padding-bottom: 0.5rem;
             }
             nav {
-                flex-wrap: nowrap; /* Prevent wrapping */
-                align-items: center; /* Center-align logo and title */
-                position: relative; /* Allow absolute positioning of hamburger */
+                flex-wrap: nowrap;
+                align-items: center;
+                position: relative;
             }
             #shd-price {
-                font-size: 1.25rem; /* Reduce from text-2xl (1.5rem) to text-xl */
+                font-size: 1.25rem;
             }
         }
-        /* Adjustments for 351px-450px */
         @media (max-width: 450px) {
             .nav-menu a {
                 font-size: 0.9rem;
@@ -191,69 +194,64 @@
                 max-width: 80px;
             }
             img[src="Logo_200.png"] {
-                max-height: 180px; /* Cap logo height to prevent overflow */
+                max-height: 180px;
             }
             .nav-menu {
-                top: 190px; /* Adjust dropdown for capped logo */
+                top: 190px;
             }
             .hamburger {
-                top: 0.75rem; /* Tighter alignment */
+                top: 0.75rem;
                 right: 0.75rem;
             }
             #shd-price {
-                font-size: 1rem; /* Further reduce to text-base for small screens */
-                max-width: 90%; /* Slightly less than 100% to avoid edge overflow */
+                font-size: 1rem;
+                max-width: 90%;
             }
             .flex.items-center.space-x-4 {
-                gap: 0.75rem; /* Slightly tighter gap between logo and title */
+                gap: 0.75rem;
             }
         }
-        /* Tighter adjustments for 74px-350px */
         @media (max-width: 350px) {
             img[src="Logo_200.png"] {
-                max-height: 150px; /* Further reduce logo height */
-                max-width: 150px; /* Cap width to fit narrow screens */
-                object-fit: contain; /* Ensure aspect ratio is preserved */
+                max-height: 150px;
+                max-width: 150px;
+                object-fit: contain;
             }
             .neon-glow {
-                box-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc; /* Reduce glow bleed */
+                box-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc;
             }
             .nav-menu {
-                top: 160px; /* Adjust dropdown for smaller logo */
+                top: 160px;
             }
             .hamburger {
-                top: 0.5rem; /* Even tighter alignment */
+                top: 0.5rem;
                 right: 0.5rem;
             }
             .flex.items-center.space-x-4 {
-                gap: 0.5rem; /* Minimize gap for very narrow screens */
+                gap: 0.5rem;
             }
         }
-        /* Truncate URLs for smaller screens */
         .truncate-url {
             display: inline-block;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             vertical-align: middle;
-            max-width: 200px; /* Default max-width for larger screens */
+            max-width: 200px;
         }
-        /* Adjust max-width for mobile screens */
         @media (max-width: 767px) {
             .truncate-url {
-                max-width: 120px; /* Tighter truncation for mobile */
+                max-width: 120px;
             }
         }
-        /* Further adjust for very small screens */
         @media (max-width: 450px) {
             .truncate-url {
-                max-width: 80px; /* Even tighter for very small screens */
+                max-width: 80px;
             }
         }
-        /* Ensure full URLs are visible on larger screens */
         @media (min-width: 768px) {
             .truncate-url {
-                max-width: none; /* No truncation on larger screens */
+                max-width: none;
                 overflow: visible;
                 text-overflow: initial;
             }
@@ -265,10 +263,10 @@
     <header class="py-6 px-4 sm:px-6 lg:px-8">
         <nav class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center space-x-4">
-                <img src="Logo_200.png" alt="SnipeHead Logo" class="h-auto w-auto"> <!-- Preserve original logo size -->
+                <img src="Logo_200.png" alt="SnipeHead Logo" class="h-auto w-auto">
                 <h1 class="text-3xl font-bold text-[#00ffcc] neon-glow">SnipeHead</h1>
             </div>
-            <div class="hamburger" onclick="toggleMenu()">
+            <div class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -380,7 +378,6 @@
                 document.querySelector('.nav-menu').classList.remove('active');
                 document.querySelector('.hamburger').classList.remove('active');
             }
-            // Set initial title text based on viewport width
             updateTitleText();
         });
 
@@ -401,55 +398,51 @@
         });
 
         // Copy contract address to clipboard
-        function copyContractAddress() {
+        async function copyContractAddress() {
             const contractAddress = '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d';
-            navigator.clipboard.writeText(contractAddress).then(() => {
+            try {
+                await navigator.clipboard.writeText(contractAddress);
                 alert('Contract address copied to clipboard!');
-            }).catch(err => {
+            } catch (err) {
                 console.error('Failed to copy contract address:', err);
                 alert('Failed to copy contract address.');
-            });
+            }
         }
 
         // Fetch SnipeHead (SHD) price and market cap from DexScreener
-        fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd')
-            .then(response => {
+        async function fetchPriceAndMarketCap() {
+            try {
+                const response = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd');
                 if (!response.ok) {
                     throw new Error('Failed to fetch DexScreener data');
                 }
-                return response.json();
-            })
-            .then(data => {
+                const data = await response.json();
                 const pair = data.pairs && data.pairs[0];
                 if (!pair) {
                     throw new Error('Pair data not found');
                 }
                 const price = pair.priceUsd || 0;
-                // Adjust price formatting based on screen width
                 const isMobile = window.innerWidth <= 767;
                 const isVerySmall = window.innerWidth <= 400;
                 let formattedPrice;
                 if (isVerySmall) {
-                    // Use scientific notation for very small screens
                     formattedPrice = price < 0.0001 ? price.toExponential(2) : parseFloat(price).toFixed(6);
                 } else if (isMobile) {
-                    // Use 6 decimals on mobile
                     formattedPrice = parseFloat(price).toFixed(6);
                 } else {
-                    // Full precision (10 decimals) on larger screens
                     formattedPrice = parseFloat(price).toFixed(10);
                 }
                 document.getElementById('shd-price').textContent = `$${formattedPrice}`;
-                document.getElementById('shd-price').title = `$${parseFloat(price).toFixed(10)}`; // Show full price on hover
+                document.getElementById('shd-price').title = `$${parseFloat(price).toFixed(10)}`;
                 const liquidity = pair.liquidity?.usd || 0;
                 document.getElementById('shd-market-cap').textContent = `$${Math.round(liquidity).toLocaleString()}`;
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error fetching DexScreener data:', error);
                 document.getElementById('shd-price').textContent = 'Error';
                 document.getElementById('shd-market-cap').textContent = 'Error';
                 document.getElementById('shd-price').innerHTML += '<br><span class="text-sm text-red-400">Check DexScreener chart below for price</span>';
-            });
+            }
+        }
 
         // Fetch all SnipeHead (SHD) holders from PulseChain BlockScout with pagination
         async function fetchAllHolders() {
@@ -457,7 +450,6 @@
             const offset = 10000;
             let page = 1;
             let allHolders = [];
-
             try {
                 while (true) {
                     const response = await fetch(
@@ -485,6 +477,8 @@
             }
         }
 
+        // Execute fetch functions
+        fetchPriceAndMarketCap();
         fetchAllHolders();
     </script>
 </body>
