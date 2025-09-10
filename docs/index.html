@@ -62,6 +62,13 @@
         #pulseswap-embed.fallback .widget-fallback {
             display: block;
         }
+        /* Price truncation for small screens */
+        #shd-price {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%; /* Ensure it stays within the parent box */
+        }
         /* Hamburger menu styles */
         .hamburger {
             display: none;
@@ -100,16 +107,38 @@
                 gap: 0.5rem;
             }
         }
+        /* Fix for 768px-850px range to prevent nav overlap with title */
+        @media (min-width: 768px) and (max-width: 850px) {
+            .nav-menu {
+                gap: 0.25rem; /* Tighter gaps */
+                flex-wrap: wrap;
+                justify-content: flex-end; /* Push links to the right */
+            }
+            .nav-menu a {
+                font-size: 0.875rem; /* text-sm, smaller than text-base */
+                padding: 0.25rem 0.5rem; /* Add minimal padding for touch */
+                white-space: nowrap; /* Prevent link text wrapping */
+            }
+            h1 {
+                font-size: 1.5rem !important; /* text-2xl, reduce title size slightly */
+            }
+            .flex.items-center.space-x-4 > div:first-child { /* Target logo/title container */
+                max-width: 50%; /* Limit left side width to force better distribution */
+            }
+        }
         @media (max-width: 767px) {
             .hamburger {
                 display: flex;
+                position: absolute;
+                top: 1rem; /* Align with reduced header padding */
+                right: 1rem; /* Pin to top-right corner */
             }
             .nav-menu {
                 display: none;
                 flex-direction: column;
                 width: 100%;
                 position: absolute;
-                top: 100px; /* Increased to account for large logo */
+                top: 210px; /* Adjusted for ~200px logo + padding */
                 left: 0;
                 background: #1a1a2e;
                 padding: 1.5rem;
@@ -138,8 +167,22 @@
                 max-width: 100px;
                 vertical-align: middle;
             }
+            /* Mobile-specific fixes for header alignment */
+            header {
+                padding-top: 1rem; /* Reduced for mobile */
+                padding-bottom: 0.5rem;
+            }
+            nav {
+                flex-wrap: nowrap; /* Prevent wrapping */
+                align-items: center; /* Center-align logo and title */
+                position: relative; /* Allow absolute positioning of hamburger */
+            }
+            #shd-price {
+                font-size: 1.25rem; /* Reduce from text-2xl (1.5rem) to text-xl */
+            }
         }
-        @media (max-width: 400px) {
+        /* Adjustments for 351px-450px */
+        @media (max-width: 450px) {
             .nav-menu a {
                 font-size: 0.9rem;
                 padding: 0.5rem;
@@ -147,15 +190,82 @@
             #contract-address {
                 max-width: 80px;
             }
+            img[src="Logo_200.png"] {
+                max-height: 180px; /* Cap logo height to prevent overflow */
+            }
+            .nav-menu {
+                top: 190px; /* Adjust dropdown for capped logo */
+            }
+            .hamburger {
+                top: 0.75rem; /* Tighter alignment */
+                right: 0.75rem;
+            }
+            #shd-price {
+                font-size: 1rem; /* Further reduce to text-base for small screens */
+                max-width: 90%; /* Slightly less than 100% to avoid edge overflow */
+            }
+            .flex.items-center.space-x-4 {
+                gap: 0.75rem; /* Slightly tighter gap between logo and title */
+            }
+        }
+        /* Tighter adjustments for 74px-350px */
+        @media (max-width: 350px) {
+            img[src="Logo_200.png"] {
+                max-height: 150px; /* Further reduce logo height */
+                max-width: 150px; /* Cap width to fit narrow screens */
+                object-fit: contain; /* Ensure aspect ratio is preserved */
+            }
+            .neon-glow {
+                box-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc; /* Reduce glow bleed */
+            }
+            .nav-menu {
+                top: 160px; /* Adjust dropdown for smaller logo */
+            }
+            .hamburger {
+                top: 0.5rem; /* Even tighter alignment */
+                right: 0.5rem;
+            }
+            .flex.items-center.space-x-4 {
+                gap: 0.5rem; /* Minimize gap for very narrow screens */
+            }
+        }
+        /* Truncate URLs for smaller screens */
+        .truncate-url {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            max-width: 200px; /* Default max-width for larger screens */
+        }
+        /* Adjust max-width for mobile screens */
+        @media (max-width: 767px) {
+            .truncate-url {
+                max-width: 120px; /* Tighter truncation for mobile */
+            }
+        }
+        /* Further adjust for very small screens */
+        @media (max-width: 450px) {
+            .truncate-url {
+                max-width: 80px; /* Even tighter for very small screens */
+            }
+        }
+        /* Ensure full URLs are visible on larger screens */
+        @media (min-width: 768px) {
+            .truncate-url {
+                max-width: none; /* No truncation on larger screens */
+                overflow: visible;
+                text-overflow: initial;
+            }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="text-white">
     <header class="py-6 px-4 sm:px-6 lg:px-8">
-        <nav class="flex items-center justify-between max-w-7xl mx-auto flex-wrap">
+        <nav class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center space-x-4">
-                <img src="Logo_200.png" alt="SnipeHead Logo" class="h-42 w-auto">
+                <img src="Logo_200.png" alt="SnipeHead Logo" class="h-auto w-auto"> <!-- Preserve original logo size -->
                 <h1 class="text-3xl font-bold text-[#00ffcc] neon-glow">SnipeHead</h1>
             </div>
             <div class="hamburger" onclick="toggleMenu()">
@@ -218,10 +328,10 @@
             <h3 class="text-2xl font-semibold text-[#00ffcc] mb-4">PulseChain Network Details</h3>
             <div class="bg-[#1a1a2e] p-6 rounded-lg neon-glow mb-6">
                 <p class="text-lg"><strong>Network Name:</strong> PulseChain</p>
-                <p class="text-lg"><strong>RPC URL:</strong> <a href="https://rpc.pulsechain.com" class="text-[#00ffcc] hover:underline">https://rpc.pulsechain.com</a></p>
+                <p class="text-lg"><strong>RPC URL:</strong> <a href="https://rpc.pulsechain.com" class="text-[#00ffcc] hover:underline truncate-url" title="https://rpc.pulsechain.com">https://rpc.pulsechain.com</a></p>
                 <p class="text-lg"><strong>Chain ID:</strong> 369</p>
                 <p class="text-lg"><strong>Currency Symbol:</strong> PLS</p>
-                <p class="text-lg"><strong>Block Explorer URL:</strong> <a href="https://ipfs.scan.pulsechain.com" class="text-[#00ffcc] hover:underline">https://ipfs.scan.pulsechain.com</a></p>
+                <p class="text-lg"><strong>Block Explorer URL:</strong> <a href="https://ipfs.scan.pulsechain.com" class="text-[#00ffcc] hover:underline truncate-url" title="https://ipfs.scan.pulsechain.com">https://ipfs.scan.pulsechain.com</a></p>
             </div>
             <h4 class="text-xl font-semibold text-[#00ffcc] mb-4">SnipeHead Token Details</h4>
             <div class="bg-[#1a1a2e] p-6 rounded-lg neon-glow">
@@ -270,11 +380,24 @@
                 document.querySelector('.nav-menu').classList.remove('active');
                 document.querySelector('.hamburger').classList.remove('active');
             }
+            // Set initial title text based on viewport width
+            updateTitleText();
         });
 
-        // Log screen size for debugging
+        // Update title text based on viewport width
+        function updateTitleText() {
+            const title = document.querySelector('h1');
+            if (window.innerWidth >= 74 && window.innerWidth <= 450) {
+                title.textContent = 'SHD';
+            } else {
+                title.textContent = 'SnipeHead';
+            }
+        }
+
+        // Update title on resize
         window.addEventListener('resize', () => {
             console.log(`Window size: ${window.innerWidth} x ${window.innerHeight}`);
+            updateTitleText();
         });
 
         // Copy contract address to clipboard
@@ -302,7 +425,22 @@
                     throw new Error('Pair data not found');
                 }
                 const price = pair.priceUsd || 0;
-                document.getElementById('shd-price').textContent = `$${parseFloat(price).toFixed(10)}`;
+                // Adjust price formatting based on screen width
+                const isMobile = window.innerWidth <= 767;
+                const isVerySmall = window.innerWidth <= 400;
+                let formattedPrice;
+                if (isVerySmall) {
+                    // Use scientific notation for very small screens
+                    formattedPrice = price < 0.0001 ? price.toExponential(2) : parseFloat(price).toFixed(6);
+                } else if (isMobile) {
+                    // Use 6 decimals on mobile
+                    formattedPrice = parseFloat(price).toFixed(6);
+                } else {
+                    // Full precision (10 decimals) on larger screens
+                    formattedPrice = parseFloat(price).toFixed(10);
+                }
+                document.getElementById('shd-price').textContent = `$${formattedPrice}`;
+                document.getElementById('shd-price').title = `$${parseFloat(price).toFixed(10)}`; // Show full price on hover
                 const liquidity = pair.liquidity?.usd || 0;
                 document.getElementById('shd-market-cap').textContent = `$${Math.round(liquidity).toLocaleString()}`;
             })
