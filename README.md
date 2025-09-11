@@ -4,9 +4,9 @@
 > 🧠 Portal: [https://www.snipehead.xyz](https://www.snipehead.xyz)  
 > 📦 Contract Address: `0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d`
 
-**SnipeHead Fallback**: https://ipfs.io/ipfs/bafybeibatjwx7dhbfrwxprvag4t7x4y5jbp3an6sfcimgl7uijhqj5dplq/1index.html
+**SnipeHead Fallback**: https://ipfs.io/ipfs/bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq/
 
-**bafybeibatjwx7dhbfrwxprvag4t7x4y5jbp3an6sfcimgl7uijhqj5dplq**
+**bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq**
 
 ---
 
