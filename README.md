@@ -4,9 +4,17 @@
 > 🧠 Portal: [https://www.snipehead.xyz](https://www.snipehead.xyz)  
 > 📦 Contract Address: `0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d`
 
-**SnipeHead Fallback**: https://ipfs.io/ipfs/bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq/
-
-**bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq**
+1. **SnipeHead Fallback**  
+   [SnipeHead Link ](https://ipfs.io/ipfs/bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq/)
+   
+2. **SnipeHead Faucet Fallback**  
+   [Faucet Link ](https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/)
+   
+3. **Mining Fallback**  
+   [Mining Link ](https://ipfs.io/ipfs/bafybeibzsdchcbl376jbvajpwj2fvazjfuicfr2h4awwk24xnqrih7f5ny/)
+   
+4. **Airdrop Fallback**  
+   [Airdrop Checker Link](https://ipfs.io/ipfs/bafybeihegcjlaw6fkqbzc3kjwp64fn7bks7i4yhbdys5ckj2xpxtuorjwy/)
 
 ---
 
