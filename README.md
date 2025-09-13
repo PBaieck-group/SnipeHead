@@ -3,6 +3,7 @@
 > PulseChain ERC-20 Token with Permit Support  
 > 🧠 Portal: [https://www.snipehead.xyz](https://www.snipehead.xyz)  
 > 📦 Contract Address: `0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d`
+
 > 📄 white paper: [Paper](https://github.com/PBaieck-group/SnipeHead/blob/main/whitepaper.md) 
 
 1. **SnipeHead Fallback**  
