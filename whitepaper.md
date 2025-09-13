@@ -1,4 +1,4 @@
-# Snipehead (SHD) Whitepaper
+# SnipeHead (SHD): A Decentralized Token on PulseChain
 
 ## Overview
 
