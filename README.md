@@ -5,16 +5,16 @@
 > 📦 Contract Address: `0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d`
 
 1. **SnipeHead Fallback**  
-   [SnipeHead Link ](https://ipfs.io/ipfs/bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq/)
+   (https://ipfs.io/ipfs/bafybeidncnqobpjszescv2uewuljfgfmywnbrezi2lrkpsjiwezzsixytq/)
    
 2. **SnipeHead Faucet Fallback**  
-   [Faucet Link ](https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/)
+   (https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/)
    
 3. **SnipeHead Mining Fallback**  
-   [Mining Link ](https://ipfs.io/ipfs/bafybeibzsdchcbl376jbvajpwj2fvazjfuicfr2h4awwk24xnqrih7f5ny/)
+   (https://ipfs.io/ipfs/bafybeibzsdchcbl376jbvajpwj2fvazjfuicfr2h4awwk24xnqrih7f5ny/)
    
 4. **SnipeHead Airdrop Fallback**  
-   [Airdrop Checker Link](https://ipfs.io/ipfs/bafybeihegcjlaw6fkqbzc3kjwp64fn7bks7i4yhbdys5ckj2xpxtuorjwy/)
+   (https://ipfs.io/ipfs/bafybeihegcjlaw6fkqbzc3kjwp64fn7bks7i4yhbdys5ckj2xpxtuorjwy/)
 
 ---
 
