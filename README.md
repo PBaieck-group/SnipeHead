@@ -10,10 +10,10 @@
 2. **SnipeHead Faucet Fallback**  
    [Faucet Link ](https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/)
    
-3. **Mining Fallback**  
+3. **SnipeHead Mining Fallback**  
    [Mining Link ](https://ipfs.io/ipfs/bafybeibzsdchcbl376jbvajpwj2fvazjfuicfr2h4awwk24xnqrih7f5ny/)
    
-4. **Airdrop Fallback**  
+4. **SnipeHead Airdrop Fallback**  
    [Airdrop Checker Link](https://ipfs.io/ipfs/bafybeihegcjlaw6fkqbzc3kjwp64fn7bks7i4yhbdys5ckj2xpxtuorjwy/)
 
 ---
