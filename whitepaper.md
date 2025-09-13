@@ -128,7 +128,7 @@ This whitepaper is for informational purposes. Interacting with SHD or its dApps
 
 ## 7. Repository
 
-- **GitHub**: [https://github.com/snipehead/Snipehead](https://github.com/snipehead/Snipehead)
+- **GitHub**: [https://github.com/PBaieck-group/SnipeHead](https://github.com/PBaieck-group/SnipeHead)
 - **Contracts**: `SnipeHead.sol`, `SnipeHeadFaucet.sol`, `SnipeheadMiningDecentralized.sol`
 - **IPFS Links**: Included in repository README.
 
