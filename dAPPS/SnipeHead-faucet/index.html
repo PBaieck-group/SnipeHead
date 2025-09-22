@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnipeHead Faucet - PulseChain</title>
+    <link href="output.css" rel="stylesheet">
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="text/javascript"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-snipehead bg-cover bg-center bg-no-repeat text-gray-200 font-arial">
+    <div class="ascii-art font-mono text-center text-black my-4">
+        //                (   O   )
+        // I’m SnipeHead  ( === )
+        // Suck Me Dry    `---'
+    </div>
+    <div class="max-w-md w-full bg-gray-900 p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center mb-4">SnipeHead Faucet</h1>
+        <p class="text-center text-gray-400 mb-6">Claim 5,000 SHD tokens every 24 hours on PulseChain.</p>
+        
+        <div id="wallet-status" class="text-center mb-4">
+            <button id="connect-wallet" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">
+                Connect Wallet
+            </button>
+            <button id="add-token" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mt-2 hidden">
+                Add SHD to Wallet
+            </button>
+            <p id="wallet-address" class="text-gray-400 mt-2 hidden"></p>
+        </div>
+        
+        <div class="text-center mb-6">
+            <button id="claim-tokens" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded w-full" disabled>
+                Claim 5,000 SHD
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="font-semibold">Faucet Balance:</p>
+                <p id="faucet-balance">Loading...</p>
+            </div>
+            <div>
+                <p class="font-semibold">Daily Tokens Remaining:</p>
+                <p id="daily-remaining">Loading...</p>
+            </div>
+            <div>
+                <p class="font-semibold">Your Last Claim:</p>
+                <p id="last-claim">Connect Wallet</p>
+            </div>
+            <div>
+                <p class="font-semibold">Cooldown Status:</p>
+                <p id="cooldown-status">Connect Wallet</p>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center text-gray-400 text-sm">
+            <p><a href="https://pulsechain.com" target="_blank" class="text-black-400 hover:underline">Network: PulseChain (Chain ID: 369)</a></p>
+            <p>Currency: PLS</p>
+            <p><a href="https://ipfs.scan.pulsechain.com/address/0x451f3EF744C6B942765E86BF82dB4F898c9dA67f?tab=contract" target="_blank" class="text-blue-400 hover:underline">View Contract</a></p>
+            <p><a href="https://www.snipehead.xyz" target="_blank" class="text-blue-400 hover:underline">SnipeHead Portal</a></p>
+            <p><a href="https://gitlab.com/pbaieck-group/SnipeHead-faucet" target="_blank" class="text-blue-400 hover:underline">View Source</a></p>
+        </div>
+    </div>
+
+    <script>
+        const faucetAddress = '0x451f3EF744C6B942765E86BF82dB4F898c9dA67f';
+        const shdTokenAddress = '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d';
+        const faucetAbi = [
+            {
+                "inputs": [{"internalType": "address", "name": "_shdTokenAddress", "type": "address"}],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "TokensClaimed",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "sender", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "TokensDeposited",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "owner", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "TokensWithdrawn",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "COOLDOWN_PERIOD",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "DAILY_TOKEN_LIMIT",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "TOKENS_PER_CLAIM",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "claimTokens",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "dailyTokensDispensed",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+                "name": "depositTokens",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getDailyTokensRemaining",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getFaucetBalance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getLastClaimTime",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "lastResetTime",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "name": "lastClaimTime",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "shdToken",
+                "outputs": [{"internalType": "contract IERC20", "name": "", "type": "address"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+                "name": "withdrawTokens",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+        const tokenAbi = [
+            {
+                "inputs": [{"internalType": "address", "name": "recipient", "type": "address"}],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "spender", "type": "address"},
+                    {"internalType": "uint256", "name": "allowance", "type": "uint256"},
+                    {"internalType": "uint256", "name": "needed", "type": "uint256"}
+                ],
+                "name": "ERC20InsufficientAllowance",
+                "type": "error"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "sender", "type": "address"},
+                    {"internalType": "uint256", "name": "balance", "type": "uint256"},
+                    {"internalType": "uint256", "name": "needed", "type": "uint256"}
+                ],
+                "name": "ERC20InsufficientBalance",
+                "type": "error"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "approver", "type": "address"}],
+                "name": "ERC20InvalidApprover",
+                "type": "error"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "receiver", "type": "address"}],
+                "name": "ERC20InvalidReceiver",
+                "type": "error"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "sender", "type": "address"}],
+                "name": "ERC20InvalidSender",
+                "type": "error"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "spender", "type": "address"}],
+                "name": "ERC20InvalidSpender",
+                "type": "error"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "owner", "type": "address"},
+                    {"indexed": true, "internalType": "address", "name": "spender", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "value", "type": "uint256"}
+                ],
+                "name": "Approval",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "from", "type": "address"},
+                    {"indexed": true, "internalType": "address", "name": "to", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "value", "type": "uint256"}
+                ],
+                "name": "Transfer",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "owner", "type": "address"},
+                    {"internalType": "address", "name": "spender", "type": "address"}
+                ],
+                "name": "allowance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "spender", "type": "address"},
+                    {"internalType": "uint256", "name": "value", "type": "uint256"}
+                ],
+                "name": "approve",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "name",
+                "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "to", "type": "address"},
+                    {"internalType": "uint256", "name": "value", "type": "uint256"}
+                ],
+                "name": "transfer",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address", "name": "from", "type": "address"},
+                    {"internalType": "address", "name": "to", "type": "address"},
+                    {"internalType": "uint256", "name": "value", "type": "uint256"}
+                ],
+                "name": "transferFrom",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        let provider, signer, faucetContract, tokenContract, userAccount;
+        let readOnlyProvider, readOnlyFaucetContract, readOnlyTokenContract;
+
+        readOnlyProvider = new ethers.providers.JsonRpcProvider('https://rpc.pulsechain.com');
+        readOnlyFaucetContract = new ethers.Contract(faucetAddress, faucetAbi, readOnlyProvider);
+        readOnlyTokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, readOnlyProvider);
+
+        async function getTokenDetails() {
+            try {
+                const activeTokenContract = tokenContract || readOnlyTokenContract;
+                const name = await activeTokenContract.name();
+                const symbol = await activeTokenContract.symbol();
+                const decimals = await activeTokenContract.decimals();
+                return { name, symbol, decimals };
+            } catch (error) {
+                console.error('Error fetching token details:', error);
+                return { name: 'SnipeHead', symbol: 'SHD', decimals: 18 };
+            }
+        }
+
+        async function addSHDTokenToWallet() {
+            if (!window.ethereum) {
+                alert('Please install MetaMask or another Web3 wallet.');
+                return;
+            }
+            try {
+                const { symbol, decimals } = await getTokenDetails();
+                const wasAdded = await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: shdTokenAddress,
+                            symbol: symbol,
+                            decimals: decimals,
+                            image: 'https://www.snipehead.xyz/shd-logo.png'
+                        }
+                    }
+                });
+                if (wasAdded) {
+                    alert(`${symbol} token added to your wallet!`);
+                } else {
+                    alert(`${symbol} token was not added to your wallet. You may have rejected the request.`);
+                }
+            } catch (error) {
+                console.error('Add token error:', error);
+                const { name, symbol, decimals } = await getTokenDetails();
+                alert(`Failed to add ${symbol} token automatically. Please add it manually:\n\n1. Open your wallet (e.g., MetaMask).\n2. Ensure you're on PulseChain (Chain ID: 369).\n3. Go to Import Token.\n4. Enter:\n   - Token Contract Address: ${shdTokenAddress}\n   - Token Symbol: ${symbol}\n   - Token Decimals: ${decimals}\n5. Click "Add Custom Token" or "Import".\n\nThe token should appear after claiming from the faucet.`);
+            }
+        }
+
+        async function checkNetwork() {
+            if (!provider) return false;
+            const chainId = await provider.getNetwork();
+            if (chainId.chainId !== 369) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x171' }],
+                    });
+                    return true;
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x171',
+                                    chainName: 'PulseChain',
+                                    rpcUrls: ['https://rpc.pulsechain.com'],
+                                    nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 },
+                                    blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
+                                }],
+                            });
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            return true;
+                        } catch (addError) {
+                            console.error('Error adding PulseChain:', addError);
+                            throw new Error('Failed to add PulseChain. Please add it manually in your wallet.');
+                        }
+                    } else {
+                        console.error('Error switching to PulseChain:', switchError);
+                        throw new Error('Failed to switch to PulseChain. Please select PulseChain in your wallet.');
+                    }
+                }
+            }
+            return true;
+        }
+
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert('Please install MetaMask or another Web3 wallet.');
+                return;
+            }
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send('eth_requestAccounts', []);
+                signer = provider.getSigner();
+                userAccount = await signer.getAddress();
+
+                const networkSwitched = await checkNetwork();
+                if (networkSwitched) {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    userAccount = await signer.getAddress();
+                }
+
+                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
+                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
+
+                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+                document.getElementById('wallet-address').classList.remove('hidden');
+                document.getElementById('connect-wallet').textContent = 'Wallet Connected';
+                document.getElementById('connect-wallet').classList.add('bg-gray-600', 'cursor-not-allowed');
+                document.getElementById('connect-wallet').disabled = true;
+                document.getElementById('add-token').classList.remove('hidden');
+                document.getElementById('claim-tokens').disabled = false;
+                await updateFaucetStatus();
+            } catch (error) {
+                alert('Failed to connect wallet: ' + error.message);
+                console.error('Wallet connection error:', error);
+            }
+        }
+
+        async function updateFaucetStatus() {
+            try {
+                const activeFaucetContract = faucetContract || readOnlyFaucetContract;
+                const activeTokenContract = tokenContract || readOnlyTokenContract;
+
+                const decimals = await activeTokenContract.decimals();
+                const balance = await activeFaucetContract.getFaucetBalance();
+                document.getElementById('faucet-balance').textContent = `${Number(ethers.utils.formatUnits(balance, decimals)).toLocaleString()} SHD`;
+
+                const remaining = await activeFaucetContract.getDailyTokensRemaining();
+                document.getElementById('daily-remaining').textContent = `${Number(ethers.utils.formatUnits(remaining, decimals)).toLocaleString()} SHD`;
+
+                if (userAccount && faucetContract) {
+                    const lastClaim = await faucetContract.getLastClaimTime(userAccount);
+                    document.getElementById('last-claim').textContent = lastClaim.isZero() ? 'Never' : new Date(lastClaim * 1000).toLocaleString();
+
+                    const cooldownPeriod = await faucetContract.COOLDOWN_PERIOD();
+                    const currentTime = Math.floor(Date.now() / 1000);
+                    const timeSinceLastClaim = currentTime - lastClaim;
+                    if (timeSinceLastClaim < cooldownPeriod) {
+                        document.getElementById('cooldown-status').textContent = 'Not eligible';
+                        document.getElementById('claim-tokens').disabled = true;
+                        document.getElementById('claim-tokens').classList.add('bg-gray-600', 'cursor-not-allowed');
+                    } else {
+                        document.getElementById('cooldown-status').textContent = 'Eligible';
+                        document.getElementById('claim-tokens').disabled = false;
+                        document.getElementById('claim-tokens').classList.remove('bg-gray-600', 'cursor-not-allowed');
+                    }
+                } else {
+                    document.getElementById('last-claim').textContent = 'Connect Wallet';
+                    document.getElementById('cooldown-status').textContent = 'Connect Wallet';
+                }
+            } catch (error) {
+                console.error('Error updating faucet status:', error);
+                document.getElementById('faucet-balance').textContent = 'Error';
+                document.getElementById('daily-remaining').textContent = 'Error';
+                if (!userAccount) {
+                    document.getElementById('last-claim').textContent = 'Connect Wallet';
+                    document.getElementById('cooldown-status').textContent = 'Connect Wallet';
+                } else {
+                    document.getElementById('last-claim').textContent = 'Error';
+                    document.getElementById('cooldown-status').textContent = 'Error';
+                }
+            }
+        }
+
+        async function claimTokens() {
+            if (!userAccount) {
+                alert('Please connect your wallet first.');
+                return;
+            }
+            try {
+                const balance = await provider.getBalance(userAccount);
+                if (balance.isZero()) {
+                    alert('Insufficient PLS for gas fees.');
+                    return;
+                }
+
+                document.getElementById('claim-tokens').textContent = 'Claiming...';
+                document.getElementById('claim-tokens').disabled = true;
+                const gasLimit = await faucetContract.estimateGas.claimTokens();
+                const tx = await faucetContract.claimTokens({ gasLimit: gasLimit.mul(12).div(10) });
+                await tx.wait();
+                alert('Successfully claimed 5,000 SHD tokens!');
+                await updateFaucetStatus();
+            } catch (error) {
+                alert('Failed to claim tokens: ' + error.message);
+                console.error('Claim tokens error:', error);
+            } finally {
+                document.getElementById('claim-tokens').textContent = 'Claim 5,000 SHD';
+                document.getElementById('claim-tokens').disabled = false;
+            }
+        }
+
+        document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+        document.getElementById('claim-tokens').addEventListener('click', claimTokens);
+        document.getElementById('add-token').addEventListener('click', addSHDTokenToWallet);
+
+        window.ethereum?.on('accountsChanged', async (accounts) => {
+            if (accounts.length > 0) {
+                userAccount = accounts[0];
+                signer = provider.getSigner();
+                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
+                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
+                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+                document.getElementById('add-token').classList.remove('hidden');
+                await updateFaucetStatus();
+            } else {
+                userAccount = null;
+                document.getElementById('wallet-address').classList.add('hidden');
+                document.getElementById('connect-wallet').textContent = 'Connect Wallet';
+                document.getElementById('connect-wallet').classList.remove('bg-gray-600', 'cursor-not-allowed');
+                document.getElementById('connect-wallet').disabled = false;
+                document.getElementById('add-token').classList.add('hidden');
+                document.getElementById('claim-tokens').disabled = true;
+                await updateFaucetStatus();
+            }
+        });
+
+        window.ethereum?.on('chainChanged', async (chainId) => {
+            if (parseInt(chainId, 16) === 369) {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userAccount = await signer.getAddress();
+                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
+                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
+                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+                document.getElementById('wallet-address').classList.remove('hidden');
+                document.getElementById('connect-wallet').textContent = 'Wallet Connected';
+                document.getElementById('connect-wallet').classList.add('bg-gray-600', 'cursor-not-allowed');
+                document.getElementById('connect-wallet').disabled = true;
+                document.getElementById('add-token').classList.remove('hidden');
+                document.getElementById('claim-tokens').disabled = false;
+                await updateFaucetStatus();
+            } else {
+                alert('Please switch to PulseChain to continue.');
+                document.getElementById('wallet-address').classList.add('hidden');
+                document.getElementById('connect-wallet').textContent = 'Connect Wallet';
+                document.getElementById('connect-wallet').classList.remove('bg-gray-600', 'cursor-not-allowed');
+                document.getElementById('connect-wallet').disabled = false;
+                document.getElementById('add-token').classList.add('hidden');
+                document.getElementById('claim-tokens').disabled = true;
+                await updateFaucetStatus();
+            }
+        });
+
+        updateFaucetStatus();
+    </script>
+</body>
+</html>

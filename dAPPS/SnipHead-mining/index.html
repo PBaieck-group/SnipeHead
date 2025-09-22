@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnipeHead Mining</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+            overflow-x: hidden;
+        }
+        h1 {
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        h2 {
+            font-family: 'Exo 2', sans-serif;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glassmorphism:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(0, 255, 255, 0.3);
+        }
+        .pulse-button:hover:not(:disabled) {
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse-status {
+            animation: pulse-status 1.5s infinite;
+        }
+        @keyframes pulse-status {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .placeholder {
+            height: 1.5rem;
+            width: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+        }
+        .neon-glow {
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4);
+        }
+        .header-animation {
+            animation: neon-flicker 3s infinite;
+        }
+        @keyframes neon-flicker {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4); }
+            50% { opacity: 0.95; text-shadow: 0 0 5px rgba(0, 255, 255, 0.6); }
+        }
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: transparent;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(1); opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col relative">
+    <div class="bg-particles" id="particles"></div>
+    <header class="bg-gradient-to-r from-blue-900/80 to-cyan-900/80 py-4 glassmorphism sticky top-0 z-10">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-cyan-400 tracking-wider neon-glow header-animation">SnipeHead Mining</h1>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 py-8 flex-grow relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Mining Controls -->
+            <div class="glassmorphism rounded-2xl p-8 shadow-lg transition-all duration-300">
+                <h2 class="text-2xl font-semibold mb-4 text-cyan-300 neon-glow">Your Mining Dashboard</h2>
+                <div class="space-y-6">
+                    <p id="account" class="text-lg text-gray-200">Not connected</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Token Balance:</span>
+                        <span id="balance" class="text-xl text-cyan-400 font-bold flex items-center">
+                            <span id="balanceValue"></span>
+                            <span id="balancePlaceholder" class="placeholder animate-pulse"></span>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Mined Amount:</span>
+                        <span id="staked" class="text-xl text-cyan-400 font-bold flex items-center">
+                            <span id="stakedValue"></span>
+                            <span id="stakedPlaceholder" class="placeholder animate-pulse"></span>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Pending Rewards:</span>
+                        <span id="rewards" class="text-xl text-cyan-400 font-bold flex items-center">
+                            <span id="rewardsValue"></span>
+                            <span id="rewardsPlaceholder" class="placeholder animate-pulse"></span>
+                        </span>
+                    </div>
+                    <button id="connectButton" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Connect Wallet</button>
+                    <input id="amountInput" type="text" placeholder="Amount (e.g., 1234.56 or 1,234.56)" class="w-full bg-gray-800/50 border border-gray-600/50 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="mineButton" disabled class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Mine</button>
+                        <button id="unmineButton" disabled class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Unmine</button>
+                    </div>
+                    <button id="claimButton" disabled class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-teal-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Claim Rewards</button>
+                    <p id="status" class="text-center text-gray-200"></p>
+                </div>
+            </div>
+            <!-- SnipeHead Statistics -->
+            <div class="glassmorphism rounded-2xl p-8 shadow-lg transition-all duration-300">
+                <h2 class="text-2xl font-semibold mb-2 text-cyan-300 neon-glow">SnipeHead Statistics</h2>
+                <p class="text-gray-400 italic mb-4 text-base">Mine SHD tokens while rewards are available in the pool!</p>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">APY:</span>
+                        <span id="apy" class="text-xl text-cyan-400 font-bold">Loading...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Total SHD Being Mined:</span>
+                        <span id="totalMined" class="text-xl text-cyan-400 font-bold">Loading...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Contract SHD Balance:</span>
+                        <span id="contractBalance" class="text-xl text-cyan-400 font-bold">Loading...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Available Rewards Pool:</span>
+                        <span id="availableRewards" class="text-xl text-cyan-400 font-bold">Loading...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg text-gray-200 font-medium">Reward Rate:</span>
+                        <span id="rewardRate" class="text-xl text-cyan-400 font-bold">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-gradient-to-r from-blue-900/80 to-cyan-900/80 py-6 glassmorphism shadow-inner">
+        <div class="container mx-auto px-4 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-cyan-300 neon-glow">Network</h3>
+                    <p><a href="https://www.pulsechain.com/" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-all duration-300">PulseChain (Chain ID: 369)</a></p>
+                    <p class="text-gray-400">Currency: PLS</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-cyan-300 neon-glow">Block Explorer</h3>
+                    <a href="https://ipfs.scan.pulsechain.com/address/0xF5e97b7167Fa1618965f36C08f1263b722FE60Ea?tab=contract" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-all duration-300">View Contract</a>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-cyan-300 neon-glow">Links</h3>
+                    <p><a href="https://www.snipehead.xyz/" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-all duration-300">SnipeHead Portal</a></p>
+                    <p><a href="https://gitlab.com/pbaieck-group/snipehead-mining" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-all duration-300">View Source</a></p>
+                </div>
+            </div>
+            <p class="text-gray-400 text-base">&copy; 2025 SnipeHead Mining. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Particle effect for futuristic background
+        function createParticles() {
+            const particleContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = Math.random() * 5 + 5 + 's';
+                particleContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        const MINING_CONTRACT_ADDRESS = "0xF5e97b7167Fa1618965f36C08f1263b722FE60Ea";
+        const TOKEN_CONTRACT_ADDRESS = "0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d";
+        const PULSECHAIN_RPC = "https://rpc.pulsechain.com";
+        const MINING_ABI = [
+            "function mine(uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public",
+            "function unmine(uint256 amount) public",
+            "function claimRewards() public",
+            "function pendingRewards(address account) public view returns (uint256)",
+            "function userInfo(address) view returns (uint256 minedAmount, uint256 rewardDebt)",
+            "function totalMined() public view returns (uint256)",
+            "function getContractSHDBalance() public view returns (uint256)",
+            "function rewardRate() public view returns (uint256)",
+            "function lastRewardBlock() public view returns (uint256)"
+        ];
+        const TOKEN_ABI = [
+            "function balanceOf(address account) view returns (uint256)",
+            "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public",
+            "function nonces(address owner) view returns (uint256)",
+            "function DOMAIN_SEPARATOR() view returns (bytes32)"
+        ];
+
+        let provider, signer, account, miningContract, tokenContract;
+        let balanceInterval;
+
+        const connectButton = document.getElementById('connectButton');
+        const mineButton = document.getElementById('mineButton');
+        const unmineButton = document.getElementById('unmineButton');
+        const claimButton = document.getElementById('claimButton');
+        const amountInput = document.getElementById('amountInput');
+        const statusElement = document.getElementById('status');
+
+        async function init() {
+            try {
+                provider = window.ethereum || window.web3
+                    ? new ethers.providers.Web3Provider(window.ethereum || window.web3.currentProvider)
+                    : new ethers.providers.JsonRpcProvider(PULSECHAIN_RPC);
+
+                const network = await provider.getNetwork();
+                if (network.chainId !== 369 && provider instanceof ethers.providers.Web3Provider) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x171' }],
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x171',
+                                    chainName: 'PulseChain',
+                                    rpcUrls: ['https://rpc.pulsechain.com'],
+                                    nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 },
+                                    blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
+                                }],
+                            });
+                        } else {
+                            setStatus("Failed to switch to PulseChain: " + switchError.message, "text-red-500");
+                            return;
+                        }
+                    }
+                }
+
+                miningContract = new ethers.Contract(MINING_CONTRACT_ADDRESS, MINING_ABI, provider);
+                tokenContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, TOKEN_ABI, provider);
+
+                updateNetworkStats();
+                setInterval(updateNetworkStats, 30000);
+
+                if (window.ethereum || window.web3) {
+                    connectButton.addEventListener('click', connectWallet);
+                } else {
+                    setStatus("No wallet detected. Stats are still available.", "text-yellow-500");
+                    connectButton.disabled = true;
+                }
+            } catch (err) {
+                setStatus("Initialization failed: " + err.message, "text-red-500");
+            }
+        }
+
+        async function connectWallet() {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                document.getElementById('account').textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                connectButton.textContent = 'Wallet Connected';
+                connectButton.disabled = true;
+                [mineButton, unmineButton, claimButton].forEach(btn => btn.disabled = false);
+
+                signer = provider.getSigner();
+                miningContract = miningContract.connect(signer);
+                tokenContract = tokenContract.connect(signer);
+
+                updateBalances();
+                balanceInterval = setInterval(updateBalances, 30000);
+                setStatus("Wallet connected successfully", "text-green-500");
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        clearInterval(balanceInterval);
+                        document.getElementById('account').textContent = 'Not connected';
+                        document.getElementById('balanceValue').textContent = '';
+                        document.getElementById('stakedValue').textContent = '';
+                        document.getElementById('rewardsValue').textContent = '';
+                        document.getElementById('balancePlaceholder').classList.remove('hidden');
+                        document.getElementById('stakedPlaceholder').classList.remove('hidden');
+                        document.getElementById('rewardsPlaceholder').classList.remove('hidden');
+                        connectButton.textContent = 'Connect Wallet';
+                        connectButton.disabled = false;
+                        [mineButton, unmineButton, claimButton].Each(btn => btn.disabled = true);
+                        setStatus("Wallet disconnected", "text-red-500");
+                    }
+                });
+            } catch (err) {
+                setStatus("Failed to connect wallet: " + err.message, "text-red-500");
+            }
+        }
+
+        async function updateBalances() {
+            if (!account) {
+                document.getElementById('balanceValue').textContent = '';
+                document.getElementById('stakedValue').textContent = '';
+                document.getElementById('rewardsValue').textContent = '';
+                document.getElementById('balancePlaceholder').classList.remove('hidden');
+                document.getElementById('stakedPlaceholder').classList.remove('hidden');
+                document.getElementById('rewardsPlaceholder').classList.remove('hidden');
+                return;
+            }
+            try {
+                const balance = await tokenContract.balanceOf(account);
+                document.getElementById('balanceValue').textContent = `${Number(ethers.utils.formatEther(balance)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('balancePlaceholder').classList.add('hidden');
+
+                const userInfo = await miningContract.userInfo(account);
+                document.getElementById('stakedValue').textContent = `${Number(ethers.utils.formatEther(userInfo.minedAmount)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('stakedPlaceholder').classList.add('hidden');
+
+                const rewards = await miningContract.pendingRewards(account);
+                document.getElementById('rewardsValue').textContent = `${Number(ethers.utils.formatEther(rewards)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('rewardsPlaceholder').classList.add('hidden');
+            } catch (err) {
+                console.error("Error updating balances:", err);
+                setStatus("Failed to fetch balances: " + err.message, "text-red-500");
+            }
+        }
+
+        async function updateNetworkStats() {
+            try {
+                const totalMined = await miningContract.totalMined();
+                const totalMinedNum = Number(ethers.utils.formatEther(totalMined));
+                document.getElementById('totalMined').textContent = `${totalMinedNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                const contractBalance = await miningContract.getContractSHDBalance();
+                const contractBalanceNum = Number(ethers.utils.formatEther(contractBalance));
+                document.getElementById('contractBalance').textContent = `${contractBalanceNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                let availableRewards = contractBalanceNum - totalMinedNum;
+                if (availableRewards < 0) availableRewards = 0;
+                document.getElementById('availableRewards').textContent = `${availableRewards.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                const rewardRate = await miningContract.rewardRate();
+                document.getElementById('rewardRate').textContent = `${Number(ethers.utils.formatEther(rewardRate)).toLocaleString('en-US', { minimumFractionDigits: 18, maximumFractionDigits: 18 })} SHD/block/SHD`;
+                const blocksPerYear = (365 * 24 * 60 * 60) / 10;
+                const apy = Number(ethers.utils.formatEther(rewardRate)) * blocksPerYear * 100;
+                document.getElementById('apy').textContent = `${apy.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+            } catch (err) {
+                document.getElementById('apy').textContent = `Error`;
+                document.getElementById('totalMined').textContent = `Error`;
+                document.getElementById('contractBalance').textContent = `Error`;
+                document.getElementById('availableRewards').textContent = `Error`;
+                document.getElementById('rewardRate').textContent = `Error`;
+                setStatus("Failed to fetch SnipeHead stats: " + err.message, "text-red-500");
+            }
+        }
+
+        async function handleMine() {
+            if (!signer) {
+                setStatus("Please connect a wallet to perform actions", "text-red-500");
+                return;
+            }
+            let amount = amountInput.value.replace(/,/g, '');
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                setStatus("Please enter a valid amount", "text-red-500");
+                return;
+            }
+
+            try {
+                setStatus("Signing transaction 1 of 2...", "text-cyan-400 pulse-status");
+                mineButton.disabled = true;
+                const amountWei = ethers.utils.parseEther(amount);
+                const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+                const owner = account;
+                const spender = MINING_CONTRACT_ADDRESS;
+                const nonce = await tokenContract.nonces(owner);
+                const domainSeparator = await tokenContract.DOMAIN_SEPARATOR();
+
+                const domain = {
+                    name: "SnipeHead",
+                    version: "1",
+                    chainId: 369,
+                    verifyingContract: TOKEN_CONTRACT_ADDRESS
+                };
+
+                const types = {
+                    Permit: [
+                        { name: "owner", type: "address" },
+                        { name: "spender", type: "address" },
+                        { name: "value", type: "uint256" },
+                        { name: "nonce", type: "uint256" },
+                        { name: "deadline", type: "uint256" }
+                    ]
+                };
+
+                const message = {
+                    owner,
+                    spender,
+                    value: amountWei,
+                    nonce,
+                    deadline
+                };
+
+                const signature = await signer._signTypedData(domain, types, message);
+                const { v, r, s } = ethers.utils.splitSignature(signature);
+
+                setStatus("Submitting mining transaction...", "text-cyan-400 pulse-status");
+                const tx = await miningContract.mine(amountWei, deadline, v, r, s);
+                await tx.wait();
+                setStatus("Mining successful", "text-green-500");
+                amountInput.value = "";
+                updateBalances();
+                updateNetworkStats();
+            } catch (err) {
+                setStatus("Mining failed: " + err.message, "text-red-500");
+            } finally {
+                mineButton.disabled = false;
+            }
+        }
+
+        async function handleUnmine() {
+            if (!signer) {
+                setStatus("Please connect a wallet to perform actions", "text-red-500");
+                return;
+            }
+            let amount = amountInput.value.replace(/,/g, '');
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                setStatus("Please enter a valid amount", "text-red-500");
+                return;
+            }
+            try {
+                setStatus("Unmining...", "text-cyan-400 pulse-status");
+                unmineButton.disabled = true;
+                const amountWei = ethers.utils.parseEther(amount);
+                const tx = await miningContract.unmine(amountWei);
+                await tx.wait();
+                setStatus("Unmining successful", "text-green-500");
+                amountInput.value = "";
+                updateBalances();
+                updateNetworkStats();
+            } catch (err) {
+                setStatus("Unmining failed: " + err.message, "text-red-500");
+            } finally {
+                unmineButton.disabled = false;
+            }
+        }
+
+        async function handleClaim() {
+            if (!signer) {
+                setStatus("Please connect a wallet to perform actions", "text-red-500");
+                return;
+            }
+            try {
+                setStatus("Claiming...", "text-cyan-400 pulse-status");
+                claimButton.disabled = true;
+                const tx = await miningContract.claimRewards();
+                await tx.wait();
+                setStatus("Claim successful", "text-green-500");
+                updateBalances();
+                updateNetworkStats();
+            } catch (err) {
+                setStatus("Claim failed: " + err.message, "text-red-500");
+            } finally {
+                claimButton.disabled = false;
+            }
+        }
+
+        function setStatus(message, className) {
+            statusElement.textContent = message;
+            statusElement.className = `text-center ${className}`;
+        }
+
+        mineButton.addEventListener('click', handleMine);
+        unmineButton.addEventListener('click', handleUnmine);
+        claimButton.addEventListener('click', handleClaim);
+
+        init();
+    </script>
+</body>
+</html>
