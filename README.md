@@ -7,7 +7,7 @@
 - 📄 **White Paper**: [View on GitHub](https://github.com/PBaieck-group/SnipeHead/blob/main/whitepaper.md)
 
 1. **SnipeHead Fallback**  
-   (https://ipfs.io/ipfs/bafybeihmrx5pcdac2fuakcqjnkuolnwf7f6ynxa5k3yvjb6jlkhqvzuv6q/)
+   (https://ipfs.io/ipfs/bafybeigohs3fe7uajz6hey32ycghwedv7kvr6hijoiyny3ryy3yttgkigm/)
    
 2. **SnipeHead Faucet Fallback**  
    (https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/)
