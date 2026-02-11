@@ -182,4 +182,4 @@ Built using the latest OpenZeppelin libraries and tested with `viem`, `node:test
 
 ✅ **Disclaimer**: This contract is provided as-is. Interacting with smart contracts involves risk; always verify code and test thoroughly. The SnipeHead project is not responsible for any losses.
 
-🛡 Built with lots of ❤️ by the SnipeHead Team 
+🛡 Built with of ❤️ by the SnipeHead Team 
