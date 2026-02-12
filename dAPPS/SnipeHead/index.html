@@ -339,7 +339,7 @@
 
         .countdown-display {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -618,9 +618,6 @@
             color: #fff;
         }
 
-        /* ─────────────────────────────────────────────── */
-        /* FINAL OVERRIDES - placed LAST to win specificity */
-        /* ─────────────────────────────────────────────── */
         header {
             position: relative;
             z-index: 1000 !important;
@@ -654,7 +651,6 @@
         .grid-pattern {
             pointer-events: none !important;
         }
-        /* ─────────────────────────────────────────────── */
     </style>
 </head>
 <body class="text-white">
@@ -698,11 +694,22 @@
     <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 relative z-10">
         <!-- Countdown Section -->
         <section class="text-center mb-8">
-            <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-card">
-                <svg class="w-5 h-5 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span id="shd-countdown" class="countdown-display">AGE: Calculating...</span>
+            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-card">
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span id="shd-countdown" class="countdown-display">AGE: Calculating...</span>
+                </div>
+
+                <div class="h-4 w-px bg-gradient-to-b from-transparent via-[#00ffcc]/40 to-transparent"></div>
+
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span class="countdown-display">PLS <span id="pls-price">$0.00000000</span></span>
+                </div>
             </div>
         </section>
 
@@ -929,6 +936,9 @@
                     <a href="https://github.com/PBaieck-group/SnipeHead" class="text-[#00ffcc] hover:underline transition" target="_blank" rel="noopener noreferrer">GitHub</a>
                 </p>
             </div>
+            <div class="mt-4 text-xs text-gray-500">
+                v1.5.7
+            </div>
         </div>
     </footer>
 
@@ -1029,31 +1039,45 @@
                     return;
                 }
                 const d = Math.floor(diff / 86400000);
-                const h = Math.floor((diff % 86400000) / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('shd-countdown').textContent = `AGE: ${d}d ${h}h ${m}m ${s}s`;
+                document.getElementById('shd-countdown').textContent = `AGE: ${d}d`;
             }
             tick();
             setInterval(tick, 1000);
         }
 
-        async function fetchPriceAndMarketCap() {
+        async function fetchPrices() {
             try {
-                const r = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd');
-                const data = await r.json();
-                const pair = data.pairs?.[0];
-                if (pair) {
-                    document.getElementById('shd-price').textContent = `$${parseFloat(pair.priceUsd || 0).toFixed(10)}`;
-                    document.getElementById('shd-market-cap').textContent = `$${Math.round(pair.liquidity?.usd || 0).toLocaleString()}`;
+                const shdRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd');
+                const shdData = await shdRes.json();
+                const shdPair = shdData.pairs?.[0];
+                if (shdPair && shdPair.priceUsd) {
+                    const shdPrice = parseFloat(shdPair.priceUsd);
+                    document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(10)}`;
+                    document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
                 }
+
+                const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE');
+                const plsData = await plsRes.json();
+                const plsPair = plsData.pairs?.[0];
+                if (plsPair && plsPair.priceUsd) {
+                    const plsPrice = parseFloat(plsPair.priceUsd);
+                    const plsEl = document.getElementById('pls-price');
+                    if (plsEl) {
+                        plsEl.textContent = `$${plsPrice.toFixed(8)}`;
+                    }
+                } else {
+                    const plsEl = document.getElementById('pls-price');
+                    if (plsEl) plsEl.textContent = '$N/A';
+                }
+
             } catch (e) {
-                console.error(e);
+                console.error("Price fetch error:", e);
+                const plsEl = document.getElementById('pls-price');
+                if (plsEl) plsEl.textContent = '$—';
             }
         }
 
         async function fetchAllHolders() {
-            // simplified version - real one has pagination
             try {
                 const r = await fetch(`https://api.scan.pulsechain.com/api?module=token&action=getTokenHolders&contractaddress=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&page=1&offset=10000`);
                 const data = await r.json();
@@ -1066,8 +1090,9 @@
             }
         }
 
-        fetchPriceAndMarketCap();
+        fetchPrices();
         fetchAllHolders();
+        setInterval(fetchPrices, 45000);
 
         function copyContract(btn) {
             navigator.clipboard.writeText('0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d').then(() => {
