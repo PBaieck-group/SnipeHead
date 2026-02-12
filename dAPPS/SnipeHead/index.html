@@ -651,6 +651,52 @@
         .grid-pattern {
             pointer-events: none !important;
         }
+
+        /* New styles for tool cards */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tool-card {
+            background: rgba(20, 20, 35, 0.6);
+            border: 1px solid rgba(0, 255, 204, 0.12);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            background: rgba(20, 20, 35, 0.85);
+            border-color: rgba(0, 255, 204, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .tool-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .tool-desc {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.45;
+        }
+
+        /* Toast / Snackbar styles */
+        @keyframes slide-in-right {
+            from { transform: translateX(120%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        .animate-slide-in-right {
+            animation: slide-in-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
     </style>
 </head>
 <body class="text-white">
@@ -663,6 +709,9 @@
     </div>
     <div class="grid-pattern"></div>
     <canvas id="particles"></canvas>
+
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-6 right-6 z-[10000] flex flex-col gap-3 max-w-sm pointer-events-none"></div>
 
     <header class="py-6 px-4 sm:px-6 lg:px-8 relative">
         <nav class="flex items-center justify-between max-w-7xl mx-auto relative">
@@ -681,7 +730,7 @@
             </div>
 
             <div class="nav-menu">
-                <a href="https://app.provex.com/" class="nav-link" target="_blank" rel="noopener noreferrer">ProveX</a>
+                <a href="https://libertyswap.finance/" class="nav-link" target="_blank" rel="noopener noreferrer">LibertySwap</a>
                 <a href="https://ipfs.bridge.pulsechain.com/" class="nav-link" target="_blank" rel="noopener noreferrer">Bridge</a>
                 <a href="https://ipfs.io/ipfs/bafybeihegcjlaw6fkqbzc3kjwp64fn7bks7i4yhbdys5ckj2xpxtuorjwy/" class="nav-link" target="_blank" rel="noopener noreferrer">Drop</a>
                 <a href="https://ipfs.app.pulsex.com/?outputCurrency=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d" class="nav-link" target="_blank" rel="noopener noreferrer">Swap</a>
@@ -816,7 +865,7 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">RPC URL</span>
-                            <a href="https://rpc.pulsechain.com" class="info-value text-[#00ffcc] hover:underline truncate-url" target="_blank" rel="noopener noreferrer">https://rpc.pulsechain.com</a>
+                            <span class="info-value">https://rpc.pulsechain.com</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Chain ID</span>
@@ -828,8 +877,17 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Explorer</span>
-                            <a href="https://ipfs.scan.pulsechain.com" class="info-value text-[#00ffcc] hover:underline truncate-url" target="_blank" rel="noopener noreferrer">ipfs.scan.pulsechain.com</a>
+                            <span class="info-value">https://ipfs.scan.pulsechain.com</span>
                         </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button 
+                            onclick="addPulseChainToWallet()"
+                            class="btn-primary w-full sm:w-auto"
+                        >
+                            Add PulseChain to Wallet
+                        </button>
                     </div>
                 </div>
 
@@ -864,6 +922,16 @@
                             <span class="info-value">ERC20 + Permit</span>
                         </div>
                     </div>
+
+                    <!-- Added "Add SHD to Wallet" button here -->
+                    <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                        <button 
+                            onclick="addSHDToWallet()"
+                            class="btn-primary w-full sm:w-auto"
+                        >
+                            Add SHD to Wallet
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -887,10 +955,36 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                 </svg>
-                                View
+                            View
                             </span>
                         </a>
                     </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 mt-6">
+                <h4 class="text-xl font-bold text-white font-display mb-6 flex items-center gap-3">
+                    <svg class="w-7 h-7 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Helpful Community Tools
+                </h4>
+
+                <div class="tool-grid">
+                    <a href="https://libertyswap.finance/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                        <div class="tool-title">Liberty Swap</div>
+                        <p class="tool-desc">Quickly, easily swap tokens from other networks to PulseChain.</p>
+                    </a>
+
+                    <a href="https://app.provex.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                        <div class="tool-title">ProveX</div>
+                        <p class="tool-desc">ZK-proof protocol kills crypto exchanges, enables trustless P2P trading.</p>
+                    </a>
+
+                    <a href="https://www.pulsechainstats.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                        <div class="tool-title">PulseChain Stats</div>
+                        <p class="tool-desc">In-depth stats, analytics, and insights on PulseChain.</p>
+                    </a>
                 </div>
             </div>
         </section>
@@ -937,7 +1031,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v1.5.7
+                v1.6.7
             </div>
         </div>
     </footer>
@@ -1100,6 +1194,112 @@
                 btn.innerHTML = 'Copied!';
                 setTimeout(() => btn.innerHTML = orig, 2000);
             });
+        }
+
+        // ────────────────────────────────────────────────
+        // Custom Toast Notification
+        // ────────────────────────────────────────────────
+        function showToast(message, type = 'success') {  // type: 'success' | 'error'
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `
+                glass-card p-4 pr-12 relative shadow-2xl pointer-events-auto
+                border ${type === 'error' ? 'border-red-500/50' : 'border-[#00ffcc]/50'}
+                bg-gradient-to-r ${type === 'error' ? 'from-red-950/30 to-transparent' : 'from-[#00ffcc]/10 to-transparent'}
+                animate-slide-in-right
+            `;
+            
+            toast.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <svg class="w-6 h-6 ${type === 'error' ? 'text-red-400' : 'text-[#00ffcc]'} flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'error' 
+                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' 
+                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'}
+                    </svg>
+                    <p class="text-white font-medium leading-relaxed">${message}</p>
+                </div>
+                <button class="absolute top-3 right-3 text-gray-400 hover:text-white transition text-xl leading-none" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto-remove after 5 seconds with fade-out
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(-20px)';
+                    toast.style.transition = 'all 0.4s ease-out';
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 5000);
+        }
+
+        // ────────────────────────────────────────────────
+        // Add PulseChain Network
+        // ────────────────────────────────────────────────
+        async function addPulseChainToWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showToast("No Ethereum-compatible wallet detected.<br>Please install MetaMask, Rabby, or similar.", 'error');
+                return;
+            }
+
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x171',
+                        chainName: 'PulseChain',
+                        nativeCurrency: {
+                            name: 'PulseChain',
+                            symbol: 'PLS',
+                            decimals: 18
+                        },
+                        rpcUrls: ['https://rpc.pulsechain.com'],
+                        blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
+                    }]
+                });
+                showToast("PulseChain network added successfully!<br>You can now switch to it in your wallet.");
+            } catch (error) {
+                if (error.code === 4001) return; // User rejected
+                console.error(error);
+                showToast(`Failed to add PulseChain network.<br>${error.message || "Unknown error — check console."}`, 'error');
+            }
+        }
+
+        // ────────────────────────────────────────────────
+        // Add SHD Token to Wallet (ERC-20)
+        // ────────────────────────────────────────────────
+        async function addSHDToWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showToast("No Ethereum-compatible wallet detected.<br>Please install MetaMask, Rabby, or similar.", 'error');
+                return;
+            }
+
+            try {
+                const wasAdded = await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d',
+                            symbol: 'SHD',
+                            decimals: 18,
+                            // Optional: image: 'https://your-site.com/shd-logo.png'  // Add if you have a token logo URL
+                        }
+                    }
+                });
+
+                if (wasAdded) {
+                    showToast("SHD token added to your wallet!<br>It should now appear in your assets list (after switching to PulseChain).");
+                } else {
+                    showToast("Token addition was not confirmed.<br>You can try again or add it manually.", 'error');
+                }
+            } catch (error) {
+                if (error.code === 4001) return; // User rejected
+                console.error(error);
+                showToast(`Failed to add SHD token.<br>${error.message || "Unknown error — make sure you're on PulseChain network."}`, 'error');
+            }
         }
     </script>
 </body>
