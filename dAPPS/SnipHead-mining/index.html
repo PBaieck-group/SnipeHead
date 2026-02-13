@@ -87,6 +87,25 @@
             0% { transform: translateY(100vh) scale(1); opacity: 0.5; }
             100% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
         }
+        /* Mobile improvements */
+        @media (max-width: 768px) {
+            input, button {
+                padding: 1rem 1.25rem;
+                font-size: 1.125rem;
+            }
+            .grid-cols-1 {
+                gap: 2.5rem;
+            }
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        .status-link {
+            color: #67e8f9;
+            text-decoration: underline;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col relative">
@@ -102,7 +121,13 @@
             <div class="glassmorphism rounded-2xl p-8 shadow-lg transition-all duration-300">
                 <h2 class="text-2xl font-semibold mb-4 text-cyan-300 neon-glow">Your Mining Dashboard</h2>
                 <div class="space-y-6">
-                    <p id="account" class="text-lg text-gray-200">Not connected</p>
+                    <div class="flex items-center justify-between">
+                        <p id="account" class="text-lg text-gray-200">Not connected</p>
+                        <div id="chainIndicator" class="hidden items-center text-sm text-green-400">
+                            <span class="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                            PulseChain
+                        </div>
+                    </div>
                     <div class="flex justify-between items-center">
                         <span class="text-lg text-gray-200 font-medium">Token Balance:</span>
                         <span id="balance" class="text-xl text-cyan-400 font-bold flex items-center">
@@ -125,19 +150,26 @@
                         </span>
                     </div>
                     <button id="connectButton" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Connect Wallet</button>
-                    <input id="amountInput" type="text" placeholder="Amount (e.g., 1234.56 or 1,234.56)" class="w-full bg-gray-800/50 border border-gray-600/50 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300">
+                    <div class="relative">
+                        <input id="amountInput" type="text" placeholder="Amount (e.g., 1234.56 or 1,234.56)" class="w-full bg-gray-800/50 border border-gray-600/50 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300 pr-16">
+                        <button id="maxButton" class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 text-sm font-medium hover:text-cyan-300">MAX</button>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <button id="mineButton" disabled class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Mine</button>
                         <button id="unmineButton" disabled class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Unmine</button>
                     </div>
                     <button id="claimButton" disabled class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-3 px-4 rounded-lg hover:shadow-lg hover:shadow-teal-500/50 transition-all duration-300 pulse-button disabled:bg-gray-600 disabled:cursor-not-allowed">Claim Rewards</button>
-                    <p id="status" class="text-center text-gray-200"></p>
+                    <div id="disconnectSection" class="hidden mt-4">
+                        <button id="disconnectButton" class="w-full bg-gradient-to-r from-red-600/70 to-red-700/70 text-white py-2.5 px-4 rounded-lg hover:shadow-lg hover:shadow-red-500/40 transition-all duration-300 text-sm">Disconnect Wallet</button>
+                    </div>
+                    <p id="status" class="text-center text-gray-200 min-h-[1.5rem]"></p>
                 </div>
             </div>
             <!-- SnipeHead Statistics -->
             <div class="glassmorphism rounded-2xl p-8 shadow-lg transition-all duration-300">
                 <h2 class="text-2xl font-semibold mb-2 text-cyan-300 neon-glow">SnipeHead Statistics</h2>
-                <p class="text-gray-400 italic mb-4 text-base">Mine SHD tokens while rewards are available in the pool!</p>
+                <p class="text-gray-400 italic mb-2 text-base">Mine SHD tokens while rewards are available in the pool!</p>
+                <p id="statsUpdated" class="text-gray-500 text-sm mb-4">Last updated: —</p>
                 <div class="space-y-6">
                     <div class="flex justify-between items-center">
                         <span class="text-lg text-gray-200 font-medium">APY:</span>
@@ -181,12 +213,15 @@
                     <p><a href="https://gitlab.com/pbaieck-group/snipehead-mining" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-all duration-300">View Source</a></p>
                 </div>
             </div>
-            <p class="text-gray-400 text-base">&copy; 2025 SnipeHead Mining. All rights reserved.</p>
+            <p class="text-gray-400 text-base">
+                © <span id="copyright-year">2025</span> SnipeHead Mining. All rights reserved.
+            </p>
+            <p class="text-gray-500 text-sm mt-2">v1.1.0</p>
         </div>
     </footer>
 
     <script>
-        // Particle effect for futuristic background
+        // Particle effect
         function createParticles() {
             const particleContainer = document.getElementById('particles');
             for (let i = 0; i < 50; i++) {
@@ -203,6 +238,8 @@
         const MINING_CONTRACT_ADDRESS = "0xF5e97b7167Fa1618965f36C08f1263b722FE60Ea";
         const TOKEN_CONTRACT_ADDRESS = "0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d";
         const PULSECHAIN_RPC = "https://rpc.pulsechain.com";
+        const EXPLORER_URL = "https://ipfs.scan.pulsechain.com/tx/";
+
         const MINING_ABI = [
             "function mine(uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public",
             "function unmine(uint256 amount) public",
@@ -214,6 +251,7 @@
             "function rewardRate() public view returns (uint256)",
             "function lastRewardBlock() public view returns (uint256)"
         ];
+
         const TOKEN_ABI = [
             "function balanceOf(address account) view returns (uint256)",
             "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public",
@@ -223,13 +261,48 @@
 
         let provider, signer, account, miningContract, tokenContract;
         let balanceInterval;
+        let statsLastUpdated = null;
 
         const connectButton = document.getElementById('connectButton');
+        const disconnectButton = document.getElementById('disconnectButton');
+        const disconnectSection = document.getElementById('disconnectSection');
         const mineButton = document.getElementById('mineButton');
         const unmineButton = document.getElementById('unmineButton');
         const claimButton = document.getElementById('claimButton');
+        const maxButton = document.getElementById('maxButton');
         const amountInput = document.getElementById('amountInput');
         const statusElement = document.getElementById('status');
+        const chainIndicator = document.getElementById('chainIndicator');
+
+        // Full precise formatting for user's dashboard (easy to copy)
+        function formatNumberFull(num) {
+            if (typeof num !== 'number' || isNaN(num)) return "—";
+            const decimals = Math.abs(num) < 1 ? 6 : (Math.abs(num) < 10 ? 4 : 2);
+            return num.toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        // Abbreviated formatting for global stats
+        function formatNumberAbbrev(num) {
+            if (typeof num !== 'number' || isNaN(num)) return "—";
+            const absNum = Math.abs(num);
+            if (absNum >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+            if (absNum >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+            if (absNum >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function updateLastUpdated() {
+            if (!statsLastUpdated) return;
+            const diffSec = Math.floor((Date.now() - statsLastUpdated) / 1000);
+            let text = "just now";
+            if (diffSec >= 120) text = Math.floor(diffSec / 60) + " min ago";
+            else if (diffSec >= 60) text = "1 min ago";
+            else if (diffSec > 10) text = diffSec + " sec ago";
+            document.getElementById('statsUpdated').textContent = `Last updated: ${text}`;
+        }
 
         async function init() {
             try {
@@ -240,10 +313,7 @@
                 const network = await provider.getNetwork();
                 if (network.chainId !== 369 && provider instanceof ethers.providers.Web3Provider) {
                     try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x171' }],
-                        });
+                        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x171' }] });
                     } catch (switchError) {
                         if (switchError.code === 4902) {
                             await window.ethereum.request({
@@ -254,10 +324,10 @@
                                     rpcUrls: ['https://rpc.pulsechain.com'],
                                     nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 },
                                     blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
-                                }],
+                                }]
                             });
                         } else {
-                            setStatus("Failed to switch to PulseChain: " + switchError.message, "text-red-500");
+                            setStatus("Failed to switch to PulseChain", "text-red-500");
                             return;
                         }
                     }
@@ -268,15 +338,16 @@
 
                 updateNetworkStats();
                 setInterval(updateNetworkStats, 30000);
+                setInterval(updateLastUpdated, 30000);
 
                 if (window.ethereum || window.web3) {
                     connectButton.addEventListener('click', connectWallet);
                 } else {
-                    setStatus("No wallet detected. Stats are still available.", "text-yellow-500");
+                    setStatus("No wallet detected. Stats still available.", "text-yellow-500");
                     connectButton.disabled = true;
                 }
             } catch (err) {
-                setStatus("Initialization failed: " + err.message, "text-red-500");
+                setStatus("Initialization failed", "text-red-500");
             }
         }
 
@@ -284,9 +355,11 @@
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 account = accounts[0];
-                document.getElementById('account').textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
-                connectButton.textContent = 'Wallet Connected';
-                connectButton.disabled = true;
+                document.getElementById('account').textContent = `Connected: ${account.slice(0,6)}...${account.slice(-4)}`;
+                connectButton.classList.add('hidden');
+                disconnectSection.classList.remove('hidden');
+                chainIndicator.classList.remove('hidden');
+
                 [mineButton, unmineButton, claimButton].forEach(btn => btn.disabled = false);
 
                 signer = provider.getSigner();
@@ -295,53 +368,57 @@
 
                 updateBalances();
                 balanceInterval = setInterval(updateBalances, 30000);
-                setStatus("Wallet connected successfully", "text-green-500");
+
+                setStatus("Wallet connected", "text-green-500");
+
                 window.ethereum.on('accountsChanged', (accounts) => {
-                    if (accounts.length === 0) {
-                        clearInterval(balanceInterval);
-                        document.getElementById('account').textContent = 'Not connected';
-                        document.getElementById('balanceValue').textContent = '';
-                        document.getElementById('stakedValue').textContent = '';
-                        document.getElementById('rewardsValue').textContent = '';
-                        document.getElementById('balancePlaceholder').classList.remove('hidden');
-                        document.getElementById('stakedPlaceholder').classList.remove('hidden');
-                        document.getElementById('rewardsPlaceholder').classList.remove('hidden');
-                        connectButton.textContent = 'Connect Wallet';
-                        connectButton.disabled = false;
-                        [mineButton, unmineButton, claimButton].Each(btn => btn.disabled = true);
-                        setStatus("Wallet disconnected", "text-red-500");
-                    }
+                    if (accounts.length === 0) disconnectWallet();
                 });
             } catch (err) {
-                setStatus("Failed to connect wallet: " + err.message, "text-red-500");
+                setStatus("Connection failed", "text-red-500");
             }
         }
 
+        function disconnectWallet() {
+            account = null;
+            signer = null;
+            clearInterval(balanceInterval);
+
+            document.getElementById('account').textContent = 'Not connected';
+            connectButton.classList.remove('hidden');
+            disconnectSection.classList.add('hidden');
+            chainIndicator.classList.add('hidden');
+
+            connectButton.textContent = 'Connect Wallet';
+            connectButton.disabled = false;
+            [mineButton, unmineButton, claimButton].forEach(btn => btn.disabled = true);
+
+            document.getElementById('balanceValue').textContent = '';
+            document.getElementById('stakedValue').textContent = '';
+            document.getElementById('rewardsValue').textContent = '';
+            document.getElementById('balancePlaceholder').classList.remove('hidden');
+            document.getElementById('stakedPlaceholder').classList.remove('hidden');
+            document.getElementById('rewardsPlaceholder').classList.remove('hidden');
+
+            setStatus("Wallet disconnected", "text-yellow-500");
+        }
+
         async function updateBalances() {
-            if (!account) {
-                document.getElementById('balanceValue').textContent = '';
-                document.getElementById('stakedValue').textContent = '';
-                document.getElementById('rewardsValue').textContent = '';
-                document.getElementById('balancePlaceholder').classList.remove('hidden');
-                document.getElementById('stakedPlaceholder').classList.remove('hidden');
-                document.getElementById('rewardsPlaceholder').classList.remove('hidden');
-                return;
-            }
+            if (!account) return;
             try {
                 const balance = await tokenContract.balanceOf(account);
-                document.getElementById('balanceValue').textContent = `${Number(ethers.utils.formatEther(balance)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('balanceValue').textContent = formatNumberFull(Number(ethers.utils.formatEther(balance))) + " SHD";
                 document.getElementById('balancePlaceholder').classList.add('hidden');
 
                 const userInfo = await miningContract.userInfo(account);
-                document.getElementById('stakedValue').textContent = `${Number(ethers.utils.formatEther(userInfo.minedAmount)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('stakedValue').textContent = formatNumberFull(Number(ethers.utils.formatEther(userInfo.minedAmount))) + " SHD";
                 document.getElementById('stakedPlaceholder').classList.add('hidden');
 
                 const rewards = await miningContract.pendingRewards(account);
-                document.getElementById('rewardsValue').textContent = `${Number(ethers.utils.formatEther(rewards)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('rewardsValue').textContent = formatNumberFull(Number(ethers.utils.formatEther(rewards))) + " SHD";
                 document.getElementById('rewardsPlaceholder').classList.add('hidden');
             } catch (err) {
-                console.error("Error updating balances:", err);
-                setStatus("Failed to fetch balances: " + err.message, "text-red-500");
+                console.error("Balance update error:", err);
             }
         }
 
@@ -349,48 +426,49 @@
             try {
                 const totalMined = await miningContract.totalMined();
                 const totalMinedNum = Number(ethers.utils.formatEther(totalMined));
-                document.getElementById('totalMined').textContent = `${totalMinedNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('totalMined').textContent = formatNumberAbbrev(totalMinedNum) + " SHD";
+
                 const contractBalance = await miningContract.getContractSHDBalance();
                 const contractBalanceNum = Number(ethers.utils.formatEther(contractBalance));
-                document.getElementById('contractBalance').textContent = `${contractBalanceNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('contractBalance').textContent = formatNumberAbbrev(contractBalanceNum) + " SHD";
+
                 let availableRewards = contractBalanceNum - totalMinedNum;
                 if (availableRewards < 0) availableRewards = 0;
-                document.getElementById('availableRewards').textContent = `${availableRewards.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SHD`;
+                document.getElementById('availableRewards').textContent = formatNumberAbbrev(availableRewards) + " SHD";
+
                 const rewardRate = await miningContract.rewardRate();
                 document.getElementById('rewardRate').textContent = `${Number(ethers.utils.formatEther(rewardRate)).toLocaleString('en-US', { minimumFractionDigits: 18, maximumFractionDigits: 18 })} SHD/block/SHD`;
+
                 const blocksPerYear = (365 * 24 * 60 * 60) / 10;
                 const apy = Number(ethers.utils.formatEther(rewardRate)) * blocksPerYear * 100;
                 document.getElementById('apy').textContent = `${apy.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+
+                statsLastUpdated = Date.now();
+                updateLastUpdated();
             } catch (err) {
-                document.getElementById('apy').textContent = `Error`;
-                document.getElementById('totalMined').textContent = `Error`;
-                document.getElementById('contractBalance').textContent = `Error`;
-                document.getElementById('availableRewards').textContent = `Error`;
-                document.getElementById('rewardRate').textContent = `Error`;
-                setStatus("Failed to fetch SnipeHead stats: " + err.message, "text-red-500");
+                document.getElementById('apy').textContent = 'Error';
+                document.getElementById('totalMined').textContent = 'Error';
+                document.getElementById('contractBalance').textContent = 'Error';
+                document.getElementById('availableRewards').textContent = 'Error';
+                document.getElementById('rewardRate').textContent = 'Error';
+                setStatus("Failed to load stats", "text-red-500");
             }
         }
 
         async function handleMine() {
-            if (!signer) {
-                setStatus("Please connect a wallet to perform actions", "text-red-500");
-                return;
-            }
-            let amount = amountInput.value.replace(/,/g, '');
-            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-                setStatus("Please enter a valid amount", "text-red-500");
-                return;
-            }
+            if (!signer) return setStatus("Connect wallet first", "text-red-500");
+            let amount = amountInput.value.trim().replace(/,/g, '');
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return setStatus("Enter valid amount", "text-red-500");
 
             try {
-                setStatus("Signing transaction 1 of 2...", "text-cyan-400 pulse-status");
+                setStatus("This action requires **two steps**:<br>1. Permit approval (signature, no gas)<br>2. Mining transaction (requires gas)", "text-cyan-400 pulse-status");
                 mineButton.disabled = true;
+
                 const amountWei = ethers.utils.parseEther(amount);
                 const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
                 const owner = account;
                 const spender = MINING_CONTRACT_ADDRESS;
                 const nonce = await tokenContract.nonces(owner);
-                const domainSeparator = await tokenContract.DOMAIN_SEPARATOR();
 
                 const domain = {
                     name: "SnipeHead",
@@ -409,86 +487,100 @@
                     ]
                 };
 
-                const message = {
-                    owner,
-                    spender,
-                    value: amountWei,
-                    nonce,
-                    deadline
-                };
-
+                const message = { owner, spender, value: amountWei, nonce, deadline };
                 const signature = await signer._signTypedData(domain, types, message);
                 const { v, r, s } = ethers.utils.splitSignature(signature);
 
-                setStatus("Submitting mining transaction...", "text-cyan-400 pulse-status");
+                setStatus("Submitting mining transaction... <br>(this is step 2/2)", "text-cyan-400 pulse-status");
                 const tx = await miningContract.mine(amountWei, deadline, v, r, s);
+                setStatus(`Mining in progress... <a href="${EXPLORER_URL}${tx.hash}" target="_blank" class="status-link">View tx</a>`, "text-cyan-400");
+
                 await tx.wait();
-                setStatus("Mining successful", "text-green-500");
+                setStatus(`Mining successful! <a href="${EXPLORER_URL}${tx.hash}" target="_blank" class="status-link">View tx</a>`, "text-green-500");
                 amountInput.value = "";
                 updateBalances();
                 updateNetworkStats();
             } catch (err) {
-                setStatus("Mining failed: " + err.message, "text-red-500");
+                if (err.code === 4001) setStatus("Transaction rejected", "text-red-500");
+                else if (err.message?.includes("insufficient funds")) setStatus("Not enough PLS for gas", "text-red-500");
+                else setStatus("Mining failed: " + (err.reason || err.message || "unknown error"), "text-red-500");
             } finally {
                 mineButton.disabled = false;
             }
         }
 
         async function handleUnmine() {
-            if (!signer) {
-                setStatus("Please connect a wallet to perform actions", "text-red-500");
-                return;
-            }
-            let amount = amountInput.value.replace(/,/g, '');
-            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-                setStatus("Please enter a valid amount", "text-red-500");
-                return;
-            }
+            if (!signer) return setStatus("Connect wallet first", "text-red-500");
+            let amount = amountInput.value.trim().replace(/,/g, '');
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return setStatus("Enter valid amount", "text-red-500");
+
             try {
-                setStatus("Unmining...", "text-cyan-400 pulse-status");
+                setStatus("Sending unmine transaction...", "text-cyan-400 pulse-status");
                 unmineButton.disabled = true;
+
                 const amountWei = ethers.utils.parseEther(amount);
                 const tx = await miningContract.unmine(amountWei);
+                setStatus(`Unmining in progress... <a href="${EXPLORER_URL}${tx.hash}" target="_blank" class="status-link">View tx</a>`, "text-cyan-400");
+
                 await tx.wait();
-                setStatus("Unmining successful", "text-green-500");
+                setStatus(`Unmined successfully! <a href="${EXPLORER_URL}${tx.hash}" target="_blank" class="status-link">View tx</a>`, "text-green-500");
                 amountInput.value = "";
                 updateBalances();
                 updateNetworkStats();
             } catch (err) {
-                setStatus("Unmining failed: " + err.message, "text-red-500");
+                if (err.code === 4001) setStatus("Transaction rejected", "text-red-500");
+                else setStatus("Unmine failed: " + (err.reason || err.message || "unknown"), "text-red-500");
             } finally {
                 unmineButton.disabled = false;
             }
         }
 
         async function handleClaim() {
-            if (!signer) {
-                setStatus("Please connect a wallet to perform actions", "text-red-500");
-                return;
-            }
+            if (!signer) return setStatus("Connect wallet first", "text-red-500");
+
             try {
-                setStatus("Claiming...", "text-cyan-400 pulse-status");
+                setStatus("Sending claim transaction...", "text-cyan-400 pulse-status");
                 claimButton.disabled = true;
+
                 const tx = await miningContract.claimRewards();
+                setStatus(`Claim in progress... <a href="${EXPLORER_URL}${tx.hash}" target="_blank" class="status-link">View tx</a>`, "text-cyan-400");
+
                 await tx.wait();
-                setStatus("Claim successful", "text-green-500");
+                setStatus(`Claim successful! <a href="${EXPLORER_URL}${tx.hash}" target="_blank" class="status-link">View tx</a>`, "text-green-500");
                 updateBalances();
                 updateNetworkStats();
             } catch (err) {
-                setStatus("Claim failed: " + err.message, "text-red-500");
+                if (err.code === 4001) setStatus("Transaction rejected", "text-red-500");
+                else setStatus("Claim failed: " + (err.reason || err.message || "unknown"), "text-red-500");
             } finally {
                 claimButton.disabled = false;
             }
         }
 
-        function setStatus(message, className) {
-            statusElement.textContent = message;
+        function setStatus(message, className = "text-gray-200") {
+            statusElement.innerHTML = message;
             statusElement.className = `text-center ${className}`;
         }
 
+        // Event listeners
         mineButton.addEventListener('click', handleMine);
         unmineButton.addEventListener('click', handleUnmine);
         claimButton.addEventListener('click', handleClaim);
+        disconnectButton.addEventListener('click', disconnectWallet);
+
+        maxButton.addEventListener('click', async () => {
+            if (!account) return setStatus("Connect wallet first", "text-red-500");
+            try {
+                const bal = await tokenContract.balanceOf(account);
+                const balNum = Number(ethers.utils.formatEther(bal));
+                amountInput.value = Math.floor(balNum).toString();
+            } catch (err) {
+                setStatus("Could not fetch balance", "text-red-500");
+            }
+        });
+
+        // Auto-update copyright year
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
 
         init();
     </script>
