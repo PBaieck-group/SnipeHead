@@ -14,700 +14,231 @@
     <link rel="apple-touch-icon" href="favicon.png">
     <title>SnipeHead - PulseChain</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00ffcc;
-            --primary-dark: #00ccaa;
-            --secondary: #8b5cf6;
-            --accent: #f472b6;
-            --bg-dark: #0a0a0f;
-            --bg-card: rgba(15, 15, 25, 0.8);
-            --bg-card-hover: rgba(20, 20, 35, 0.9);
+            --primary: #ffd700;        /* Gold - prosperity & luck */
+            --primary-dark: #ffcc00;
+            --red-festive: #c41e3a;    /* Classic Chinese New Year red */
+            --red-deep: #a1122a;
+            --accent: #ff8c00;         /* Vibrant orange-gold */
+            --bg-dark: #1a0000;        /* Deep red-black festive base */
+            --bg-card: rgba(30, 0, 10, 0.78);
+            --bg-card-hover: rgba(50, 10, 20, 0.88);
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             background: var(--bg-dark);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Serif SC', serif;
+            color: #fff;
             overflow-x: hidden;
             position: relative;
         }
 
         .gradient-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: -2;
-            background: linear-gradient(135deg, #0a0a0f 0%, #0d0d1a 25%, #0a0a0f 50%, #110a1a 75%, #0a0a0f 100%);
+            background: linear-gradient(135deg, #2a0000 0%, #4a0000 25%, #1a0000 50%, #3a0a1a 75%, #2a0000 100%);
         }
 
-        .gradient-orbs {
+        .chinese-pattern {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 255, 204, 0.3) 0%, transparent 70%);
-            top: -200px;
-            left: -200px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
-            top: 50%;
-            right: -150px;
-            animation-delay: -7s;
-        }
-
-        .orb-3 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(244, 114, 182, 0.2) 0%, transparent 70%);
-            bottom: -100px;
-            left: 30%;
-            animation-delay: -14s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, -50px) scale(1.1); }
-            50% { transform: translate(0, -100px) scale(1); }
-            75% { transform: translate(-50px, -50px) scale(0.9); }
-        }
-
-        .grid-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: -1;
             background-image: 
-                linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+                radial-gradient(circle at 15% 25%, rgba(255,215,0,0.07) 0%, transparent 8%),
+                radial-gradient(circle at 85% 75%, rgba(255,215,0,0.06) 0%, transparent 10%),
+                repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(196,30,58,0.09) 30px, rgba(196,30,58,0.09) 60px);
+            opacity: 0.65;
             pointer-events: none;
         }
 
-        #particles {
+        .lantern-glows {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: -1;
             pointer-events: none;
         }
 
-        .font-display {
-            font-family: 'Orbitron', sans-serif;
+        .lantern {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle at 50% 35%, #ffd700 10%, #ff8c00 40%, transparent 65%);
+            filter: blur(100px);
+            opacity: 0.28;
+            animation: lantern-sway 22s ease-in-out infinite;
         }
+
+        .lantern-1 { top: 8%; left: -10%; animation-delay: 0s; }
+        .lantern-2 { bottom: 12%; right: -5%; animation-delay: -8s; }
+        .lantern-3 { top: 45%; right: 15%; animation-delay: -15s; }
+
+        @keyframes lantern-sway {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(40px, -50px) scale(1.12); }
+        }
+
+        #particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
+        .font-display { font-family: 'Orbitron', sans-serif; }
 
         .glow-text {
             color: var(--primary);
-            text-shadow: 
-                0 0 10px rgba(0, 255, 204, 0.5),
-                0 0 20px rgba(0, 255, 204, 0.3),
-                0 0 40px rgba(0, 255, 204, 0.2);
+            text-shadow: 0 0 15px #ffd70099, 0 0 30px #ffcc0099, 0 0 60px #ff8c0044;
         }
 
-        .glow-text-subtle {
-            text-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        .glow-red {
+            text-shadow: 0 0 15px #c41e3a99, 0 0 30px #c41e3a77, 0 0 50px #c41e3a44;
         }
 
         .glass-card {
-            background: linear-gradient(135deg, rgba(15, 15, 25, 0.9) 0%, rgba(20, 20, 35, 0.8) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 204, 0.1);
-            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(40,0,15,0.92), rgba(60,10,20,0.82));
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,215,0,0.2);
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 204, 0.5), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: all 0.4s ease;
         }
 
         .glass-card:hover {
-            border-color: rgba(0, 255, 204, 0.3);
-            transform: translateY(-4px);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.4),
-                0 0 40px rgba(0, 255, 204, 0.1);
-        }
-
-        .glass-card:hover::before {
-            opacity: 1;
+            border-color: #ffd70077;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(196,30,58,0.35), 0 0 50px rgba(255,215,0,0.25);
         }
 
         .stat-card {
             position: relative;
-            background: linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(20, 20, 35, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(50,0,20,0.96), rgba(80,10,30,0.92));
             border-radius: 20px;
-            padding: 2px;
-            transition: all 0.4s ease;
+            padding: 3px;
         }
 
         .stat-card::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            padding: 2px;
-            background: linear-gradient(135deg, rgba(0, 255, 204, 0.2), rgba(139, 92, 246, 0.2), rgba(0, 255, 204, 0.2));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0.5;
-            transition: opacity 0.4s ease;
+            inset: -2px;
+            border-radius: 22px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00, #ffd700);
+            opacity: 0.45;
+            filter: blur(10px);
+            transition: opacity 0.4s;
         }
 
-        .stat-card:hover::before {
-            opacity: 1;
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
-            animation: borderRotate 3s linear infinite;
-        }
-
-        @keyframes borderRotate {
-            0% { background: linear-gradient(0deg, var(--primary), var(--secondary), var(--primary)); }
-            25% { background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary)); }
-            50% { background: linear-gradient(180deg, var(--primary), var(--secondary), var(--primary)); }
-            75% { background: linear-gradient(270deg, var(--primary), var(--secondary), var(--primary)); }
-            100% { background: linear-gradient(360deg, var(--primary), var(--secondary), var(--primary)); }
-        }
+        .stat-card:hover::before { opacity: 0.8; }
 
         .stat-card-inner {
-            background: linear-gradient(135deg, rgba(15, 15, 25, 1) 0%, rgba(20, 20, 35, 0.95) 100%);
-            border-radius: 18px;
+            background: rgba(30,0,10,0.98);
+            border-radius: 17px;
             padding: 1.5rem;
-            height: 100%;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, #ffd700, #ffcc00);
             color: #000;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            padding: 0.85rem 1.8rem;
             border-radius: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
+            letter-spacing: 0.08em;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.55);
+            transition: all 0.3s;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 30px rgba(0, 255, 204, 0.3),
-                0 0 20px rgba(0, 255, 204, 0.2);
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 35px rgba(255,215,0,0.7);
         }
 
         .btn-secondary {
             background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            font-weight: 700;
+            padding: 0.85rem 1.8rem;
             border-radius: 12px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.875rem;
+            letter-spacing: 0.08em;
         }
 
         .btn-secondary:hover {
-            background: var(--primary);
+            background: #ffd700;
             color: #000;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 35px #ffd70099;
         }
 
         .nav-link {
-            position: relative;
-            color: rgba(255, 255, 255, 0.7);
+            color: #ffd700cc;
             font-weight: 500;
             padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
         }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-            box-shadow: 0 0 10px var(--primary);
-        }
-
         .nav-link:hover {
-            color: var(--primary);
-        }
-
-        .nav-link:hover::after {
-            width: 80%;
-        }
-
-        .logo-container {
-            position: relative;
-        }
-
-        .logo-glow {
-            position: absolute;
-            inset: -10px;
-            background: radial-gradient(circle, rgba(0, 255, 204, 0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(15px);
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .logo-container:hover .logo-glow {
-            opacity: 1;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+            color: #ffd700;
+            text-shadow: 0 0 15px #ffd70099;
         }
 
         .countdown-display {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
+            animation: shine 4s linear infinite;
         }
 
-        @keyframes gradientShift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(30deg); }
+        @keyframes shine {
+            0% { background-position: 0%; }
+            100% { background-position: 200%; }
         }
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 0.5rem;
-            background: rgba(0, 255, 204, 0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            transition: all 0.3s ease;
-        }
+        .hamburger span { background-color: #ffd700; }
 
-        .hamburger:hover {
-            background: rgba(0, 255, 204, 0.2);
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background-color: var(--primary);
-            margin: 2px 0;
-            transition: all 0.3s ease;
-            border-radius: 2px;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        #dexscreener-embed, #pulseswap-embed {
-            position: relative;
-            width: 100%;
-            height: 600px;
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        #dexscreener-embed iframe, #pulseswap-embed iframe {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border: 0;
-            border-radius: 16px;
-        }
-
-        .chart-swap-container {
-            display: flex;
-            flex-direction: row;
-            gap: 1.5rem;
-            min-height: 600px;
-        }
-
-        .chart-swap-container > div:first-child {
-            width: 66.67%;
-        }
-
-        .chart-swap-container > div:last-child {
-            width: 33.33%;
-        }
-
-        .section-header {
-            position: relative;
-            display: inline-block;
-        }
+        .hamburger:hover { background: rgba(255,215,0,0.15); }
 
         .section-header::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), transparent);
-            border-radius: 2px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid rgba(0, 255, 204, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-row:hover {
-            background: rgba(0, 255, 204, 0.05);
-            padding-left: 1rem;
-            padding-right: 1rem;
-            margin-left: -1rem;
-            margin-right: -1rem;
-            border-radius: 8px;
-        }
-
-        .info-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .info-value {
-            color: #fff;
-            font-weight: 500;
-        }
-
-        .widget-fallback {
-            display: none;
-            color: #ff6b6b;
-            font-size: 1rem;
-            text-align: center;
-            padding: 1rem;
-        }
-
-        #pulseswap-embed.fallback .widget-fallback {
-            display: block;
-        }
-
-        #shd-price {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-
-        .truncate-url {
-            display: inline-block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: middle;
-            max-width: 200px;
+            background: linear-gradient(90deg, #ffd700, transparent);
         }
 
         footer {
-            background: linear-gradient(180deg, transparent, rgba(0, 255, 204, 0.03));
-            border-top: 1px solid rgba(0, 255, 204, 0.1);
-        }
-
-        @media (max-width: 1024px) {
-            .chart-swap-container {
-                flex-direction: column;
-            }
-            .chart-swap-container > div:first-child,
-            .chart-swap-container > div:last-child {
-                width: 100%;
-            }
-        }
-
-        @media (min-width: 768px) and (max-width: 900px) {
-            .nav-menu .nav-link {
-                font-size: 0.75rem;
-                padding: 0.25rem 0.5rem;
-            }
-            .nav-menu {
-                gap: 0.25rem;
-            }
+            background: linear-gradient(180deg, transparent, rgba(196,30,58,0.15));
+            border-top: 1px solid rgba(255,215,0,0.18);
         }
 
         @media (max-width: 767px) {
-            .hamburger {
-                display: flex;
-                position: absolute;
-                top: 1rem;
-                right: 1rem;
-            }
             .nav-menu {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                margin-top: 0.75rem;
-                background: linear-gradient(180deg, rgba(15, 15, 25, 0.98), rgba(10, 10, 15, 0.98));
+                background: rgba(40,0,15,0.98);
                 backdrop-filter: blur(20px);
-                padding: 1.5rem;
-                border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-                box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+                border: 1px solid rgba(255,215,0,0.25);
             }
-            .nav-menu.active {
-                display: flex;
-            }
-            .nav-menu .nav-link {
-                margin: 0.5rem 0;
-                padding: 0.75rem;
-                text-align: center;
-                width: 100%;
-                border-radius: 8px;
-                background: rgba(0, 255, 204, 0.05);
-            }
-            .nav-menu .nav-link:hover {
-                background: rgba(0, 255, 204, 0.15);
-            }
-            .nav-menu .nav-link::after {
-                display: none;
-            }
-        }
-
-        @media (max-width: 450px) {
-            .nav-menu .nav-link {
-                font-size: 0.8rem;
-                padding: 0.5rem;
-            }
-            .logo-img {
-                max-height: 150px !important;
-            }
-            .hamburger {
-                top: 0.75rem;
-                right: 0.75rem;
-            }
-        }
-
-        @media (max-width: 350px) {
-            .logo-img {
-                max-height: 120px !important;
-                max-width: 120px !important;
-            }
-            .hamburger {
-                top: 0.5rem;
-                right: 0.5rem;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 204, 0.3);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 204, 0.5);
         }
 
         ::selection {
-            background: rgba(0, 255, 204, 0.3);
-            color: #fff;
-        }
-
-        header {
-            position: relative;
-            z-index: 1000 !important;
-        }
-
-        .logo-container,
-        .logo-container *,
-        h1 {
-            z-index: 10 !important;
-            pointer-events: auto;
-        }
-
-        .hamburger {
-            z-index: 2000 !important;
-            pointer-events: auto !important;
-        }
-
-        .nav-menu {
-            z-index: 1500 !important;
-            pointer-events: auto !important;
-        }
-
-        .nav-menu .nav-link {
-            z-index: 2001 !important;
-            pointer-events: auto !important;
-        }
-
-        #particles,
-        .gradient-bg,
-        .gradient-orbs,
-        .grid-pattern {
-            pointer-events: none !important;
-        }
-
-        /* New styles for tool cards */
-        .tool-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .tool-card {
-            background: rgba(20, 20, 35, 0.6);
-            border: 1px solid rgba(0, 255, 204, 0.12);
-            border-radius: 12px;
-            padding: 1.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .tool-card:hover {
-            background: rgba(20, 20, 35, 0.85);
-            border-color: rgba(0, 255, 204, 0.3);
-            transform: translateY(-3px);
-        }
-
-        .tool-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .tool-desc {
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.75);
-            line-height: 1.45;
-        }
-
-        /* Toast / Snackbar styles */
-        @keyframes slide-in-right {
-            from { transform: translateX(120%); opacity: 0; }
-            to   { transform: translateX(0);    opacity: 1; }
-        }
-
-        .animate-slide-in-right {
-            animation: slide-in-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            background: #ffd70055;
+            color: #000;
         }
     </style>
 </head>
 <body class="text-white">
 
     <div class="gradient-bg"></div>
-    <div class="gradient-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+    <div class="chinese-pattern"></div>
+    <div class="lantern-glows">
+        <div class="lantern lantern-1"></div>
+        <div class="lantern lantern-2"></div>
+        <div class="lantern lantern-3"></div>
     </div>
-    <div class="grid-pattern"></div>
     <canvas id="particles"></canvas>
 
     <!-- Toast container -->
@@ -716,20 +247,20 @@
     <header class="py-6 px-4 sm:px-6 lg:px-8 relative">
         <nav class="flex items-center justify-between max-w-7xl mx-auto relative">
             <div class="flex items-center space-x-4">
-                <div class="logo-container">
-                    <div class="logo-glow"></div>
+                <div class="logo-container relative">
+                    <div class="absolute inset-[-30px] bg-gradient-radial from-[#ffd70066] to-transparent rounded-full blur-2xl opacity-70 animate-pulse"></div>
                     <img src="Logo_200.png" alt="SnipeHead Logo" class="logo-img h-auto w-auto max-h-48 relative z-10">
                 </div>
                 <h1 class="text-3xl md:text-4xl font-bold glow-text font-display tracking-wider">SnipeHead</h1>
             </div>
 
-            <div class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="hamburger md:hidden flex flex-col cursor-pointer p-2 rounded-lg border border-[#ffd70033]" onclick="toggleMenu()" aria-label="Toggle navigation menu">
+                <span class="w-6 h-0.5 my-1"></span>
+                <span class="w-6 h-0.5 my-1"></span>
+                <span class="w-6 h-0.5 my-1"></span>
             </div>
 
-            <div class="nav-menu">
+            <div class="nav-menu hidden md:flex items-center gap-6">
                 <a href="https://libertyswap.finance/" class="nav-link" target="_blank" rel="noopener noreferrer">LibertySwap</a>
                 <a href="https://ipfs.bridge.pulsechain.com/" class="nav-link" target="_blank" rel="noopener noreferrer">Bridge</a>
                 <a href="https://ipfs.io/ipfs/bafybeihegcjlaw6fkqbzc3kjwp64fn7bks7i4yhbdys5ckj2xpxtuorjwy/" class="nav-link" target="_blank" rel="noopener noreferrer">Drop</a>
@@ -741,23 +272,22 @@
     </header>
 
     <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 relative z-10">
+
         <!-- Countdown Section -->
         <section class="text-center mb-8">
-            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-card">
-                <div class="flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full glass-card border border-[#ffd70044]">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#ffd700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <span id="shd-countdown" class="countdown-display">AGE: Calculating...</span>
+                    <span id="shd-countdown" class="countdown-display text-xl font-bold">AGE: Calculating...</span>
                 </div>
-
-                <div class="h-4 w-px bg-gradient-to-b from-transparent via-[#00ffcc]/40 to-transparent"></div>
-
-                <div class="flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="h-5 w-px bg-gradient-to-b from-transparent via-[#ffd700]/60 to-transparent"></div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#ffd700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
-                    <span class="countdown-display">PLS <span id="pls-price">$0.00000000</span></span>
+                    <span class="countdown-display font-bold">PLS <span id="pls-price">$0.00000000</span></span>
                 </div>
             </div>
         </section>
@@ -765,13 +295,13 @@
         <!-- Hero Section -->
         <section class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 font-display">
-                <span class="text-white">Welcome to </span>
+                <span class="glow-red">Welcome to </span>
                 <span class="glow-text">SnipeHead</span>
             </h2>
-            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
                 Flow free from corp systems. Claim free SHD tokens daily then mine to maximize your rewards on PulseChain.
             </p>
-            <div class="flex justify-center gap-4 mt-8 flex-wrap">
+            <div class="flex justify-center gap-6 mt-10 flex-wrap">
                 <a href="https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/" class="btn-primary" target="_blank" rel="noopener noreferrer">
                     Claim Tokens
                 </a>
@@ -784,44 +314,46 @@
         <!-- Stats Section -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             <div class="stat-card">
-                <div class="stat-card-inner">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00ffcc] to-[#00ccaa] flex items-center justify-center">
-                            <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="stat-card-inner text-center">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#ffd700] to-[#ffcc00] flex items-center justify-center shadow-xl">
+                            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">SHD Price</h3>
                     </div>
-                    <p class="text-2xl md:text-3xl font-bold text-white font-display" id="shd-price">$0.0000000000</p>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-2">SHD Price</h3>
+                    <p class="text-3xl font-bold glow-text" id="shd-price">$0.0000000000</p>
                     <p class="text-sm text-gray-500 mt-2">Fetched from DexScreener</p>
                 </div>
             </div>
+
             <div class="stat-card">
-                <div class="stat-card-inner">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="stat-card-inner text-center">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#ff8c00] to-[#ff4500] flex items-center justify-center shadow-xl">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                             </svg>
                         </div>
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">Market Cap</h3>
                     </div>
-                    <p class="text-2xl md:text-3xl font-bold text-white font-display" id="shd-market-cap">$100,000</p>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-2">Market Cap</h3>
+                    <p class="text-3xl font-bold glow-text" id="shd-market-cap">$100,000</p>
                     <p class="text-sm text-gray-500 mt-2">Based on liquidity</p>
                 </div>
             </div>
+
             <div class="stat-card">
-                <div class="stat-card-inner">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f472b6] to-[#ec4899] flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="stat-card-inner text-center">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#c41e3a] to-[#a1122a] flex items-center justify-center shadow-xl">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">Holders</h3>
                     </div>
-                    <p class="text-2xl md:text-3xl font-bold text-white font-display" id="shd-holders">Loading...</p>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-2">Holders</h3>
+                    <p class="text-3xl font-bold glow-text" id="shd-holders">Loading...</p>
                     <p class="text-sm text-gray-500 mt-2">Unique wallet addresses</p>
                 </div>
             </div>
@@ -829,133 +361,112 @@
 
         <!-- Chart & Swap Section -->
         <section class="mb-16">
-            <h3 class="text-2xl font-bold glow-text-subtle mb-6 font-display section-header">Price Chart & Swap</h3>
-            <div class="chart-swap-container">
-                <div id="dexscreener-embed" class="glass-card overflow-hidden">
-                    <iframe src="https://dexscreener.com/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15"></iframe>
+            <h3 class="text-2xl font-bold glow-text mb-6 font-display section-header">Price Chart & Swap</h3>
+            <div class="chart-swap-container flex flex-col lg:flex-row gap-6">
+                <div id="dexscreener-embed" class="glass-card overflow-hidden flex-1 min-h-[600px]">
+                    <iframe src="https://dexscreener.com/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15" class="w-full h-full border-0"></iframe>
                 </div>
-                <div id="pulseswap-embed" class="glass-card">
-                    <iframe
-                        title="PulseSwap Widget — SHD Swap"
-                        src="https://pulseswap.io/?chain=pulsechain&from=0x0000000000000000000000000000000000000000&to=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&amount=1000&embed=yes"
-                        onerror="this.parentNode.classList.add('fallback')"
-                    ></iframe>
-                    <p class="widget-fallback">Unable to load swap widget. Visit <a href="https://ipfs.app.pulsex.com/?outputCurrency=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d" class="text-[#00ffcc] hover:underline" target="_blank" rel="noopener noreferrer">PulseX</a> to trade SHD.</p>
+                <div id="pulseswap-embed" class="glass-card flex-1 min-h-[600px] relative">
+                    <iframe title="PulseSwap Widget — SHD Swap" src="https://pulseswap.io/?chain=pulsechain&from=0x0000000000000000000000000000000000000000&to=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&amount=1000&embed=yes" class="absolute inset-0 w-full h-full border-0" onerror="this.parentNode.classList.add('fallback')"></iframe>
+                    <p class="widget-fallback hidden text-red-400 text-center p-6">Unable to load swap widget. Visit <a href="https://ipfs.app.pulsex.com/?outputCurrency=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d" class="text-[#ffd700] underline" target="_blank">PulseX</a> to trade SHD.</p>
                 </div>
             </div>
         </section>
 
         <!-- Network Details Section -->
         <section class="mb-16">
-            <h3 class="text-2xl font-bold glow-text-subtle mb-6 font-display section-header">Network Details</h3>
+            <h3 class="text-2xl font-bold glow-text mb-6 font-display section-header">Network Details</h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="glass-card p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00ffcc] to-[#8b5cf6] flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#ffd700] to-[#ff8c00] flex items-center justify-center shadow-lg">
+                            <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
                             </svg>
                         </div>
-                        <h4 class="text-lg font-bold text-white font-display">PulseChain Network</h4>
+                        <h4 class="text-xl font-bold text-white font-display">PulseChain Network</h4>
                     </div>
-                    <div class="space-y-1">
-                        <div class="info-row">
-                            <span class="info-label">Network Name</span>
-                            <span class="info-value">PulseChain</span>
+                    <div class="space-y-3">
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Network Name</span>
+                            <span class="font-medium">PulseChain</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">RPC URL</span>
-                            <span class="info-value">https://rpc.pulsechain.com</span>
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">RPC URL</span>
+                            <span class="font-mono">https://rpc.pulsechain.com</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Chain ID</span>
-                            <span class="info-value font-mono">369</span>
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Chain ID</span>
+                            <span class="font-mono">369</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Currency</span>
-                            <span class="info-value">PLS</span>
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Currency</span>
+                            <span>PLS</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Explorer</span>
-                            <span class="info-value">https://ipfs.scan.pulsechain.com</span>
+                        <div class="info-row flex justify-between py-2 hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Explorer</span>
+                            <span>https://ipfs.scan.pulsechain.com</span>
                         </div>
                     </div>
-
-                    <div class="mt-6">
-                        <button 
-                            onclick="addPulseChainToWallet()"
-                            class="btn-primary w-full sm:w-auto"
-                        >
-                            Add PulseChain to Wallet
-                        </button>
-                    </div>
+                    <button onclick="addPulseChainToWallet()" class="btn-primary w-full mt-6 py-3">
+                        Add PulseChain to Wallet
+                    </button>
                 </div>
 
                 <div class="glass-card p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f472b6] to-[#8b5cf6] flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#c41e3a] to-[#ff8c00] flex items-center justify-center shadow-lg">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                             </svg>
                         </div>
-                        <h4 class="text-lg font-bold text-white font-display">SHD Token</h4>
+                        <h4 class="text-xl font-bold text-white font-display">SHD Token</h4>
                     </div>
-                    <div class="space-y-1">
-                        <div class="info-row">
-                            <span class="info-label">Name</span>
-                            <span class="info-value">SnipeHead</span>
+                    <div class="space-y-3">
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Name</span>
+                            <span class="font-medium">SnipeHead</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Symbol</span>
-                            <span class="info-value">SHD</span>
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Symbol</span>
+                            <span>SHD</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Total Supply</span>
-                            <span class="info-value">21,000,000,000</span>
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Total Supply</span>
+                            <span>21,000,000,000</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Decimals</span>
-                            <span class="info-value font-mono">18</span>
+                        <div class="info-row flex justify-between py-2 border-b border-[#ffd70022] hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Decimals</span>
+                            <span class="font-mono">18</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Type</span>
-                            <span class="info-value">ERC20 + Permit</span>
+                        <div class="info-row flex justify-between py-2 hover:bg-[#ffd70011] rounded px-2 transition">
+                            <span class="text-gray-400 uppercase text-sm tracking-wide">Type</span>
+                            <span>ERC20 + Permit</span>
                         </div>
                     </div>
-
-                    <!-- Added "Add SHD to Wallet" button here -->
-                    <div class="mt-6 flex flex-col sm:flex-row gap-4">
-                        <button 
-                            onclick="addSHDToWallet()"
-                            class="btn-primary w-full sm:w-auto"
-                        >
-                            Add SHD to Wallet
-                        </button>
-                    </div>
+                    <button onclick="addSHDToWallet()" class="btn-primary w-full mt-6 py-3">
+                        Add SHD to Wallet
+                    </button>
                 </div>
             </div>
 
             <div class="glass-card p-6 mt-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <p class="text-sm text-gray-400 uppercase tracking-wider mb-2">Contract Address</p>
-                        <p id="contract-address" class="text-[#00ffcc] font-mono text-sm sm:text-base break-all">0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d</p>
+                        <p class="text-sm text-gray-400 uppercase tracking-wider mb-1">Contract Address</p>
+                        <p id="contract-address" class="text-[#ffd700] font-mono break-all">0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d</p>
                     </div>
-                    <div class="flex gap-3 flex-shrink-0">
-                        <button onclick="copyContract(this)" class="btn-primary text-sm">
+                    <div class="flex gap-3">
+                        <button onclick="copyContract(this)" class="btn-primary px-5 py-2 text-sm">
                             <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 Copy
                             </span>
                         </button>
-                        <a href="https://ipfs.scan.pulsechain.com/address/0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d?tab=contract" class="btn-secondary text-sm" target="_blank" rel="noopener noreferrer">
+                        <a href="https://ipfs.scan.pulsechain.com/address/0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d?tab=contract" class="btn-secondary px-5 py-2 text-sm" target="_blank">
                             <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                            View
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                View
                             </span>
                         </a>
                     </div>
@@ -964,56 +475,44 @@
 
             <div class="glass-card p-6 mt-6">
                 <h4 class="text-xl font-bold text-white font-display mb-6 flex items-center gap-3">
-                    <svg class="w-7 h-7 text-[#00ffcc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-[#ffd700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
                     Helpful Community Tools
                 </h4>
-
-                <div class="tool-grid">
-                    <a href="https://libertyswap.finance/" target="_blank" rel="noopener noreferrer" class="tool-card">
-                        <div class="tool-title">Liberty Swap</div>
-                        <p class="tool-desc">Quickly, easily swap tokens from other networks to PulseChain.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <a href="https://libertyswap.finance/" target="_blank" class="glass-card p-5 hover:bg-[#ffd70011] transition">
+                        <div class="text-[#ffd700] font-bold mb-2">Liberty Swap</div>
+                        <p class="text-gray-300 text-sm">Quickly swap tokens from other networks to PulseChain.</p>
                     </a>
-
-                    <a href="https://app.provex.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
-                        <div class="tool-title">ProveX</div>
-                        <p class="tool-desc">ZK-proof protocol kills crypto exchanges, enables trustless P2P trading.</p>
+                    <a href="https://app.provex.com/" target="_blank" class="glass-card p-5 hover:bg-[#ffd70011] transition">
+                        <div class="text-[#ffd700] font-bold mb-2">ProveX</div>
+                        <p class="text-gray-300 text-sm">ZK-proof protocol for trustless P2P trading.</p>
                     </a>
-
-                    <a href="https://www.pulsechainstats.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
-                        <div class="tool-title">PulseChain Stats</div>
-                        <p class="tool-desc">In-depth stats, analytics, and insights on PulseChain.</p>
+                    <a href="https://www.pulsechainstats.com/" target="_blank" class="glass-card p-5 hover:bg-[#ffd70011] transition">
+                        <div class="text-[#ffd700] font-bold mb-2">PulseChain Stats</div>
+                        <p class="text-gray-300 text-sm">In-depth analytics on PulseChain.</p>
                     </a>
                 </div>
             </div>
         </section>
 
+        <!-- Join Section -->
         <section class="text-center glass-card p-8 md:p-12">
             <h3 class="text-3xl md:text-4xl font-bold mb-4 font-display">
-                <span class="text-white">Join the </span>
+                <span class="glow-red">Join the </span>
                 <span class="glow-text">SnipeHead</span>
-                <span class="text-white"> Ecosystem</span>
+                <span class="glow-red"> Ecosystem</span>
             </h3>
-            <p class="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+            <p class="text-lg text-gray-300 mb-8 max-w-xl mx-auto">
                 Explore the faucet to claim your free SHD tokens then dive into mining for exclusive rewards.
             </p>
-            <div class="flex justify-center gap-4 flex-wrap">
-                <a href="https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/" class="btn-primary" target="_blank" rel="noopener noreferrer">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Claim Tokens
-                    </span>
+            <div class="flex justify-center gap-6 flex-wrap">
+                <a href="https://ipfs.io/ipfs/bafybeigo643sh275jirwmy2lgou7qanfsgjpxk4bcygaqyqodgoswhe4fe/" class="btn-primary px-8 py-4 text-lg" target="_blank">
+                    Claim Tokens
                 </a>
-                <a href="https://ipfs.io/ipfs/bafybeigqis32bq5ks45qaxoqh226ylda74cg6espo5nhlcdj74hu5zkdzi" class="btn-secondary" target="_blank" rel="noopener noreferrer">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                        </svg>
-                        Start Mining
-                    </span>
+                <a href="https://ipfs.io/ipfs/bafybeigqis32bq5ks45qaxoqh226ylda74cg6espo5nhlcdj74hu5zkdzi" class="btn-secondary px-8 py-4 text-lg" target="_blank">
+                    Start Mining
                 </a>
             </div>
         </section>
@@ -1021,26 +520,27 @@
 
     <footer class="py-8 px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-gray-400">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-gray-300">
                 <p>© 2025–<span id="copyright-year">2026</span> SnipeHead. All rights reserved.</p>
                 <span class="hidden md:inline">•</span>
                 <p>
-                    Built on <a href="https://pulsechain.com" class="text-[#00ffcc] hover:underline transition" target="_blank" rel="noopener noreferrer">PulseChain</a>
+                    Built on <a href="https://pulsechain.com" class="text-[#ffd700] hover:underline" target="_blank">PulseChain</a>
                     <span class="mx-2">|</span>
-                    <a href="https://github.com/PBaieck-group/SnipeHead" class="text-[#00ffcc] hover:underline transition" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <a href="https://github.com/PBaieck-group/SnipeHead" class="text-[#ffd700] hover:underline" target="_blank">GitHub</a>
                 </p>
             </div>
-            <div class="mt-4 text-xs text-gray-500">
-                v1.7.8
+            <div class="mt-4 text-sm text-gray-500">
+                v1.7.8 | Happy Year of the Fire Horse 2026 🐎🧧🔥
             </div>
         </div>
     </footer>
 
     <script>
+        // Particles - festive red & gold sparkles
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
-        let particles = [];
-        const particleCount = 50;
+        let particlesArray = [];
+        const particleCount = 90;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -1048,149 +548,98 @@
         }
 
         class Particle {
-            constructor() {
-                this.reset();
-            }
+            constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5;
-                this.opacity = Math.random() * 0.5 + 0.1;
-                this.hue = Math.random() > 0.5 ? 170 : 270;
+                this.size = Math.random() * 2.8 + 0.6;
+                this.speedX = (Math.random() - 0.5) * 0.7;
+                this.speedY = (Math.random() - 0.5) * 0.7;
+                this.opacity = Math.random() * 0.7 + 0.2;
+                this.hue = Math.random() > 0.45 ? 45 : 0; // gold / red
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+                this.opacity = Math.max(0.08, this.opacity - 0.003);
             }
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.opacity})`;
+                ctx.fillStyle = this.hue === 45 
+                    ? `hsla(45, 100%, 75%, ${this.opacity})` 
+                    : `hsla(0, 90%, 65%, ${this.opacity})`;
                 ctx.fill();
             }
         }
 
         function initParticles() {
-            particles = [];
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
+            particlesArray = [];
+            for (let i = 0; i < particleCount; i++) particlesArray.push(new Particle());
         }
 
         function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            particles.forEach((p1, i) => {
-                particles.slice(i + 1).forEach(p2 => {
-                    const dx = p1.x - p2.x;
-                    const dy = p1.y - p2.y;
-                    const d = Math.sqrt(dx*dx + dy*dy);
-                    if (d < 150) {
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(0, 255, 204, ${0.1 * (1 - d / 150)})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
-                    }
-                });
-            });
+            ctx.fillStyle = 'rgba(26,0,0,0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particlesArray.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateParticles);
         }
 
         resizeCanvas();
         initParticles();
         animateParticles();
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles();
-        });
+        window.addEventListener('resize', resizeCanvas);
 
         function toggleMenu() {
-            document.querySelector('.nav-menu').classList.toggle('active');
-            document.querySelector('.hamburger').classList.toggle('active');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.innerWidth <= 767) {
-                document.querySelector('.nav-menu').classList.remove('active');
-                document.querySelector('.hamburger').classList.remove('active');
+            const menu = document.querySelector('.nav-menu');
+            const hamburger = document.querySelector('.hamburger');
+            menu.classList.toggle('hidden');
+            hamburger.classList.toggle('active');
+            if (hamburger.classList.contains('active')) {
+                hamburger.innerHTML = '<span class="w-6 h-0.5 my-1 rotate-45 translate-y-2"></span><span class="w-6 h-0.5 my-1 opacity-0"></span><span class="w-6 h-0.5 my-1 -rotate-45 -translate-y-2"></span>';
+            } else {
+                hamburger.innerHTML = '<span class="w-6 h-0.5 my-1"></span><span class="w-6 h-0.5 my-1"></span><span class="w-6 h-0.5 my-1"></span>';
             }
-            updateCountdown();
-            // Auto-update copyright year range
-            const startYear = 2025;
-            const currentYear = new Date().getFullYear();
-            document.getElementById('copyright-year').textContent = currentYear;
-        });
+        }
 
         function updateCountdown() {
             const creation = new Date('2025-08-07T14:11:45-04:00');
-            function tick() {
-                const diff = Date.now() - creation;
-                if (diff < 0) {
-                    document.getElementById('shd-countdown').textContent = 'AGE: Launching Soon...';
-                    return;
-                }
-                const d = Math.floor(diff / 86400000);
-                document.getElementById('shd-countdown').textContent = `AGE: ${d}d`;
-            }
-            tick();
-            setInterval(tick, 1000);
+            const diff = Date.now() - creation;
+            const days = Math.floor(diff / 86400000);
+            document.getElementById('shd-countdown').textContent = diff < 0 ? 'AGE: Launching Soon...' : `AGE: ${days}d`;
         }
+        setInterval(updateCountdown, 86400000);
+        updateCountdown();
 
         async function fetchPrices() {
             try {
                 const shdRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd');
-                const shdData = await shdRes.json();
-                const shdPair = shdData.pairs?.[0];
-                if (shdPair && shdPair.priceUsd) {
-                    const shdPrice = parseFloat(shdPair.priceUsd);
-                    document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(10)}`;
-                    document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
+                const shd = (await shdRes.json()).pairs?.[0];
+                if (shd?.priceUsd) {
+                    document.getElementById('shd-price').textContent = `$${parseFloat(shd.priceUsd).toFixed(10)}`;
+                    document.getElementById('shd-market-cap').textContent = `$${Math.round(shd.liquidity?.usd || 0).toLocaleString()}`;
                 }
 
                 const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE');
-                const plsData = await plsRes.json();
-                const plsPair = plsData.pairs?.[0];
-                if (plsPair && plsPair.priceUsd) {
-                    const plsPrice = parseFloat(plsPair.priceUsd);
-                    const plsEl = document.getElementById('pls-price');
-                    if (plsEl) {
-                        plsEl.textContent = `$${plsPrice.toFixed(8)}`;
-                    }
-                } else {
-                    const plsEl = document.getElementById('pls-price');
-                    if (plsEl) plsEl.textContent = '$N/A';
-                }
-
-            } catch (e) {
-                console.error("Price fetch error:", e);
-                const plsEl = document.getElementById('pls-price');
-                if (plsEl) plsEl.textContent = '$—';
-            }
+                const pls = (await plsRes.json()).pairs?.[0];
+                if (pls?.priceUsd) document.getElementById('pls-price').textContent = `$${parseFloat(pls.priceUsd).toFixed(8)}`;
+            } catch (e) { console.error(e); }
         }
+        fetchPrices();
+        setInterval(fetchPrices, 60000);
 
         async function fetchAllHolders() {
             try {
-                const r = await fetch(`https://api.scan.pulsechain.com/api?module=token&action=getTokenHolders&contractaddress=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&page=1&offset=10000`);
-                const data = await r.json();
+                const res = await fetch(`https://api.scan.pulsechain.com/api?module=token&action=getTokenHolders&contractaddress=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&page=1&offset=10000`);
+                const data = await res.json();
                 if (data.status === '1') {
                     const unique = new Set(data.result.map(h => h.address)).size;
                     document.getElementById('shd-holders').textContent = unique.toLocaleString();
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
-
-        fetchPrices();
         fetchAllHolders();
-        setInterval(fetchPrices, 45000);
 
         function copyContract(btn) {
             navigator.clipboard.writeText('0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d').then(() => {
@@ -1200,88 +649,52 @@
             });
         }
 
-        // ────────────────────────────────────────────────
-        // Custom Toast Notification
-        // ────────────────────────────────────────────────
-        function showToast(message, type = 'success') {  // type: 'success' | 'error'
+        // Toast function (unchanged)
+        function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
-            
             const toast = document.createElement('div');
-            toast.className = `
-                glass-card p-4 pr-12 relative shadow-2xl pointer-events-auto
-                border ${type === 'error' ? 'border-red-500/50' : 'border-[#00ffcc]/50'}
-                bg-gradient-to-r ${type === 'error' ? 'from-red-950/30 to-transparent' : 'from-[#00ffcc]/10 to-transparent'}
-                animate-slide-in-right
-            `;
-            
+            toast.className = `glass-card p-4 pr-12 relative shadow-2xl pointer-events-auto border ${type === 'error' ? 'border-red-500/60' : 'border-[#ffd700]/60'} bg-gradient-to-r ${type === 'error' ? 'from-red-950/40' : 'from-[#ffd700]/15'} animate-slide-in-right`;
             toast.innerHTML = `
                 <div class="flex items-start gap-3">
-                    <svg class="w-6 h-6 ${type === 'error' ? 'text-red-400' : 'text-[#00ffcc]'} flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        ${type === 'error' 
-                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' 
-                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'}
+                    <svg class="w-6 h-6 ${type === 'error' ? 'text-red-400' : 'text-[#ffd700]'} flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'}
                     </svg>
                     <p class="text-white font-medium leading-relaxed">${message}</p>
                 </div>
-                <button class="absolute top-3 right-3 text-gray-400 hover:text-white transition text-xl leading-none" onclick="this.parentElement.remove()">×</button>
+                <button class="absolute top-3 right-3 text-gray-400 hover:text-white text-xl" onclick="this.parentElement.remove()">×</button>
             `;
-
             container.appendChild(toast);
-
-            // Auto-remove after 5 seconds with fade-out
             setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateY(-20px)';
-                    toast.style.transition = 'all 0.4s ease-out';
-                    setTimeout(() => toast.remove(), 400);
-                }
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 400);
             }, 5000);
         }
 
-        // ────────────────────────────────────────────────
-        // Add PulseChain Network
-        // ────────────────────────────────────────────────
         async function addPulseChainToWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                showToast("No Ethereum-compatible wallet detected.<br>Please install MetaMask, Rabby, or similar.", 'error');
-                return;
-            }
-
+            if (!window.ethereum) return showToast("No wallet detected.<br>Install MetaMask/Rabby.", 'error');
             try {
                 await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
                     params: [{
                         chainId: '0x171',
                         chainName: 'PulseChain',
-                        nativeCurrency: {
-                            name: 'PulseChain',
-                            symbol: 'PLS',
-                            decimals: 18
-                        },
+                        nativeCurrency: { name: 'PulseChain', symbol: 'PLS', decimals: 18 },
                         rpcUrls: ['https://rpc.pulsechain.com'],
                         blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
                     }]
                 });
-                showToast("PulseChain network added successfully!<br>You can now switch to it in your wallet.");
-            } catch (error) {
-                if (error.code === 4001) return; // User rejected
-                console.error(error);
-                showToast(`Failed to add PulseChain network.<br>${error.message || "Unknown error — check console."}`, 'error');
+                showToast("PulseChain added!<br>Switch to it in your wallet.");
+            } catch (err) {
+                if (err.code === 4001) return;
+                showToast(`Failed to add PulseChain.<br>${err.message || "Check console."}`, 'error');
             }
         }
 
-        // ────────────────────────────────────────────────
-        // Add SHD Token to Wallet (ERC-20)
-        // ────────────────────────────────────────────────
         async function addSHDToWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                showToast("No Ethereum-compatible wallet detected.<br>Please install MetaMask, Rabby, or similar.", 'error');
-                return;
-            }
-
+            if (!window.ethereum) return showToast("No wallet detected.<br>Install MetaMask/Rabby.", 'error');
             try {
-                const wasAdded = await window.ethereum.request({
+                const added = await window.ethereum.request({
                     method: 'wallet_watchAsset',
                     params: {
                         type: 'ERC20',
@@ -1289,22 +702,19 @@
                             address: '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d',
                             symbol: 'SHD',
                             decimals: 18,
-                            // Optional: image: 'https://your-site.com/shd-logo.png'  // Add if you have a token logo URL
                         }
                     }
                 });
-
-                if (wasAdded) {
-                    showToast("SHD token added to your wallet!<br>It should now appear in your assets list (after switching to PulseChain).");
-                } else {
-                    showToast("Token addition was not confirmed.<br>You can try again or add it manually.", 'error');
-                }
-            } catch (error) {
-                if (error.code === 4001) return; // User rejected
-                console.error(error);
-                showToast(`Failed to add SHD token.<br>${error.message || "Unknown error — make sure you're on PulseChain network."}`, 'error');
+                showToast(added ? "SHD added to wallet!" : "Addition not confirmed.<br>Try again.", added ? 'success' : 'error');
+            } catch (err) {
+                if (err.code === 4001) return;
+                showToast(`Failed to add SHD.<br>${err.message || "Ensure you're on PulseChain."}`, 'error');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('copyright-year').textContent = new Date().getFullYear();
+        });
     </script>
 </body>
 </html>
