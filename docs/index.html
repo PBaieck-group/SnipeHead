@@ -9,7 +9,9 @@
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
+    <meta property="og:image" content="https://snipehead.xyz/og-image.jpg">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://snipehead.xyz/twitter-image.jpg">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
     <title>SnipeHead - PulseChain</title>
@@ -723,7 +725,7 @@
                 <h1 class="text-3xl md:text-4xl font-bold glow-text font-display tracking-wider">SnipeHead</h1>
             </div>
 
-            <div class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">
+            <div class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -1031,7 +1033,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v1.7.8
+                v1.7.9
             </div>
         </div>
     </footer>
@@ -1112,8 +1114,11 @@
         });
 
         function toggleMenu() {
-            document.querySelector('.nav-menu').classList.toggle('active');
-            document.querySelector('.hamburger').classList.toggle('active');
+            const menu = document.querySelector('.nav-menu');
+            const hamburger = document.querySelector('.hamburger');
+            const isActive = menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', isActive);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1145,7 +1150,9 @@
 
         async function fetchPrices() {
             try {
-                const shdRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd');
+                const shdRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0x8f55C03abf5B0c62270129352AE51E735eD5ECFd', {
+                    signal: AbortSignal.timeout(10000)
+                });
                 const shdData = await shdRes.json();
                 const shdPair = shdData.pairs?.[0];
                 if (shdPair && shdPair.priceUsd) {
@@ -1154,7 +1161,9 @@
                     document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
                 }
 
-                const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE');
+                const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE', {
+                    signal: AbortSignal.timeout(10000)
+                });
                 const plsData = await plsRes.json();
                 const plsPair = plsData.pairs?.[0];
                 if (plsPair && plsPair.priceUsd) {
@@ -1177,7 +1186,9 @@
 
         async function fetchAllHolders() {
             try {
-                const r = await fetch(`https://api.scan.pulsechain.com/api?module=token&action=getTokenHolders&contractaddress=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&page=1&offset=10000`);
+                const r = await fetch(`https://api.scan.pulsechain.com/api?module=token&action=getTokenHolders&contractaddress=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&page=1&offset=10000`, {
+                    signal: AbortSignal.timeout(10000)
+                });
                 const data = await r.json();
                 if (data.status === '1') {
                     const unique = new Set(data.result.map(h => h.address)).size;
@@ -1221,7 +1232,7 @@
                             ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' 
                             : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'}
                     </svg>
-                    <p class="text-white font-medium leading-relaxed">${message}</p>
+                    <p class="text-white font-medium leading-relaxed whitespace-pre-line">${message}</p>
                 </div>
                 <button class="absolute top-3 right-3 text-gray-400 hover:text-white transition text-xl leading-none" onclick="this.parentElement.remove()">×</button>
             `;
@@ -1244,7 +1255,7 @@
         // ────────────────────────────────────────────────
         async function addPulseChainToWallet() {
             if (typeof window.ethereum === 'undefined') {
-                showToast("No Ethereum-compatible wallet detected.<br>Please install MetaMask, Rabby, or similar.", 'error');
+                showToast("No Ethereum-compatible wallet detected.\nPlease install MetaMask, Rabby, or similar.", 'error');
                 return;
             }
 
@@ -1263,11 +1274,11 @@
                         blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
                     }]
                 });
-                showToast("PulseChain network added successfully!<br>You can now switch to it in your wallet.");
+                showToast("PulseChain network added successfully!\nYou can now switch to it in your wallet.");
             } catch (error) {
                 if (error.code === 4001) return; // User rejected
                 console.error(error);
-                showToast(`Failed to add PulseChain network.<br>${error.message || "Unknown error — check console."}`, 'error');
+                showToast(`Failed to add PulseChain network.\n${error.message || "Unknown error — check console."}`, 'error');
             }
         }
 
@@ -1276,7 +1287,7 @@
         // ────────────────────────────────────────────────
         async function addSHDToWallet() {
             if (typeof window.ethereum === 'undefined') {
-                showToast("No Ethereum-compatible wallet detected.<br>Please install MetaMask, Rabby, or similar.", 'error');
+                showToast("No Ethereum-compatible wallet detected.\nPlease install MetaMask, Rabby, or similar.", 'error');
                 return;
             }
 
@@ -1289,20 +1300,20 @@
                             address: '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d',
                             symbol: 'SHD',
                             decimals: 18,
-                            // Optional: image: 'https://your-site.com/shd-logo.png'  // Add if you have a token logo URL
+                            
                         }
                     }
                 });
 
                 if (wasAdded) {
-                    showToast("SHD token added to your wallet!<br>It should now appear in your assets list (after switching to PulseChain).");
+                    showToast("SHD token added to your wallet!\nIt should now appear in your assets list (after switching to PulseChain).");
                 } else {
-                    showToast("Token addition was not confirmed.<br>You can try again or add it manually.", 'error');
+                    showToast("Token addition was not confirmed.\nYou can try again or add it manually.", 'error');
                 }
             } catch (error) {
                 if (error.code === 4001) return; // User rejected
                 console.error(error);
-                showToast(`Failed to add SHD token.<br>${error.message || "Unknown error — make sure you're on PulseChain network."}`, 'error');
+                showToast(`Failed to add SHD token.\n${error.message || "Unknown error — make sure you're on PulseChain network."}`, 'error');
             }
         }
     </script>
