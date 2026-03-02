@@ -16,6 +16,7 @@
     <link rel="apple-touch-icon" href="favicon.png">
     <title>SnipeHead - PulseChain</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -818,13 +819,13 @@
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f472b6] to-[#ec4899] flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7m-7-7l-4 4m7-4v12"></path>
                             </svg>
                         </div>
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">Holders</h3>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">Total SHD Being Mined</h3>
                     </div>
-                    <p class="text-2xl md:text-3xl font-bold text-white font-display" id="shd-holders">Loading...</p>
-                    <p class="text-sm text-gray-500 mt-2">Unique wallet addresses</p>
+                    <p class="text-2xl md:text-3xl font-bold text-white font-display" id="total-mined">Loading...</p>
+                    <p class="text-sm text-gray-500 mt-2">In mining contract</p>
                 </div>
             </div>
         </section>
@@ -925,7 +926,6 @@
                         </div>
                     </div>
 
-                    <!-- Added "Add SHD to Wallet" button here -->
                     <div class="mt-6 flex flex-col sm:flex-row gap-4">
                         <button 
                             onclick="addSHDToWallet()"
@@ -1033,7 +1033,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v1.7.9
+                v1.8.9
             </div>
         </div>
     </footer>
@@ -1184,24 +1184,38 @@
             }
         }
 
-        async function fetchAllHolders() {
+        // ────────────────────────────────────────────────
+        // Fetch Total SHD Being Mined from mining contract
+        // ────────────────────────────────────────────────
+        const MINING_CONTRACT = "0xF5e97b7167Fa1618965f36C08f1263b722FE60Ea";
+
+        async function fetchTotalMined() {
             try {
-                const r = await fetch(`https://api.scan.pulsechain.com/api?module=token&action=getTokenHolders&contractaddress=0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d&page=1&offset=10000`, {
-                    signal: AbortSignal.timeout(10000)
-                });
-                const data = await r.json();
-                if (data.status === '1') {
-                    const unique = new Set(data.result.map(h => h.address)).size;
-                    document.getElementById('shd-holders').textContent = unique.toLocaleString();
-                }
-            } catch (e) {
-                console.error(e);
+                const provider = new ethers.providers.JsonRpcProvider("https://rpc.pulsechain.com");
+                const contract = new ethers.Contract(MINING_CONTRACT, [
+                    "function totalMined() view returns (uint256)"
+                ], provider);
+
+                const total = await contract.totalMined();
+                const formatted = Number(ethers.utils.formatEther(total));
+
+                let display = formatted.toLocaleString('en-US', { maximumFractionDigits: 0 });
+                if (formatted >= 1e9) display = (formatted / 1e9).toFixed(2) + 'B';
+                else if (formatted >= 1e6) display = (formatted / 1e6).toFixed(2) + 'M';
+                else if (formatted >= 1e3) display = (formatted / 1e3).toFixed(2) + 'K';
+
+                document.getElementById('total-mined').textContent = display + " SHD";
+            } catch (err) {
+                console.error("Failed to load total mined:", err);
+                document.getElementById('total-mined').textContent = "Error";
             }
         }
 
+        // Load data on page load + periodic refresh
         fetchPrices();
-        fetchAllHolders();
+        fetchTotalMined();
         setInterval(fetchPrices, 45000);
+        setInterval(fetchTotalMined, 60000);   // update mined amount every minute
 
         function copyContract(btn) {
             navigator.clipboard.writeText('0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d').then(() => {
@@ -1211,9 +1225,7 @@
             });
         }
 
-        // ────────────────────────────────────────────────
         // Custom Toast Notification
-        // ────────────────────────────────────────────────
         function showToast(message, type = 'success') {  // type: 'success' | 'error'
             const container = document.getElementById('toast-container');
             
@@ -1239,7 +1251,6 @@
 
             container.appendChild(toast);
 
-            // Auto-remove after 5 seconds with fade-out
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.style.opacity = '0';
@@ -1250,9 +1261,6 @@
             }, 5000);
         }
 
-        // ────────────────────────────────────────────────
-        // Add PulseChain Network
-        // ────────────────────────────────────────────────
         async function addPulseChainToWallet() {
             if (typeof window.ethereum === 'undefined') {
                 showToast("No Ethereum-compatible wallet detected.\nPlease install MetaMask, Rabby, or similar.", 'error');
@@ -1276,15 +1284,12 @@
                 });
                 showToast("PulseChain network added successfully!\nYou can now switch to it in your wallet.");
             } catch (error) {
-                if (error.code === 4001) return; // User rejected
+                if (error.code === 4001) return;
                 console.error(error);
                 showToast(`Failed to add PulseChain network.\n${error.message || "Unknown error — check console."}`, 'error');
             }
         }
 
-        // ────────────────────────────────────────────────
-        // Add SHD Token to Wallet (ERC-20)
-        // ────────────────────────────────────────────────
         async function addSHDToWallet() {
             if (typeof window.ethereum === 'undefined') {
                 showToast("No Ethereum-compatible wallet detected.\nPlease install MetaMask, Rabby, or similar.", 'error');
@@ -1300,7 +1305,6 @@
                             address: '0x7E5A488756c3FEe54248f97a36dF5B0e9cf27d8d',
                             symbol: 'SHD',
                             decimals: 18,
-                            
                         }
                     }
                 });
@@ -1311,7 +1315,7 @@
                     showToast("Token addition was not confirmed.\nYou can try again or add it manually.", 'error');
                 }
             } catch (error) {
-                if (error.code === 4001) return; // User rejected
+                if (error.code === 4001) return;
                 console.error(error);
                 showToast(`Failed to add SHD token.\n${error.message || "Unknown error — make sure you're on PulseChain network."}`, 'error');
             }
