@@ -63,7 +63,7 @@ Always do your own research before trading or interacting with any token.
 ## 🔗 Links
 
 - Token: [0xb95bc84f9b6d0373642d586b81979b067572f7bc](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)  
-- Transaction: [View Transaction](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)  
+- Transaction: [View Creation](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)  
 - PumpTires: [View & trade SHD](https://pump.tires/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)  
 - Official Website: [snipehead.xyz](https://snipehead.xyz)
 
