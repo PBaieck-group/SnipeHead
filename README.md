@@ -6,16 +6,21 @@
 
 ## 🚀 Overview
 
+- 🧠 **Portal**: [snipehead.xyz](https://www.snipehead.xyz)
 - **Token Name:** SnipeHead  
 - **Symbol:** SHD  
 - **Network:** PulseChain  
-- **Total Supply:** 1,000,000,000  
+- **Total Supply:** 1,000,000,000 
+
 
 - **Token Address:**  
   https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc  
 
 - **Launch Transaction:**  
   https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b  
+
+- **SnipeHead Mining Fallback**  
+  (https://ipfs.io/ipfs/bafybeiane5emozgj5rowcfvwncqm4oe2vcv7h5pjne364lsfv7tzyshmgq/)
 
 ---
 
