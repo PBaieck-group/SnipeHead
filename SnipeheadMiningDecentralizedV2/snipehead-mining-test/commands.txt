@@ -1,0 +1,19 @@
+forge script script/SnipeheadTestnetV4.s.sol \
+  --rpc-url https://rpc.v4.testnet.pulsechain.com \
+  --broadcast \
+  -vvv
+
+
+forge script script/SnipeheadTestnetV4.s.sol \
+  --rpc-url https://rpc.v4.testnet.pulsechain.com \
+  --broadcast \
+  --skip-simulation \
+  -vvv  
+
+
+forge script script/SnipeheadTestnetV4.s.sol \
+  --rpc-url https://rpc.v4.testnet.pulsechain.com \
+  --broadcast \
+  -vvv \
+  --evm-version paris \
+  --use solc:0.8.20
