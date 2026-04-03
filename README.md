@@ -37,8 +37,8 @@ The base asset powering the ecosystem.
 
 A fully trustless mining protocol is now live:
 
-- Stake SHD to earn SHD rewards  
-- No lockups (unstake anytime)  
+- Mine SHD to earn SHD rewards  
+- No lockups (unmine anytime)  
 - Fixed reward rate  
 - No admin control or upgradeability  
 - Public reward funding via `deposit()`  
