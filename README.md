@@ -13,7 +13,8 @@
 - **Total Supply:** 1,000,000,000 SHD
 - **Token Address:** [0xB95bC84f9B6D0373642D586b81979B067572f7bc](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 - **Faucet V2 Address:** [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
-- **Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
+- **Mining V2 Address:** [0xDC292E06219F683f065c8911fAf1ad2109CBEDE0](https://ipfs.scan.pulsechain.com/address/0xDC292E06219F683f065c8911fAf1ad2109CBEDE0)
+- **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
 - **SnipeHead Mining dApp Fallback:** [IPFS](https://ipfs.io/ipfs/bafybeiane5emozgj5rowcfvwncqm4oe2vcv7h5pjne364lsfv7tzyshmgq/)
 
 ---
