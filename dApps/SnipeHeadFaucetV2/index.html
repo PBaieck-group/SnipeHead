@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnipeHead Faucet V2 - PulseChain</title>
+    <link href="output.css" rel="stylesheet">
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="text/javascript"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-snipehead bg-cover bg-center bg-no-repeat text-gray-200 font-arial">
+    <div class="ascii-art font-mono text-center text-black my-4">
+        //                (   O   )
+        // I’m SnipeHead  ( === )
+        // Suck Me Dry    `---'
+    </div>
+    <div class="max-w-md w-full bg-gray-900 p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center mb-4">SnipeHead Faucet V2</h1>
+        <p class="text-center text-gray-400 mb-6">
+            Claim <strong>1 SHD</strong> per wallet address (one time only).<br>
+            Global daily limit: max 1,000 SHD dispensed per 24 hours.
+        </p>
+        
+        <div id="wallet-status" class="text-center mb-4">
+            <button id="connect-wallet" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">
+                Connect Wallet
+            </button>
+            <button id="add-token" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mt-2 hidden">
+                Add SHD to Wallet
+            </button>
+            <p id="wallet-address" class="text-gray-400 mt-2 hidden"></p>
+        </div>
+        
+        <div class="text-center mb-6">
+            <button id="claim-tokens" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded w-full" disabled>
+                Claim 1 SHD
+            </button>
+            <p id="claim-note" class="text-xs text-gray-500 mt-2"></p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="font-semibold">Faucet Balance:</p>
+                <p id="faucet-balance">Loading...</p>
+            </div>
+            <div>
+                <p class="font-semibold">Daily Remaining:</p>
+                <p id="daily-remaining">Loading...</p>
+            </div>
+            <div>
+                <p class="font-semibold">Your Claim Status:</p>
+                <p id="claim-status">Connect Wallet</p>
+            </div>
+            <div>
+                <p class="font-semibold">Global Daily Limit:</p>
+                <p>1,000 SHD</p>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center text-gray-400 text-sm">
+            <p><a href="https://pulsechain.com" target="_blank" class="hover:underline">Network: PulseChain (Chain ID: 369)</a></p>
+            <p>Currency: PLS</p>
+            <p><a href="https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98" target="_blank" class="text-blue-400 hover:underline">View Contract</a></p>
+            <p><a href="https://www.snipehead.xyz" target="_blank" class="text-blue-400 hover:underline">SnipeHead Portal</a></p>
+            <p><a href="https://gitlab.com/pbaieck-group/snipehead/-/tree/main/SnipeHead-faucetV2" target="_blank" class="text-blue-400 hover:underline">View Source</a></p>
+        </div>
+    </div>
+
+    <script>
+        const faucetAddress = '0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98';
+        const shdTokenAddress = '0xB95bC84f9B6D0373642D586b81979B067572f7bc';
+
+        const faucetAbi = [
+            {
+                "inputs": [],
+                "name": "claimTokens",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                ],
+                "name": "TokensClaimed",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "getFaucetBalance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getDailyTokensRemaining",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+                "name": "hasAddressClaimed",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        const tokenAbi = [
+            {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+        ];
+
+        let provider, signer, faucetContract, tokenContract, userAccount;
+        let readOnlyProvider, readOnlyFaucetContract, readOnlyTokenContract;
+
+        readOnlyProvider = new ethers.providers.JsonRpcProvider('https://rpc.pulsechain.com');
+        readOnlyFaucetContract = new ethers.Contract(faucetAddress, faucetAbi, readOnlyProvider);
+        readOnlyTokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, readOnlyProvider);
+
+        async function getTokenDetails() {
+            try {
+                const active = tokenContract || readOnlyTokenContract;
+                return {
+                    name: await active.name(),
+                    symbol: await active.symbol(),
+                    decimals: await active.decimals()
+                };
+            } catch (e) {
+                return { name: 'SnipeHead', symbol: 'SHD', decimals: 18 };
+            }
+        }
+
+        async function addSHDTokenToWallet() {
+            if (!window.ethereum) return alert('Please install a Web3 wallet.');
+            try {
+                const { symbol, decimals } = await getTokenDetails();
+                await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: shdTokenAddress,
+                            symbol: symbol,
+                            decimals: decimals,
+                            image: 'https://www.snipehead.xyz/shd-logo.png'
+                        }
+                    }
+                });
+                alert(`${symbol} token added to your wallet!`);
+            } catch (error) {
+                alert('Could not add token automatically. Add manually using address:\n' + shdTokenAddress);
+            }
+        }
+
+        async function checkNetwork() {
+            if (!provider) return false;
+            const network = await provider.getNetwork();
+            if (network.chainId !== 369) {
+                try {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x171' }] });
+                } catch (e) {
+                    if (e.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x171',
+                                chainName: 'PulseChain',
+                                rpcUrls: ['https://rpc.pulsechain.com'],
+                                nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 },
+                                blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
+                            }]
+                        });
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+            return true;
+        }
+
+        async function connectWallet() {
+            if (!window.ethereum) return alert('Please install MetaMask or another Web3 wallet.');
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send('eth_requestAccounts', []);
+                signer = provider.getSigner();
+                userAccount = await signer.getAddress();
+
+                await checkNetwork();
+
+                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
+                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
+
+                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
+                document.getElementById('wallet-address').classList.remove('hidden');
+                document.getElementById('connect-wallet').textContent = 'Wallet Connected';
+                document.getElementById('connect-wallet').classList.add('bg-gray-600', 'cursor-not-allowed');
+                document.getElementById('connect-wallet').disabled = true;
+                document.getElementById('add-token').classList.remove('hidden');
+                document.getElementById('claim-tokens').disabled = false;
+
+                await updateFaucetStatus();
+            } catch (error) {
+                alert('Failed to connect: ' + error.message);
+            }
+        }
+
+        async function updateFaucetStatus() {
+            try {
+                const activeFaucet = faucetContract || readOnlyFaucetContract;
+                const activeToken = tokenContract || readOnlyTokenContract;
+
+                const decimals = await activeToken.decimals();
+
+                // Faucet balance
+                const balance = await activeFaucet.getFaucetBalance();
+                document.getElementById('faucet-balance').textContent = 
+                    `${Number(ethers.utils.formatUnits(balance, decimals)).toLocaleString()} SHD`;
+
+                // Global daily remaining
+                const remaining = await activeFaucet.getDailyTokensRemaining();
+                document.getElementById('daily-remaining').textContent = 
+                    `${Number(ethers.utils.formatUnits(remaining, decimals)).toLocaleString()} SHD`;
+
+                if (userAccount && faucetContract) {
+                    const hasClaimed = await activeFaucet.hasAddressClaimed(userAccount);
+                    const statusEl = document.getElementById('claim-status');
+                    const noteEl = document.getElementById('claim-note');
+                    const claimBtn = document.getElementById('claim-tokens');
+
+                    if (hasClaimed) {
+                        statusEl.textContent = 'Already Claimed';
+                        statusEl.style.color = '#f87171';
+                        claimBtn.disabled = true;
+                        claimBtn.classList.add('bg-gray-600', 'cursor-not-allowed');
+                        noteEl.textContent = 'You have already claimed your 1 SHD (one per address ever)';
+                    } else {
+                        statusEl.textContent = 'Eligible';
+                        statusEl.style.color = '#4ade80';
+                        claimBtn.disabled = false;
+                        claimBtn.classList.remove('bg-gray-600', 'cursor-not-allowed');
+                        noteEl.textContent = 'You can claim 1 SHD once';
+                    }
+                } else {
+                    document.getElementById('claim-status').textContent = 'Connect Wallet';
+                    document.getElementById('claim-note').textContent = '';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('faucet-balance').textContent = 'Error';
+                document.getElementById('daily-remaining').textContent = 'Error';
+            }
+        }
+
+        async function claimTokens() {
+            if (!userAccount || !faucetContract) return alert('Please connect your wallet first.');
+
+            try {
+                const plsBalance = await provider.getBalance(userAccount);
+                if (plsBalance.isZero()) return alert('Insufficient PLS for gas fees.');
+
+                const claimBtn = document.getElementById('claim-tokens');
+                claimBtn.textContent = 'Claiming...';
+                claimBtn.disabled = true;
+
+                const gasLimit = await faucetContract.estimateGas.claimTokens();
+                const tx = await faucetContract.claimTokens({ gasLimit: gasLimit.mul(12).div(10) });
+                await tx.wait();
+
+                alert('✅ Successfully claimed 1 SHD!');
+                await updateFaucetStatus();
+            } catch (error) {
+                console.error(error);
+                alert('Claim failed: ' + (error.reason || error.message));
+            } finally {
+                document.getElementById('claim-tokens').textContent = 'Claim 1 SHD';
+                document.getElementById('claim-tokens').disabled = false;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+        document.getElementById('claim-tokens').addEventListener('click', claimTokens);
+        document.getElementById('add-token').addEventListener('click', addSHDTokenToWallet);
+
+        window.ethereum?.on('accountsChanged', async (accounts) => {
+            if (accounts.length > 0) {
+                userAccount = accounts[0];
+                signer = provider.getSigner();
+                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
+                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
+                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
+                await updateFaucetStatus();
+            } else {
+                resetUI();
+            }
+        });
+
+        window.ethereum?.on('chainChanged', () => location.reload());
+
+        function resetUI() {
+            userAccount = null;
+            document.getElementById('wallet-address').classList.add('hidden');
+            document.getElementById('connect-wallet').textContent = 'Connect Wallet';
+            document.getElementById('connect-wallet').classList.remove('bg-gray-600', 'cursor-not-allowed');
+            document.getElementById('connect-wallet').disabled = false;
+            document.getElementById('add-token').classList.add('hidden');
+            document.getElementById('claim-tokens').disabled = true;
+            document.getElementById('claim-status').textContent = 'Connect Wallet';
+            document.getElementById('claim-note').textContent = '';
+            updateFaucetStatus();
+        }
+
+        // Initial load
+        updateFaucetStatus();
+    </script>
+</body>
+</html>
