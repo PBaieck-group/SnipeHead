@@ -13,10 +13,10 @@
 - **Total Supply:** 1,000,000,000 SHD
 - **Token Address:** [0xB95bC84f9B6D0373642D586b81979B067572f7bc](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 - **Faucet V2 Address:** [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
-- **Mining V2 Address:** [0xDC292E06219F683f065c8911fAf1ad2109CBEDE0](https://ipfs.scan.pulsechain.com/address/0xDC292E06219F683f065c8911fAf1ad2109CBEDE0)
+- **Mining V2 Address:** [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xDC292E06219F683f065c8911fAf1ad2109CBEDE0)
 - **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
 - **IPFS Faucet dApp Fallback:** [bafybeigvp3b5e37lcadocihbishejrf74c5gu63aiwln5jpcha4d2xydvm](https://bafybeigvp3b5e37lcadocihbishejrf74c5gu63aiwln5jpcha4d2xydvm.ipfs.dweb.link)
-- **IPFS Mining dApp Fallback:** [bafybeiegjnpttuxiyhbgxwnez2yugytqu2zvif4uj44qdgj3ostpg6ftri](https://bafybeiegjnpttuxiyhbgxwnez2yugytqu2zvif4uj44qdgj3ostpg6ftri.ipfs.dweb.link)
+- **IPFS Mining dApp Fallback:** [bafkreib3g2vutddengtdbzhrsjxjsbauvu7r3e4ukkzoqcun6f2td26nzm](https://bafkreib3g2vutddengtdbzhrsjxjsbauvu7r3e4ukkzoqcun6f2td26nzm.ipfs.dweb.link)
 
 ---
 
@@ -38,7 +38,7 @@ Fully trustless mining protocol:
 - Fixed reward rate
 - No admin control or upgradeability
 
-**Mining Contract:** `0xDC292E06219F683f065c8911fAf1ad2109CBEDE0`  
+**Mining Contract:** `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`  
 **Repository:** [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2)
 
 #### 3. Faucet V2
@@ -63,7 +63,7 @@ A secure and fair community faucet to help new users get started with SHD.
 |------------------------|------------|----------------------------------------------------|------|
 | Token (SHD)            | Live       | `0xB95bC84f9B6D0373642D586b81979B067572f7bc`     | [Token.sol](https://github.com/PBaieck-group/SnipeHead/blob/main/Token.sol) |
 | Faucet V2              | Live       | `0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98`     | [SnipeHead-faucetV2/](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2) |
-| Decentralized Mining   | Live       | `0xDC292E06219F683f065c8911fAf1ad2109CBEDE0`     | [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2) |
+| Decentralized Mining   | Live       | `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`     | [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2) |
 
 ---
 
@@ -109,7 +109,7 @@ Always do your own research (DYOR) before interacting with any smart contracts o
 - **Website**: [snipehead.xyz](https://www.snipehead.xyz)
 - **Token**: [View on PulseChain Scan](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 - **Faucet V2**: [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
-- **Mining Contract V2**: [0xDC292E06219F683f065c8911fAf1ad2109CBEDE0](https://ipfs.scan.pulsechain.com/address/0xDC292E06219F683f065c8911fAf1ad2109CBEDE0)
+- **Mining Contract V2**: [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **Trade on PumpTires**: [pump.tires](https://pump.tires/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 
 ---
