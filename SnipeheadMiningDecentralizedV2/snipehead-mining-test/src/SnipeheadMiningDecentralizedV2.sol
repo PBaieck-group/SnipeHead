@@ -8,15 +8,13 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    
     IERC20 public immutable shdToken = IERC20(0xB95bC84f9B6D0373642D586b81979B067572f7bc);
 
     struct UserInfo {
-        uint256 minedAmount;   // Amount of SHD currently staked by user
-        uint256 rewardDebt;    // Used to calculate pending rewards correctly
+        uint256 minedAmount;  // Amount of SHD currently mined by user
+        uint256 rewardDebt;   // Used to calculate pending rewards correctly
     }
 
-   
     uint256 public immutable rewardRate = 31771820820; // Fixed forever
 
     uint256 public lastRewardBlock;
@@ -24,6 +22,12 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
 
     mapping(address => UserInfo) public userInfo;
     uint256 public totalMined;
+
+    // ── FIX 1: Separate accounting ────────────────────────────────────────────
+    // rewardReserve tracks SHD deposited specifically for rewards via deposit().
+    // totalMined tracks SHD mined by users via mine().
+    // The two pools never overlap: rewards are only paid from rewardReserve.
+    uint256 public rewardReserve;
 
     // Events
     event Deposited(address indexed from, uint256 amount);
@@ -36,7 +40,10 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
         lastRewardBlock = block.number;
     }
 
-    // Update global reward variables
+    // ── Update global reward variables ────────────────────────────────────────
+    // FIX 2: updatePool() now caps the reward it can accrue to what is
+    // actually sitting in rewardReserve, preventing the pool from promising
+    // more than it can pay and thereby protecting miner principal.
     function updatePool() public {
         if (block.number <= lastRewardBlock || totalMined == 0) {
             lastRewardBlock = block.number;
@@ -44,27 +51,49 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
         }
 
         uint256 blocks = block.number - lastRewardBlock;
-        uint256 reward = (blocks * rewardRate * totalMined) / 1e18;
-        accRewardPerShare += (reward * 1e18) / totalMined;
+        uint256 theoreticalReward = (blocks * rewardRate * totalMined) / 1e18;
+
+        // Cap accrual to whatever reward tokens are actually available.
+        // This is the reserve cap: we never accrue more than we can pay.
+        uint256 actualReward = theoreticalReward > rewardReserve
+            ? rewardReserve
+            : theoreticalReward;
+
+        if (actualReward > 0) {
+            accRewardPerShare += (actualReward * 1e18) / totalMined;
+            // Earmark those tokens so safeSHDTransfer knows they are spoken for.
+            rewardReserve -= actualReward;
+        }
+
         lastRewardBlock = block.number;
     }
 
-    // View pending rewards for a user
+    // ── View pending rewards for a user ───────────────────────────────────────
     function pendingRewards(address _user) public view returns (uint256) {
         UserInfo storage user = userInfo[_user];
         uint256 acc = accRewardPerShare;
 
         if (block.number > lastRewardBlock && totalMined != 0) {
             uint256 blocks = block.number - lastRewardBlock;
-            uint256 reward = (blocks * rewardRate * totalMined) / 1e18;
-            acc += (reward * 1e18) / totalMined;
+            uint256 theoreticalReward = (blocks * rewardRate * totalMined) / 1e18;
+
+            // Mirror the reserve cap used in updatePool() so the view is honest.
+            uint256 actualReward = theoreticalReward > rewardReserve
+                ? rewardReserve
+                : theoreticalReward;
+
+            if (actualReward > 0) {
+                acc += (actualReward * 1e18) / totalMined;
+            }
         }
 
         return (user.minedAmount * acc) / 1e18 - user.rewardDebt;
     }
 
-    // ==================== ANYONE CAN FUND THE POOL ====================
-    // Public function so anyone can send SHD to support development and rewards
+    // ── Anyone can fund the reward pool ───────────────────────────────────────
+    // FIX 1 applied here: deposited tokens are credited to rewardReserve,
+    // a separate counter from totalMined, so they can never be confused with
+    // miner principal or withdrawn by miners.
     function deposit(uint256 _amount) external nonReentrant {
         if (_amount == 0) revert ZeroAmount();
 
@@ -74,10 +103,15 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
 
         if (actualReceived == 0) revert NoTokensReceived();
 
+        // Credit exclusively to the reward reserve — NOT to totalMined.
+        rewardReserve += actualReceived;
+
         emit Deposited(msg.sender, actualReceived);
     }
 
-    // Mine SHD tokens (requires approve first)
+    // ── Mine SHD tokens ───────────────────────────────────────────────
+    // Mined tokens are tracked in totalMined / user.minedAmount only.
+    // They are never mixed with rewardReserve.
     function mine(uint256 _amount) external nonReentrant {
         if (_amount == 0) revert ZeroAmount();
 
@@ -85,7 +119,7 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
 
         UserInfo storage user = userInfo[msg.sender];
 
-        // Claim any pending rewards before adding more stake
+        // Claim any pending rewards before adding more mine.
         if (user.minedAmount > 0) {
             uint256 pending = (user.minedAmount * accRewardPerShare) / 1e18 - user.rewardDebt;
             if (pending > 0) {
@@ -107,14 +141,16 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
         emit Mined(msg.sender, actualReceived);
     }
 
-    // Unmine SHD tokens
+    // ── Unmine SHD tokens ───────────────────────────────────────────
+    // Returns exactly the mined principal from the mining portion of the
+    // balance. The reward reserve is never touched here.
     function unmine(uint256 _amount) external nonReentrant {
         UserInfo storage user = userInfo[msg.sender];
         if (_amount == 0 || user.minedAmount < _amount) revert InsufficientAmount();
 
         updatePool();
 
-        // Claim pending rewards before unstaking
+        // Claim pending rewards before unmining.
         uint256 pending = (user.minedAmount * accRewardPerShare) / 1e18 - user.rewardDebt;
         if (pending > 0) {
             safeSHDTransfer(msg.sender, pending);
@@ -130,7 +166,7 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
         emit Unmined(msg.sender, _amount);
     }
 
-    // Claim rewards without unstaking
+    // ── Claim rewards without unmining ───────────────────────────────────────
     function claimRewards() external nonReentrant {
         updatePool();
         UserInfo storage user = userInfo[msg.sender];
@@ -143,12 +179,23 @@ contract SnipeheadMiningDecentralizedV2 is ReentrancyGuard {
         emit RewardClaimed(msg.sender, pending);
     }
 
-    // View contract SHD balance
+    // ── View helpers ──────────────────────────────────────────────────────────
+
+    // Total SHD held by the contract (mined principal + reward reserve).
     function getContractSHDBalance() public view returns (uint256) {
         return shdToken.balanceOf(address(this));
     }
 
-    // Internal safe transfer (never sends more than available)
+    // Remaining SHD available for future rewards.
+    function getRewardReserve() public view returns (uint256) {
+        return rewardReserve;
+    }
+
+    // ── Internal safe transfer ────────────────────────────────────────────────
+    // FIX 1 applied here: transfers come from the contract balance but the
+    // amount is already bounded by accRewardPerShare which was itself bounded
+    // by rewardReserve in updatePool(). Miner principal is therefore never
+    // reachable by this path under normal operation.
     function safeSHDTransfer(address _to, uint256 _amount) private {
         uint256 bal = shdToken.balanceOf(address(this));
         uint256 transferAmount = _amount > bal ? bal : _amount;

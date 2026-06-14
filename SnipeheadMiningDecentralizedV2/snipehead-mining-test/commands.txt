@@ -17,3 +17,6 @@ forge script script/SnipeheadTestnetV4.s.sol \
   -vvv \
   --evm-version paris \
   --use solc:0.8.20
+
+
+forge test --match-path test/SnipeheadMiningDecentralizedV2.t.sol -vvv
