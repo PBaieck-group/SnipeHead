@@ -174,7 +174,7 @@ forge script script/SnipeheadMiningDecentralizedV2.s.sol \
 ## Security
 
 - Uses OpenZeppelin `SafeERC20` and `ReentrancyGuard`
-- Reward reserve and staked principal are strictly separated in accounting
+- Reward reserve and mined principal are strictly separated in accounting
 - Reward accrual is hard-capped by available reserve — no over-promising
 - No upgradeability or privileged functions after deployment
 - No admin keys, no owner, fully immutable once deployed
