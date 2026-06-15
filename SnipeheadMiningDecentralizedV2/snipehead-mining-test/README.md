@@ -76,11 +76,11 @@ Anyone can call `deposit(uint256 amount)` to add SHD to the reward reserve. This
 |---|---|
 | `mine(amount)` | Mine SHD. Auto-claims any pending rewards first. |
 | `unmine(amount)` | Unmine SHD. Auto-claims pending rewards. Principal always returned in full. |
-| `claimRewards()` | Claim pending rewards without touching your stake. |
+| `claimRewards()` | Claim pending rewards without touching your mine. |
 | `deposit(amount)` | Fund the reward reserve. Open to anyone. |
 | `pendingRewards(address)` | View pending rewards for any address. Capped honestly by reserve. |
 | `getRewardReserve()` | View remaining SHD available for future rewards. |
-| `getContractSHDBalance()` | View total SHD held by the contract (stakes + reserve). |
+| `getContractSHDBalance()` | View total SHD held by the contract (mines + reserve). |
 
 ---
 
@@ -103,7 +103,7 @@ SnipeheadMiningDecentralizedV2/
     │   ├── SnipeheadMiningDecentralizedV2.s.sol    # Mainnet deployment script
     │   └── SnipeheadTestnetV4.s.sol                # Legacy testnet script
     ├── dAPP/
-    │   └── index.html                              # Web dApp (mainnet)
+    │   └── index.html                              # Web dApp (testnet_V4)
     ├── commands.txt
     └── foundry.toml
 ~~~
