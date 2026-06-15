@@ -61,7 +61,7 @@ A secure and fair community faucet to help new users get started with SHD.
 
 | Component              | Status     | Contract Address                                   | Link |
 |------------------------|------------|----------------------------------------------------|------|
-| Token (SHD)            | Live       | `0xB95bC84f9B6D0373642D586b81979B067572f7bc`     | [SnipeHead.sol](https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/0xB95bC84f9B6D0373642D586b81979B067572f7bc?tab=contract) |
+| SnipeHead (SHD)            | Live       | `0xB95bC84f9B6D0373642D586b81979B067572f7bc`     | [SnipeHead.sol](https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/0xB95bC84f9B6D0373642D586b81979B067572f7bc?tab=contract) |
 | Faucet V2              | Live       | `0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98`     | [SnipeHead-faucetV2/](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2) |
 | Decentralized Mining   | Live       | `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`     | [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2) |
 
