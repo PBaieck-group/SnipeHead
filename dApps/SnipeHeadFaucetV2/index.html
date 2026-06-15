@@ -1,325 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnipeHead Faucet V2 - PulseChain</title>
-    <link href="output.css" rel="stylesheet">
-    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="text/javascript"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnipeHead Faucet — Claim SHD</title>
+  <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ───────────────────────────────────────────────── */
+    :root {
+      --bg:        #080b10;
+      --surface:   #0d1117;
+      --card:      #111820;
+      --border:    #1e2d3d;
+      --accent:    #00d4ff;
+      --accent2:   #7b61ff;
+      --success:   #00e5a0;
+      --danger:    #ff4d6d;
+      --text:      #e8f1ff;
+      --muted:     #5a7a99;
+      --mono:      'Space Mono', monospace;
+      --sans:      'Space Grotesk', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 48px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND ──────────────────────────────────────────── */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    .bg-glow {
+      position: fixed; z-index: 0; pointer-events: none;
+      border-radius: 50%;
+      filter: blur(120px);
+    }
+    .bg-glow-1 {
+      width: 600px; height: 600px;
+      top: -200px; left: -200px;
+      background: radial-gradient(circle, rgba(0,212,255,.10) 0%, transparent 70%);
+    }
+    .bg-glow-2 {
+      width: 500px; height: 500px;
+      bottom: -150px; right: -150px;
+      background: radial-gradient(circle, rgba(123,97,255,.12) 0%, transparent 70%);
+    }
+
+    /* ── LAYOUT ──────────────────────────────────────────────── */
+    .page { position: relative; z-index: 1; width: 100%; max-width: 480px; }
+
+    /* ── HEADER ──────────────────────────────────────────────── */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .logo-mark {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(123,97,255,.15));
+      border: 1px solid rgba(0,212,255,.25);
+      margin-bottom: 16px;
+      font-size: 32px;
+      position: relative;
+    }
+    .logo-mark::after {
+      content: '';
+      position: absolute; inset: -1px;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+    }
+    .site-title {
+      font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .site-sub {
+      margin-top: 6px;
+      font-size: 14px; color: var(--muted); font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── CARD ────────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,.4), transparent);
+    }
+
+    /* ── WALLET SECTION ──────────────────────────────────────── */
+    .wallet-section { margin-bottom: 28px; }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px 20px;
+      border-radius: 12px;
+      font-family: var(--sans); font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none; transition: all .2s ease;
+      position: relative; overflow: hidden;
+    }
+    .btn:disabled { cursor: not-allowed; opacity: .5; }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .btn-connect {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000;
+    }
+    .btn-connect:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(0,212,255,.25);
+    }
+
+    .btn-connected {
+      background: rgba(0,229,160,.08);
+      border: 1px solid rgba(0,229,160,.3);
+      color: var(--success);
+      cursor: default !important;
+    }
+
+    /* wallet address pill */
+    .wallet-pill {
+      display: none;
+      margin-top: 12px;
+      padding: 8px 14px;
+      background: rgba(0,212,255,.06);
+      border: 1px solid rgba(0,212,255,.15);
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: .5px;
+    }
+    .wallet-pill.show { display: block; }
+
+    /* ── STATS GRID ──────────────────────────────────────────── */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .stat-box {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .stat-label {
+      font-size: 11px; font-weight: 500;
+      color: var(--muted); letter-spacing: .8px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 18px; font-weight: 700;
+      color: var(--text);
+    }
+    .stat-value.green { color: var(--success); }
+    .stat-value.blue  { color: var(--accent); }
+
+    /* ── DIVIDER ─────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 24px 0;
+    }
+
+    /* ── CLAIM SECTION ───────────────────────────────────────── */
+    .claim-label {
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 10px;
+    }
+
+    .claim-status-banner {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 13px; font-weight: 500;
+    }
+    .claim-status-banner.eligible {
+      background: rgba(0,229,160,.08);
+      border: 1px solid rgba(0,229,160,.25);
+      color: var(--success);
+    }
+    .claim-status-banner.claimed {
+      background: rgba(255,77,109,.08);
+      border: 1px solid rgba(255,77,109,.25);
+      color: var(--danger);
+    }
+    .claim-status-banner.waiting {
+      background: rgba(0,212,255,.06);
+      border: 1px solid rgba(0,212,255,.15);
+      color: var(--muted);
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .eligible .status-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .claimed .status-dot  { background: var(--danger); }
+    .waiting .status-dot  { background: var(--muted); }
+
+    .btn-claim {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000; font-size: 16px;
+    }
+    .btn-claim:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px rgba(0,212,255,.3);
+    }
+    .btn-claim:active:not(:disabled) { transform: translateY(0); }
+
+    /* ── TOAST ───────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px; font-weight: 500;
+      z-index: 999;
+      opacity: 0;
+      transition: all .35s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success {
+      background: rgba(0,229,160,.15);
+      border: 1px solid rgba(0,229,160,.4);
+      color: var(--success);
+    }
+    .toast.error {
+      background: rgba(255,77,109,.12);
+      border: 1px solid rgba(255,77,109,.35);
+      color: var(--danger);
+    }
+    .toast.info {
+      background: rgba(0,212,255,.1);
+      border: 1px solid rgba(0,212,255,.3);
+      color: var(--accent);
+    }
+
+    /* ── TX MODAL ────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      width: 90%; max-width: 360px;
+      text-align: center;
+    }
+    .modal-spinner {
+      display: inline-block;
+      width: 48px; height: 48px;
+      border: 3px solid rgba(0,212,255,.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .modal-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── SUCCESS ANIMATION ───────────────────────────────────── */
+    .modal-check {
+      display: none;
+      font-size: 48px;
+      margin-bottom: 16px;
+      animation: pop .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    .footer-links {
+      margin-top: 20px;
+      display: flex; justify-content: center; gap: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      letter-spacing: .3px; transition: color .15s;
+    }
+    .footer-links a:hover { color: var(--accent); }
+
+    .network-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 14px;
+      padding: 5px 12px;
+      background: rgba(0,212,255,.06);
+      border: 1px solid rgba(0,212,255,.12);
+      border-radius: 99px;
+      font-size: 11px; color: var(--muted); letter-spacing: .4px;
+    }
+    .network-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 5px var(--success);
+    }
+
+    /* ── ADD TOKEN BUTTON ────────────────────────────────────── */
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    .btn-ghost:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,212,255,.05);
+    }
+
+    /* ── PROGRESS BAR ────────────────────────────────────────── */
+    .daily-bar-wrap {
+      margin-top: 8px;
+    }
+    .daily-bar-track {
+      height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,.06);
+      margin-top: 8px; overflow: hidden;
+    }
+    .daily-bar-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .6s ease;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 420px) {
+      .card { padding: 24px 20px; }
+      .site-title { font-size: 22px; }
+    }
+
+    /* ── REDUCED MOTION ──────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .modal-spinner { animation: none; }
+      .btn { transition: none; }
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center bg-snipehead bg-cover bg-center bg-no-repeat text-gray-200 font-arial">
-    <div class="ascii-art font-mono text-center text-black my-4">
-        //                (   O   )
-        // I’m SnipeHead  ( === )
-        // Suck Me Dry    `---'
-    </div>
-    <div class="max-w-md w-full bg-gray-900 p-6 rounded-lg shadow-lg">
-        <h1 class="text-2xl font-bold text-center mb-4">SnipeHead Faucet V2</h1>
-        <p class="text-center text-gray-400 mb-6">
-            Claim <strong>1 SHD</strong> per wallet address (one time only).<br>
-            Global daily limit: max 1,000 SHD dispensed per 24 hours.
-        </p>
-        
-        <div id="wallet-status" class="text-center mb-4">
-            <button id="connect-wallet" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">
-                Connect Wallet
-            </button>
-            <button id="add-token" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded mt-2 hidden">
-                Add SHD to Wallet
-            </button>
-            <p id="wallet-address" class="text-gray-400 mt-2 hidden"></p>
-        </div>
-        
-        <div class="text-center mb-6">
-            <button id="claim-tokens" class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded w-full" disabled>
-                Claim 1 SHD
-            </button>
-            <p id="claim-note" class="text-xs text-gray-500 mt-2"></p>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-                <p class="font-semibold">Faucet Balance:</p>
-                <p id="faucet-balance">Loading...</p>
-            </div>
-            <div>
-                <p class="font-semibold">Daily Remaining:</p>
-                <p id="daily-remaining">Loading...</p>
-            </div>
-            <div>
-                <p class="font-semibold">Your Claim Status:</p>
-                <p id="claim-status">Connect Wallet</p>
-            </div>
-            <div>
-                <p class="font-semibold">Global Daily Limit:</p>
-                <p>1,000 SHD</p>
-            </div>
-        </div>
-        
-        <div class="mt-6 text-center text-gray-400 text-sm">
-            <p><a href="https://pulsechain.com" target="_blank" class="hover:underline">Network: PulseChain (Chain ID: 369)</a></p>
-            <p>Currency: PLS</p>
-            <p><a href="https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98" target="_blank" class="text-blue-400 hover:underline">View Contract</a></p>
-            <p><a href="https://www.snipehead.xyz" target="_blank" class="text-blue-400 hover:underline">SnipeHead Portal</a></p>
-            <p><a href="https://gitlab.com/pbaieck-group/snipehead/-/tree/main/SnipeHead-faucetV2" target="_blank" class="text-blue-400 hover:underline">View Source</a></p>
-        </div>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- MAIN -->
+  <div class="page">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-mark">🎯</div>
+      <h1 class="site-title">SnipeHead Faucet</h1>
+      <p class="site-sub">Claim your free SHD token on PulseChain</p>
     </div>
 
-    <script>
-        const faucetAddress = '0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98';
-        const shdTokenAddress = '0xB95bC84f9B6D0373642D586b81979B067572f7bc';
+    <!-- Card -->
+    <div class="card">
 
-        const faucetAbi = [
-            {
-                "inputs": [],
-                "name": "claimTokens",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
-                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
-                    {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
-                ],
-                "name": "TokensClaimed",
-                "type": "event"
-            },
-            {
-                "inputs": [],
-                "name": "getFaucetBalance",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getDailyTokensRemaining",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
-                "name": "hasAddressClaimed",
-                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
+      <!-- Wallet -->
+      <div class="wallet-section">
+        <button class="btn btn-connect" id="btn-connect" onclick="connectWallet()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/><circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/></svg>
+          Connect Wallet
+        </button>
+        <div class="wallet-pill" id="wallet-pill"></div>
+      </div>
 
-        const tokenAbi = [
-            {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
-        ];
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Faucet Balance</div>
+          <div class="stat-value blue" id="stat-balance">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Daily Limit</div>
+          <div class="stat-value" id="stat-daily">—</div>
+          <div class="daily-bar-wrap">
+            <div class="daily-bar-track">
+              <div class="daily-bar-fill" id="daily-bar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Your Status</div>
+          <div class="stat-value" id="stat-status">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Per Wallet</div>
+          <div class="stat-value green">1 SHD</div>
+        </div>
+      </div>
 
-        let provider, signer, faucetContract, tokenContract, userAccount;
-        let readOnlyProvider, readOnlyFaucetContract, readOnlyTokenContract;
+      <div class="divider"></div>
 
-        readOnlyProvider = new ethers.providers.JsonRpcProvider('https://rpc.pulsechain.com');
-        readOnlyFaucetContract = new ethers.Contract(faucetAddress, faucetAbi, readOnlyProvider);
-        readOnlyTokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, readOnlyProvider);
+      <!-- Claim -->
+      <div>
+        <div class="claim-label">Claim Tokens</div>
 
-        async function getTokenDetails() {
-            try {
-                const active = tokenContract || readOnlyTokenContract;
-                return {
-                    name: await active.name(),
-                    symbol: await active.symbol(),
-                    decimals: await active.decimals()
-                };
-            } catch (e) {
-                return { name: 'SnipeHead', symbol: 'SHD', decimals: 18 };
-            }
+        <div class="claim-status-banner waiting" id="status-banner">
+          <div class="status-dot"></div>
+          <span id="status-text">Connect your wallet to check eligibility</span>
+        </div>
+
+        <button class="btn btn-claim" id="btn-claim" disabled onclick="claimTokens()">
+          Claim 1 SHD
+        </button>
+
+        <button class="btn btn-ghost" id="btn-add" style="display:none" onclick="addToken()">
+          + Add SHD to Wallet
+        </button>
+      </div>
+
+    </div><!-- /card -->
+
+    <!-- Footer -->
+    <div style="text-align:center">
+      <div class="footer-links">
+        <a href="https://pulsechain.com" target="_blank" rel="noopener">PulseChain</a>
+        <a href="https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98" target="_blank" rel="noopener">Contract</a>
+        <a href="https://www.snipehead.xyz" target="_blank" rel="noopener">SnipeHead Portal</a>
+        <a href="https://gitlab.com/pbaieck-group/snipehead/-/tree/main/SnipeHead-faucetV2" target="_blank" rel="noopener">Source</a>
+      </div>
+      <div class="network-badge">
+        <span class="network-dot"></span>
+        PulseChain · Chain ID 369
+      </div>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- TX Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-spinner" id="modal-spinner"></div>
+      <div class="modal-check" id="modal-check">🎉</div>
+      <div class="modal-title" id="modal-title">Submitting Transaction</div>
+      <div class="modal-sub" id="modal-sub">Confirm the transaction in your wallet, then wait for it to confirm on-chain.</div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ── SCRIPT ─────────────────────────────────────────────── -->
+  <script>
+    const FAUCET_ADDR  = '0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98';
+    const TOKEN_ADDR   = '0xB95bC84f9B6D0373642D586b81979B067572f7bc';
+    const PULSECHAIN   = { chainId: '0x171', chainName: 'PulseChain', rpcUrls: ['https://rpc.pulsechain.com'], nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 }, blockExplorerUrls: ['https://ipfs.scan.pulsechain.com'] };
+
+    const FAUCET_ABI = [
+      { inputs:[], name:'claimTokens', outputs:[], stateMutability:'nonpayable', type:'function' },
+      { inputs:[], name:'getFaucetBalance', outputs:[{internalType:'uint256',name:'',type:'uint256'}], stateMutability:'view', type:'function' },
+      { inputs:[], name:'getDailyTokensRemaining', outputs:[{internalType:'uint256',name:'',type:'uint256'}], stateMutability:'view', type:'function' },
+      { inputs:[{internalType:'address',name:'user',type:'address'}], name:'hasAddressClaimed', outputs:[{internalType:'bool',name:'',type:'bool'}], stateMutability:'view', type:'function' },
+    ];
+    const TOKEN_ABI = [
+      { inputs:[], name:'symbol',   outputs:[{type:'string'}], stateMutability:'view', type:'function' },
+      { inputs:[], name:'decimals', outputs:[{type:'uint8'}],  stateMutability:'view', type:'function' },
+    ];
+
+    let provider, signer, faucetRW, faucetW, userAccount;
+    const roProvider = new ethers.providers.JsonRpcProvider('https://rpc.pulsechain.com');
+    const roFaucet   = new ethers.Contract(FAUCET_ADDR, FAUCET_ABI, roProvider);
+
+    /* ── UI helpers ───────────────────────────────────────────── */
+    function showToast(msg, type = 'info', dur = 3500) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => { t.className = 'toast'; }, dur);
+    }
+
+    function setModal(state) {
+      const overlay = document.getElementById('modal');
+      const spinner = document.getElementById('modal-spinner');
+      const check   = document.getElementById('modal-check');
+      const title   = document.getElementById('modal-title');
+      const sub     = document.getElementById('modal-sub');
+      if (state === 'pending') {
+        spinner.style.display = 'inline-block'; check.style.display = 'none';
+        title.textContent = 'Submitting Transaction';
+        sub.textContent   = 'Confirm in your wallet, then wait for on-chain confirmation.';
+        overlay.classList.add('show');
+      } else if (state === 'success') {
+        spinner.style.display = 'none'; check.style.display = 'block';
+        title.textContent = 'Tokens Claimed!';
+        sub.textContent   = '1 SHD has been sent to your wallet. Welcome to SnipeHead.';
+        setTimeout(() => { overlay.classList.remove('show'); }, 2200);
+      } else {
+        overlay.classList.remove('show');
+      }
+    }
+
+    function setStatusBanner(kind, text) {
+      const el = document.getElementById('status-banner');
+      el.className = `claim-status-banner ${kind}`;
+      document.getElementById('status-text').textContent = text;
+    }
+
+    /* ── Stats update ─────────────────────────────────────────── */
+    async function refreshStats() {
+      try {
+        const active = faucetW || roFaucet;
+        const [bal, rem] = await Promise.all([active.getFaucetBalance(), active.getDailyTokensRemaining()]);
+        const balFmt = parseFloat(ethers.utils.formatUnits(bal, 18)).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        const remFmt = parseFloat(ethers.utils.formatUnits(rem, 18)).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        document.getElementById('stat-balance').textContent = `${balFmt} SHD`;
+        document.getElementById('stat-daily').textContent   = `${remFmt} / 1,000`;
+        const used = 1000 - parseFloat(ethers.utils.formatUnits(rem, 18));
+        document.getElementById('daily-bar').style.width = `${Math.min(100, (used / 1000) * 100)}%`;
+      } catch(e) {
+        document.getElementById('stat-balance').textContent = 'Error';
+        document.getElementById('stat-daily').textContent   = 'Error';
+      }
+
+      if (userAccount && faucetW) {
+        try {
+          const claimed = await (faucetW || roFaucet).hasAddressClaimed(userAccount);
+          const claimBtn = document.getElementById('btn-claim');
+          if (claimed) {
+            document.getElementById('stat-status').textContent = 'Claimed';
+            document.getElementById('stat-status').style.color = 'var(--danger)';
+            setStatusBanner('claimed', 'You have already claimed your 1 SHD. Each address can only claim once.');
+            claimBtn.disabled = true;
+          } else {
+            document.getElementById('stat-status').textContent = 'Eligible';
+            document.getElementById('stat-status').style.color = 'var(--success)';
+            setStatusBanner('eligible', 'You\'re eligible! Claim your free 1 SHD now.');
+            claimBtn.disabled = false;
+          }
+        } catch(e) {}
+      }
+    }
+
+    /* ── Connect wallet ───────────────────────────────────────── */
+    async function connectWallet() {
+      if (!window.ethereum) { showToast('No wallet detected — install MetaMask or Rabby.', 'error', 5000); return; }
+      const btn = document.getElementById('btn-connect');
+      btn.disabled = true; btn.textContent = 'Connecting…';
+      try {
+        provider    = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send('eth_requestAccounts', []);
+        signer      = provider.getSigner();
+        userAccount = await signer.getAddress();
+
+        // Ensure PulseChain
+        const { chainId } = await provider.getNetwork();
+        if (chainId !== 369) {
+          try { await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{ chainId:'0x171' }] }); }
+          catch(e) {
+            if (e.code === 4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[PULSECHAIN] });
+            else throw e;
+          }
+          provider = new ethers.providers.Web3Provider(window.ethereum);
+          signer   = provider.getSigner();
         }
 
-        async function addSHDTokenToWallet() {
-            if (!window.ethereum) return alert('Please install a Web3 wallet.');
-            try {
-                const { symbol, decimals } = await getTokenDetails();
-                await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: shdTokenAddress,
-                            symbol: symbol,
-                            decimals: decimals,
-                            image: 'https://www.snipehead.xyz/shd-logo.png'
-                        }
-                    }
-                });
-                alert(`${symbol} token added to your wallet!`);
-            } catch (error) {
-                alert('Could not add token automatically. Add manually using address:\n' + shdTokenAddress);
-            }
-        }
+        faucetW = new ethers.Contract(FAUCET_ADDR, FAUCET_ABI, signer);
 
-        async function checkNetwork() {
-            if (!provider) return false;
-            const network = await provider.getNetwork();
-            if (network.chainId !== 369) {
-                try {
-                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x171' }] });
-                } catch (e) {
-                    if (e.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x171',
-                                chainName: 'PulseChain',
-                                rpcUrls: ['https://rpc.pulsechain.com'],
-                                nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 },
-                                blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
-                            }]
-                        });
-                    } else {
-                        throw e;
-                    }
-                }
-            }
-            return true;
-        }
+        // UI: connected state
+        btn.className   = 'btn btn-connected';
+        btn.innerHTML   = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Connected`;
+        btn.disabled    = true;
+        const pill = document.getElementById('wallet-pill');
+        pill.textContent = `${userAccount.slice(0,6)} ··· ${userAccount.slice(-4)}`;
+        pill.classList.add('show');
+        document.getElementById('btn-add').style.display = 'flex';
 
-        async function connectWallet() {
-            if (!window.ethereum) return alert('Please install MetaMask or another Web3 wallet.');
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send('eth_requestAccounts', []);
-                signer = provider.getSigner();
-                userAccount = await signer.getAddress();
+        await refreshStats();
+        showToast('Wallet connected', 'success');
+      } catch(e) {
+        showToast('Connection failed: ' + (e.message || 'Unknown error'), 'error', 4000);
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/><circle cx="16" cy="14" r="1.5" fill="currentColor" stroke="none"/></svg> Connect Wallet';
+      }
+    }
 
-                await checkNetwork();
+    /* ── Claim ────────────────────────────────────────────────── */
+    async function claimTokens() {
+      if (!userAccount || !faucetW) { showToast('Connect your wallet first.', 'info'); return; }
+      try {
+        const pls = await provider.getBalance(userAccount);
+        if (pls.isZero()) { showToast('You need PLS for gas fees.', 'error', 4000); return; }
 
-                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
-                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
+        setModal('pending');
+        const gas = await faucetW.estimateGas.claimTokens();
+        const tx  = await faucetW.claimTokens({ gasLimit: gas.mul(12).div(10) });
+        await tx.wait();
 
-                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
-                document.getElementById('wallet-address').classList.remove('hidden');
-                document.getElementById('connect-wallet').textContent = 'Wallet Connected';
-                document.getElementById('connect-wallet').classList.add('bg-gray-600', 'cursor-not-allowed');
-                document.getElementById('connect-wallet').disabled = true;
-                document.getElementById('add-token').classList.remove('hidden');
-                document.getElementById('claim-tokens').disabled = false;
+        setModal('success');
+        showToast('🎯 1 SHD claimed successfully!', 'success', 5000);
+        await refreshStats();
+      } catch(e) {
+        setModal('close');
+        const msg = e.reason || e.data?.message || e.message || 'Transaction failed';
+        showToast(msg.length > 80 ? msg.slice(0,80) + '…' : msg, 'error', 5000);
+      }
+    }
 
-                await updateFaucetStatus();
-            } catch (error) {
-                alert('Failed to connect: ' + error.message);
-            }
-        }
-
-        async function updateFaucetStatus() {
-            try {
-                const activeFaucet = faucetContract || readOnlyFaucetContract;
-                const activeToken = tokenContract || readOnlyTokenContract;
-
-                const decimals = await activeToken.decimals();
-
-                // Faucet balance
-                const balance = await activeFaucet.getFaucetBalance();
-                document.getElementById('faucet-balance').textContent = 
-                    `${Number(ethers.utils.formatUnits(balance, decimals)).toLocaleString()} SHD`;
-
-                // Global daily remaining
-                const remaining = await activeFaucet.getDailyTokensRemaining();
-                document.getElementById('daily-remaining').textContent = 
-                    `${Number(ethers.utils.formatUnits(remaining, decimals)).toLocaleString()} SHD`;
-
-                if (userAccount && faucetContract) {
-                    const hasClaimed = await activeFaucet.hasAddressClaimed(userAccount);
-                    const statusEl = document.getElementById('claim-status');
-                    const noteEl = document.getElementById('claim-note');
-                    const claimBtn = document.getElementById('claim-tokens');
-
-                    if (hasClaimed) {
-                        statusEl.textContent = 'Already Claimed';
-                        statusEl.style.color = '#f87171';
-                        claimBtn.disabled = true;
-                        claimBtn.classList.add('bg-gray-600', 'cursor-not-allowed');
-                        noteEl.textContent = 'You have already claimed your 1 SHD (one per address ever)';
-                    } else {
-                        statusEl.textContent = 'Eligible';
-                        statusEl.style.color = '#4ade80';
-                        claimBtn.disabled = false;
-                        claimBtn.classList.remove('bg-gray-600', 'cursor-not-allowed');
-                        noteEl.textContent = 'You can claim 1 SHD once';
-                    }
-                } else {
-                    document.getElementById('claim-status').textContent = 'Connect Wallet';
-                    document.getElementById('claim-note').textContent = '';
-                }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('faucet-balance').textContent = 'Error';
-                document.getElementById('daily-remaining').textContent = 'Error';
-            }
-        }
-
-        async function claimTokens() {
-            if (!userAccount || !faucetContract) return alert('Please connect your wallet first.');
-
-            try {
-                const plsBalance = await provider.getBalance(userAccount);
-                if (plsBalance.isZero()) return alert('Insufficient PLS for gas fees.');
-
-                const claimBtn = document.getElementById('claim-tokens');
-                claimBtn.textContent = 'Claiming...';
-                claimBtn.disabled = true;
-
-                const gasLimit = await faucetContract.estimateGas.claimTokens();
-                const tx = await faucetContract.claimTokens({ gasLimit: gasLimit.mul(12).div(10) });
-                await tx.wait();
-
-                alert('✅ Successfully claimed 1 SHD!');
-                await updateFaucetStatus();
-            } catch (error) {
-                console.error(error);
-                alert('Claim failed: ' + (error.reason || error.message));
-            } finally {
-                document.getElementById('claim-tokens').textContent = 'Claim 1 SHD';
-                document.getElementById('claim-tokens').disabled = false;
-            }
-        }
-
-        // Event listeners
-        document.getElementById('connect-wallet').addEventListener('click', connectWallet);
-        document.getElementById('claim-tokens').addEventListener('click', claimTokens);
-        document.getElementById('add-token').addEventListener('click', addSHDTokenToWallet);
-
-        window.ethereum?.on('accountsChanged', async (accounts) => {
-            if (accounts.length > 0) {
-                userAccount = accounts[0];
-                signer = provider.getSigner();
-                faucetContract = new ethers.Contract(faucetAddress, faucetAbi, signer);
-                tokenContract = new ethers.Contract(shdTokenAddress, tokenAbi, signer);
-                document.getElementById('wallet-address').textContent = `Connected: ${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
-                await updateFaucetStatus();
-            } else {
-                resetUI();
-            }
+    /* ── Add token ────────────────────────────────────────────── */
+    async function addToken() {
+      if (!window.ethereum) return;
+      try {
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: { type:'ERC20', options: { address: TOKEN_ADDR, symbol:'SHD', decimals:18, image:'https://www.snipehead.xyz/shd-logo.png' } }
         });
+        showToast('SHD added to your wallet', 'success');
+      } catch(e) {
+        showToast('Add SHD manually: ' + TOKEN_ADDR, 'info', 6000);
+      }
+    }
 
-        window.ethereum?.on('chainChanged', () => location.reload());
+    /* ── Wallet event listeners ───────────────────────────────── */
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', async (accs) => {
+        if (accs.length) { userAccount = accs[0]; signer = provider.getSigner(); faucetW = new ethers.Contract(FAUCET_ADDR, FAUCET_ABI, signer); document.getElementById('wallet-pill').textContent = `${userAccount.slice(0,6)} ··· ${userAccount.slice(-4)}`; await refreshStats(); }
+      });
+      window.ethereum.on('chainChanged', () => location.reload());
+    }
 
-        function resetUI() {
-            userAccount = null;
-            document.getElementById('wallet-address').classList.add('hidden');
-            document.getElementById('connect-wallet').textContent = 'Connect Wallet';
-            document.getElementById('connect-wallet').classList.remove('bg-gray-600', 'cursor-not-allowed');
-            document.getElementById('connect-wallet').disabled = false;
-            document.getElementById('add-token').classList.add('hidden');
-            document.getElementById('claim-tokens').disabled = true;
-            document.getElementById('claim-status').textContent = 'Connect Wallet';
-            document.getElementById('claim-note').textContent = '';
-            updateFaucetStatus();
-        }
-
-        // Initial load
-        updateFaucetStatus();
-    </script>
+    // Init read-only stats
+    refreshStats();
+    setInterval(refreshStats, 30000);
+  </script>
 </body>
 </html>
