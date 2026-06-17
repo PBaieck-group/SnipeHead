@@ -16,7 +16,7 @@
 - **Mining V2 Address:** [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
 - **IPFS Faucet dApp Fallback:** [bafybeib255ieyhgogtv6m3z23fxviypfa4bott7hupqfox6b3ytftl35vy](https://bafybeib255ieyhgogtv6m3z23fxviypfa4bott7hupqfox6b3ytftl35vy.ipfs.dweb.link)
-- **IPFS Mining dApp Fallback:** [bafybeifext75apfqhemwear62brdr2lyodsmjti6yp5km4ka3bjnvsmoye](https://bafybeifext75apfqhemwear62brdr2lyodsmjti6yp5km4ka3bjnvsmoye.ipfs.dweb.link)
+- **IPFS Mining dApp Fallback:** [bafybeievscw62fgitz7cyywnqavzxfbhbzoibpqwgmuc3xjk5bssqxvste](https://bafybeievscw62fgitz7cyywnqavzxfbhbzoibpqwgmuc3xjk5bssqxvste.ipfs.dweb.link)
 
 ---
 
