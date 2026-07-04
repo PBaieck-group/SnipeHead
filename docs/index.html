@@ -1106,7 +1106,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.1.1
+                v2.1.2
             </div>
         </div>
     </footer>
@@ -1302,16 +1302,19 @@
         // Loading this iframe's src statically in the HTML causes it to compete with
         // fonts/CSS/other scripts for the main thread on first paint, which makes the
         // widget's internal data fetch stall on "Loading pair..." until the page is
-        // reloaded (and everything else is already cached). Instead, we load it once
-        // the rest of the page has finished loading, and give it one automatic
-        // "refresh" a few seconds later as a safety net — this is the same fix as
-        // manually reloading the page, just done for you automatically.
+        // reloaded (and everything else is already cached). On top of that, mobile
+        // browsers deprioritize network activity for off-screen iframes, so loading
+        // it on window.load still doesn't reliably work on mobile until the user
+        // scrolls it into view. So instead, we load it via IntersectionObserver right
+        // as it's about to scroll into view (with some margin so it has a head start),
+        // and give it one automatic "refresh" a few seconds after that as a safety net.
         function loadDexscreenerEmbed() {
             const iframe = document.getElementById('dexscreener-iframe');
-            if (!iframe) return;
+            if (!iframe || iframe.dataset.loaded) return;
             const chartUrl = iframe.dataset.src;
             if (!chartUrl) return;
 
+            iframe.dataset.loaded = 'true';
             iframe.src = chartUrl;
 
             // Safety net: if the widget silently stalled, force one reload of just
@@ -1321,10 +1324,24 @@
             }, 4000);
         }
 
-        if (document.readyState === 'complete') {
-            loadDexscreenerEmbed();
+        const dexscreenerContainer = document.getElementById('dexscreener-embed');
+        if (dexscreenerContainer && 'IntersectionObserver' in window) {
+            const dexscreenerObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        loadDexscreenerEmbed();
+                        dexscreenerObserver.disconnect();
+                    }
+                });
+            }, { rootMargin: '600px 0px' }); // start loading well before it's on screen
+            dexscreenerObserver.observe(dexscreenerContainer);
         } else {
-            window.addEventListener('load', loadDexscreenerEmbed);
+            // Fallback for browsers without IntersectionObserver support
+            if (document.readyState === 'complete') {
+                loadDexscreenerEmbed();
+            } else {
+                window.addEventListener('load', loadDexscreenerEmbed);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
