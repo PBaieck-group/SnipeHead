@@ -911,7 +911,7 @@
             <h3 class="text-2xl font-bold glow-text-subtle mb-6 font-display section-header">Price Chart & Swap</h3>
             <div class="chart-swap-container">
                 <div id="dexscreener-embed" class="glass-card overflow-hidden">
-                    <iframe src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15"></iframe>
+                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
                 </div>
                 <div id="pulseswap-embed" class="glass-card">
                     <iframe
@@ -1106,7 +1106,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.1.0
+                v2.1.1
             </div>
         </div>
     </footer>
@@ -1297,6 +1297,35 @@
                 }
             }
         });
+
+        // --- DexScreener embed loader ---
+        // Loading this iframe's src statically in the HTML causes it to compete with
+        // fonts/CSS/other scripts for the main thread on first paint, which makes the
+        // widget's internal data fetch stall on "Loading pair..." until the page is
+        // reloaded (and everything else is already cached). Instead, we load it once
+        // the rest of the page has finished loading, and give it one automatic
+        // "refresh" a few seconds later as a safety net — this is the same fix as
+        // manually reloading the page, just done for you automatically.
+        function loadDexscreenerEmbed() {
+            const iframe = document.getElementById('dexscreener-iframe');
+            if (!iframe) return;
+            const chartUrl = iframe.dataset.src;
+            if (!chartUrl) return;
+
+            iframe.src = chartUrl;
+
+            // Safety net: if the widget silently stalled, force one reload of just
+            // this iframe (not the whole page) a few seconds after it first loads.
+            setTimeout(() => {
+                iframe.src = chartUrl;
+            }, 4000);
+        }
+
+        if (document.readyState === 'complete') {
+            loadDexscreenerEmbed();
+        } else {
+            window.addEventListener('load', loadDexscreenerEmbed);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.innerWidth <= 767) {
