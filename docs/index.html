@@ -207,6 +207,7 @@
             mask-composite: exclude;
             opacity: 0.5;
             transition: opacity 0.4s ease;
+            pointer-events: none;
         }
 
         .stat-card:hover::before {
@@ -848,7 +849,7 @@
                 <span class="glow-text">SnipeHead</span>
             </h2>
             <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                Flow free from corp systems. Claim free SHD tokens daily then mine to maximize your rewards on PulseChain.
+                Flow free from corp systems. Claim free SHD tokens then mine to maximize your rewards on PulseChain.
             </p>
             <div class="flex justify-center gap-4 mt-8 flex-wrap">
                 <a href="https://bafkreigrees5vn6oxmbtt3od4aa6u6udprkxt7a27npxlu5rcbflgg7dlq.ipfs.dweb.link/" class="btn-primary" target="_blank" rel="noopener noreferrer">
@@ -873,6 +874,11 @@
                         <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">SHD Price</h3>
                     </div>
                     <p class="text-2xl md:text-3xl font-bold text-white font-display" id="shd-price">Loading...</p>
+                    <p class="text-sm font-semibold mt-1" id="shd-change">&nbsp;</p>
+                    <div class="flex items-center gap-3 mt-2 text-xs">
+                        <span class="text-green-400 font-semibold" id="shd-buys">&nbsp;</span>
+                        <span class="text-red-400 font-semibold" id="shd-sells">&nbsp;</span>
+                    </div>
                     <p class="text-sm text-gray-500 mt-2">Fetched from DexScreener</p>
                 </div>
             </div>
@@ -1030,7 +1036,7 @@
                                 Copy
                             </span>
                         </button>
-                        <a href="https://ipfs.scan.pulsechain.com/address/0xb95bc84f9b6d0373642d586b81979b067572f7bc?tab=contract" class="btn-secondary text-sm" target="_blank" rel="noopener noreferrer">
+                        <a href="https://otter.pulsechain.com/address/0xB95bC84f9B6D0373642D586b81979B067572f7bc" class="btn-secondary text-sm" target="_blank" rel="noopener noreferrer">
                             <span class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -1114,7 +1120,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.2.5
+                v2.3.5
             </div>
         </div>
     </footer>
@@ -1409,6 +1415,28 @@
                     const shdPrice = parseFloat(shdPair.priceUsd);
                     document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
                     document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
+
+                    const changeEl = document.getElementById('shd-change');
+                    const change24h = shdPair.priceChange?.h24;
+                    if (changeEl && typeof change24h === 'number') {
+                        const isUp = change24h >= 0;
+                        changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}% (24h)`;
+                        changeEl.classList.toggle('text-green-400', isUp);
+                        changeEl.classList.toggle('text-red-400', !isUp);
+                    } else if (changeEl) {
+                        changeEl.textContent = '';
+                    }
+
+                    const buysEl = document.getElementById('shd-buys');
+                    const sellsEl = document.getElementById('shd-sells');
+                    const txns24h = shdPair.txns?.h24;
+                    if (buysEl && sellsEl && txns24h) {
+                        buysEl.textContent = `${txns24h.buys ?? 0} buys`;
+                        sellsEl.textContent = `${txns24h.sells ?? 0} sells`;
+                    } else if (buysEl && sellsEl) {
+                        buysEl.textContent = '';
+                        sellsEl.textContent = '';
+                    }
                 }
 
                 const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE', { signal: AbortSignal.timeout(10000) });
