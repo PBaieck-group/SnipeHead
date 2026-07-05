@@ -1114,7 +1114,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.2.4
+                v2.2.5
             </div>
         </div>
     </footer>
@@ -1424,15 +1424,27 @@
 
         const MINING_CONTRACT = "0xa16c1fa26f13803083f0fd222d1ea083c1d6d650";
 
-        // Truncates (never rounds up) so the displayed amount never overstates what's actually available.
-        function formatTokenAmount(formatted) {
-            if (formatted >= 1e9) return (Math.floor(formatted / 1e7) / 100) + 'B';
-            if (formatted >= 1e6) return (Math.floor(formatted / 1e4) / 100) + 'M';
-            if (formatted >= 1e3) return (Math.floor(formatted / 10) / 100) + 'K';
-            const truncated = Math.floor(formatted * 100) / 100;
-            return truncated.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        }
-
+        // Truncates (never rounds up)
+function formatTokenAmount(formatted) {
+    if (formatted >= 1000000000) {
+        return (Math.floor(formatted / 10000000) / 100) + 'B';
+    }
+    if (formatted >= 1000000) {
+        return (Math.floor(formatted / 10000) / 100) + 'M';
+    }
+    if (formatted >= 10000) {
+        // For numbers like 9998 → show 9.998K
+        return (formatted / 1000).toFixed(3) + 'K';
+    }
+    if (formatted >= 1000) {
+        // For numbers 1000-9999
+        return (formatted / 1000).toFixed(3) + 'K';
+    }
+    
+    // Small numbers - show up to 6 decimals
+    return (Math.floor(formatted * 1000000) / 1000000)
+           .toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 6 });
+}
         async function fetchTotalMined() {
             try {
                 const provider = new ethers.providers.JsonRpcProvider("https://rpc.pulsechain.com");
