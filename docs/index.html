@@ -890,10 +890,19 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                             </svg>
                         </div>
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">Liquidity</h3>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">Market Cap</h3>
                     </div>
-                    <p class="text-2xl md:text-3xl font-bold text-white font-display" id="shd-market-cap">Loading...</p>
-                    <p class="text-sm text-gray-500 mt-2">Based on V1 Liquidity</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <p class="text-xl md:text-2xl font-bold text-white font-display truncate" id="shd-market-cap">Loading...</p>
+                            <p class="text-xs text-gray-500 mt-2">Market Cap</p>
+                        </div>
+                        <div class="border-l border-white/10 pl-3">
+                            <p class="text-xl md:text-2xl font-bold text-white font-display truncate" id="shd-liquidity">Loading...</p>
+                            <p class="text-xs text-gray-500 mt-2">Liquidity</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Fetched from DexScreener</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -914,6 +923,16 @@
                         <div class="border-l border-white/10 pl-3">
                             <p class="text-xl md:text-2xl font-bold text-white font-display truncate" id="faucet-balance">Loading...</p>
                             <p class="text-xs text-gray-500 mt-2">Faucet Balance</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-white/10 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider">Mining Balance</span>
+                            <span class="text-sm font-bold text-white font-display truncate ml-2" id="contract-balance">Loading...</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider">Reward Reserve</span>
+                            <span class="text-sm font-bold text-white font-display truncate ml-2" id="reward-reserve">Loading...</span>
                         </div>
                     </div>
                 </div>
@@ -1120,7 +1139,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.4.7
+                v2.5.7
             </div>
         </div>
     </footer>
@@ -1414,7 +1433,8 @@
                 if (shdPair && shdPair.priceUsd) {
                     const shdPrice = parseFloat(shdPair.priceUsd);
                     document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
-                    document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
+                    document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.marketCap || 0).toLocaleString()}`;
+                    document.getElementById('shd-liquidity').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
 
                     const changeEl = document.getElementById('shd-change');
                     const change24h = shdPair.priceChange?.h24;
@@ -1478,16 +1498,30 @@ function formatTokenAmount(formatted) {
             try {
                 const provider = new ethers.providers.JsonRpcProvider("https://rpc.pulsechain.com");
                 const contract = new ethers.Contract(MINING_CONTRACT, [
-                    "function totalMined() view returns (uint256)"
+                    "function totalMined() view returns (uint256)",
+                    "function getContractSHDBalance() view returns (uint256)",
+                    "function getRewardReserve() view returns (uint256)"
                 ], provider);
 
-                const total = await contract.totalMined();
-                const formatted = Number(ethers.utils.formatEther(total));
+                const [total, contractBalance, rewardReserve] = await Promise.all([
+                    contract.totalMined(),
+                    contract.getContractSHDBalance(),
+                    contract.getRewardReserve()
+                ]);
 
+                const formatted = Number(ethers.utils.formatEther(total));
                 document.getElementById('total-mined').textContent = formatTokenAmount(formatted) + " SHD";
+
+                const formattedBalance = Number(ethers.utils.formatEther(contractBalance));
+                document.getElementById('contract-balance').textContent = formatTokenAmount(formattedBalance) + " SHD";
+
+                const formattedReserve = Number(ethers.utils.formatEther(rewardReserve));
+                document.getElementById('reward-reserve').textContent = formatTokenAmount(formattedReserve) + " SHD";
             } catch (err) {
                 console.error("Failed to load total mined:", err);
                 document.getElementById('total-mined').textContent = "Error";
+                document.getElementById('contract-balance').textContent = "Error";
+                document.getElementById('reward-reserve').textContent = "Error";
             }
         }
 
