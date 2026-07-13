@@ -6,7 +6,7 @@
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://rpc.pulsechain.com; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://rpc.pulsechain.com; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -1139,7 +1139,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.5.9
+                v2.6.0
             </div>
         </div>
     </footer>
@@ -1613,7 +1613,7 @@ function formatTokenAmount(formatted) {
             try {
                 const wasAdded = await window.ethereum.request({
                     method: 'wallet_watchAsset',
-                    params: { type: 'ERC20', options: { address: '0xb95bc84f9b6d0373642d586b81979b067572f7bc', symbol: 'SHD', decimals: 18 } }
+                    params: { type: 'ERC20', options: { address: '0xb95bc84f9b6d0373642d586b81979b067572f7bc', symbol: 'SHD', decimals: 18, image: 'https://raw.githubusercontent.com/PBaieck-group/SnipeHead/main/docs/Logo_200.png' } }
                 });
                 showToast(wasAdded ? "SHD token added to your wallet!" : "Token addition cancelled.");
             } catch (error) {
