@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://rpc.pulsechain.com; img-src 'none'; font-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'none'; font-src 'none';">
   <title>SnipeHead Faucet — Claim SHD</title>
     <style>
     /* ── TOKENS ───────────────────────────────────────────────── */
@@ -164,6 +164,54 @@
       letter-spacing: .5px;
     }
     .wallet-pill.show { display: block; }
+
+    /* ── RPC SELECTOR ─────────────────────────────────────────── */
+    .rpc-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 12px;
+    }
+    .rpc-status {
+      display: flex; align-items: center; gap: 6px;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      white-space: nowrap;
+    }
+    .rpc-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted); flex-shrink: 0;
+      transition: background .3s ease;
+    }
+    .rpc-dot.ok { background: var(--success); }
+    .rpc-dot.fallback { background: #ffb020; }
+    .rpc-dot.error { background: var(--danger); }
+    .rpc-dot.trying { background: var(--accent); animation: rpc-pulse 1s infinite; }
+    @keyframes rpc-pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+    .rpc-select {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans); font-size: 12px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .rpc-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .rpc-custom-row {
+      display: flex; gap: 8px; margin-top: 8px;
+    }
+    .rpc-custom-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono); font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+    .rpc-custom-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .btn-sm { width: auto; padding: 8px 14px; font-size: 12px; }
 
     /* ── STATS GRID ──────────────────────────────────────────── */
     .stats-grid {
@@ -412,6 +460,20 @@
           Connect Wallet
         </button>
         <div class="wallet-pill" id="wallet-pill"></div>
+
+        <!-- RPC selector -->
+        <div class="rpc-row">
+          <div class="rpc-status" id="rpc-status" title="Which PulseChain RPC node is currently serving read data">
+            <span class="rpc-dot" id="rpc-dot"></span>
+            <span id="rpc-label">Connecting…</span>
+          </div>
+          <select class="rpc-select" id="rpc-select" onchange="onRpcSelectChange()"></select>
+        </div>
+        <div class="rpc-custom-row" id="rpc-custom-row" style="display:none">
+          <input type="text" class="rpc-custom-input" id="rpc-custom-input" placeholder="https://your-rpc-url.example.com" />
+          <button class="btn btn-ghost btn-sm" type="button" onclick="addCustomRpc()">Add</button>
+          <button class="btn btn-ghost btn-sm" type="button" onclick="cancelCustomRpc()">Cancel</button>
+        </div>
       </div>
 
       <!-- Stats -->
@@ -473,7 +535,7 @@
         <span class="network-dot"></span>
         PulseChain · Chain ID 369
       </div>
-      <div style="margin-top:8px; font-size:11px; color:var(--muted); font-family:var(--mono); letter-spacing:.5px;">v2.0.0</div>
+      <div style="margin-top:8px; font-size:11px; color:var(--muted); font-family:var(--mono); letter-spacing:.5px;">v2.1.0</div>
     </div>
 
   </div><!-- /page -->
@@ -511,9 +573,149 @@
       { inputs:[], name:'decimals', outputs:[{type:'uint8'}],  stateMutability:'view', type:'function' },
     ];
 
-    let provider, signer, faucetRW, faucetW, userAccount;
-    const roProvider = new ethers.providers.JsonRpcProvider('https://rpc.pulsechain.com');
-    const roFaucet   = new ethers.Contract(FAUCET_ADDR, FAUCET_ABI, roProvider);
+    let provider, signer, faucetW, userAccount;
+    let roProvider, roFaucet;
+
+    /* ── RPC manager ──────────────────────────────────────────── */
+    const DEFAULT_RPCS = [
+      { name: 'PulseChain (official)', url: 'https://rpc.pulsechain.com' },
+      { name: 'G4mm4',                 url: 'https://rpc-pulsechain.g4mm4.io' },
+      { name: 'PublicNode',            url: 'https://pulsechain-rpc.publicnode.com' },
+    ];
+    const RPC_STORAGE_KEY = 'shd_rpc_prefs_v1';
+    const RPC_TIMEOUT_MS  = 6000;
+
+    function loadRpcPrefs() {
+      try {
+        const raw = localStorage.getItem(RPC_STORAGE_KEY);
+        if (!raw) return { selected: DEFAULT_RPCS[0].url, custom: [] };
+        const parsed = JSON.parse(raw);
+        return {
+          selected: parsed.selected || DEFAULT_RPCS[0].url,
+          custom: Array.isArray(parsed.custom) ? parsed.custom : [],
+        };
+      } catch (e) { return { selected: DEFAULT_RPCS[0].url, custom: [] }; }
+    }
+    function saveRpcPrefs() {
+      try { localStorage.setItem(RPC_STORAGE_KEY, JSON.stringify(rpcPrefs)); } catch (e) {}
+    }
+
+    let rpcPrefs      = loadRpcPrefs();
+    let currentRpcUrl = rpcPrefs.selected;
+    let rpcSwitching  = false;
+
+    function allRpcs() {
+      return [...DEFAULT_RPCS, ...rpcPrefs.custom.map(u => ({ name: u, url: u }))];
+    }
+
+    function populateRpcSelect() {
+      const sel = document.getElementById('rpc-select');
+      sel.innerHTML = '';
+      allRpcs().forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.url; opt.textContent = r.name;
+        if (r.url === currentRpcUrl) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      const customOpt = document.createElement('option');
+      customOpt.value = '__custom__'; customOpt.textContent = '+ Add custom RPC…';
+      sel.appendChild(customOpt);
+    }
+
+    function setRpcStatus(state, label) {
+      const dot = document.getElementById('rpc-dot');
+      const lbl = document.getElementById('rpc-label');
+      if (!dot || !lbl) return;
+      dot.className = 'rpc-dot ' + state;
+      lbl.textContent = label;
+    }
+
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout')), ms)),
+      ]);
+    }
+
+    async function testRpc(url) {
+      const p = new ethers.providers.JsonRpcProvider(url);
+      await withTimeout(p.getBlockNumber(), RPC_TIMEOUT_MS);
+      return p;
+    }
+
+    // Tries `preferredUrl` first; on failure, silently walks the rest of the
+    // known RPC list in the background until one responds. This is what
+    // gives automatic failover when the main RPC is down.
+    async function connectReadProvider(preferredUrl) {
+      if (rpcSwitching) return roProvider;
+      rpcSwitching = true;
+      setRpcStatus('trying', 'Connecting…');
+      const candidates = [preferredUrl, ...allRpcs().map(r => r.url).filter(u => u !== preferredUrl)];
+      try {
+        for (const url of candidates) {
+          try {
+            const p = await testRpc(url);
+            roProvider = p;
+            roFaucet   = new ethers.Contract(FAUCET_ADDR, FAUCET_ABI, roProvider);
+            currentRpcUrl = url;
+            const known = allRpcs().find(r => r.url === url);
+            const label = known ? known.name : url;
+            if (url === preferredUrl) {
+              setRpcStatus('ok', label);
+            } else {
+              setRpcStatus('fallback', label + ' (backup)');
+              showToast(`Main RPC unreachable — switched to ${label}`, 'info', 4000);
+            }
+            const sel = document.getElementById('rpc-select');
+            if (sel) sel.value = allRpcs().some(r => r.url === url) ? url : '__custom__';
+            return p;
+          } catch (e) { /* try next candidate */ }
+        }
+        setRpcStatus('error', 'All RPCs unreachable');
+        throw new Error('No working RPC found');
+      } finally {
+        rpcSwitching = false;
+      }
+    }
+
+    function onRpcSelectChange() {
+      const sel = document.getElementById('rpc-select');
+      const val = sel.value;
+      if (val === '__custom__') {
+        document.getElementById('rpc-custom-row').style.display = 'flex';
+        document.getElementById('rpc-custom-input').focus();
+        sel.value = currentRpcUrl; // revert dropdown until they actually add one
+        return;
+      }
+      rpcPrefs.selected = val;
+      saveRpcPrefs();
+      connectReadProvider(val).then(refreshStats);
+    }
+
+    function addCustomRpc() {
+      const input = document.getElementById('rpc-custom-input');
+      const url = input.value.trim().replace(/\/+$/, '');
+      if (!url) return;
+      if (!/^https:\/\/.+/i.test(url)) {
+        showToast('RPC URL must start with https://', 'error', 4000);
+        return;
+      }
+      if (!rpcPrefs.custom.includes(url)) rpcPrefs.custom.push(url);
+      rpcPrefs.selected = url;
+      saveRpcPrefs();
+      populateRpcSelect();
+      document.getElementById('rpc-custom-row').style.display = 'none';
+      input.value = '';
+      connectReadProvider(url).then(refreshStats).catch(() => {
+        showToast('Could not reach that RPC — falling back automatically.', 'error', 4000);
+      });
+    }
+
+    function cancelCustomRpc() {
+      document.getElementById('rpc-custom-row').style.display = 'none';
+      const sel = document.getElementById('rpc-select');
+      if (sel) sel.value = currentRpcUrl;
+    }
 
     /* ── UI helpers ───────────────────────────────────────────── */
     function showToast(msg, type = 'info', dur = 3500) {
@@ -564,6 +766,10 @@
       } catch(e) {
         document.getElementById('stat-balance').textContent = 'Error';
         document.getElementById('stat-daily').textContent   = 'Error';
+        // Read path failed — quietly try to fail over to another RPC.
+        if (!faucetW && !rpcSwitching) {
+          connectReadProvider(currentRpcUrl).then(refreshStats).catch(() => {});
+        }
       }
 
       if (userAccount && faucetW) {
@@ -672,8 +878,9 @@
       window.ethereum.on('chainChanged', () => location.reload());
     }
 
-    // Init read-only stats
-    refreshStats();
+    // Init: populate RPC dropdown, connect (with automatic failover), then load stats
+    populateRpcSelect();
+    connectReadProvider(currentRpcUrl).then(refreshStats).catch(() => {});
     setInterval(refreshStats, 30000);
   </script>
 </body>
