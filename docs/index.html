@@ -229,6 +229,8 @@
             border-radius: 18px;
             padding: 1.5rem;
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .stat-card:hover {
@@ -359,6 +361,37 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        .rpc-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .rpc-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: #4ade80;
+            box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .rpc-dot.fallback {
+            background: #fbbf24;
+            box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
+        }
+
+        .rpc-dot.offline {
+            background: #f87171;
+            box-shadow: 0 0 6px rgba(248, 113, 113, 0.6);
         }
 
         @keyframes gradientShift {
@@ -879,7 +912,9 @@
                         <span class="text-green-400 font-semibold" id="shd-buys">&nbsp;</span>
                         <span class="text-red-400 font-semibold" id="shd-sells">&nbsp;</span>
                     </div>
-                    <p class="text-sm text-gray-500 mt-2"></p>
+                    <div class="rpc-status">
+                        <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Fetched from DexScreener</a>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
@@ -902,7 +937,9 @@
                             <p class="text-xs text-gray-500 mt-2">Liquidity</p>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-500 mt-2"></p>
+                    <div class="rpc-status">
+                        <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Fetched from DexScreener</a>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
@@ -934,6 +971,10 @@
                             <span class="text-xs text-gray-500 uppercase tracking-wider">Reward Reserve</span>
                             <span class="text-sm font-bold text-white truncate ml-2" id="reward-reserve">Loading...</span>
                         </div>
+                    </div>
+                    <div class="rpc-status" id="rpc-status">
+                        <span class="rpc-dot" id="rpc-status-dot"></span>
+                        <span id="rpc-status-text">Connecting to network...</span>
                     </div>
                 </div>
             </div>
@@ -1139,7 +1180,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v2.7.0
+                v2.6.3
             </div>
         </div>
     </footer>
@@ -1499,12 +1540,39 @@ function formatTokenAmount(formatted) {
         // and reused. If a later call fails, we re-test and switch automatically.
         const RPC_ENDPOINTS = [
             "https://rpc.pulsechain.com",
+            "https://rpc-pulsechain.g4mm4.io",
             "https://pulsechain-rpc.publicnode.com",
             "https://rpc.gigatheminter.com",
-            "https://rpc.pulsechainstats.com",
-            "https://rpc-pulsechain.g4mm4.io"
+            "https://rpc.pulsechainstats.com"
+            
         ];
+        const RPC_LABELS = {
+            "https://rpc.pulsechain.com": "rpc.pulsechain.com",
+            "https://rpc-pulsechain.g4mm4.io": "g4mm4.io",
+            "https://pulsechain-rpc.publicnode.com": "publicnode.com",
+            "https://rpc.gigatheminter.com": "gigatheminter.com",
+            "https://rpc.pulsechainstats.com": "pulsechainstats.com",
+            
+        };
         const RPC_HEALTHCHECK_TIMEOUT_MS = 5000;
+
+        function updateRpcStatusUI(url) {
+            const dot = document.getElementById('rpc-status-dot');
+            const text = document.getElementById('rpc-status-text');
+            if (!dot || !text) return;
+
+            if (!url) {
+                dot.className = 'rpc-dot offline';
+                text.textContent = 'All RPC endpoints unreachable';
+                return;
+            }
+
+            const isPrimary = url === RPC_ENDPOINTS[0];
+            dot.className = isPrimary ? 'rpc-dot' : 'rpc-dot fallback';
+            text.textContent = isPrimary
+                ? `Connected via ${RPC_LABELS[url] || url}`
+                : `Connected via ${RPC_LABELS[url] || url} (backup)`;
+        }
 
         let cachedProvider = null;
         let cachedRpcUrl = null;
@@ -1525,11 +1593,13 @@ function formatTokenAmount(formatted) {
                         cachedProvider = provider;
                         cachedRpcUrl = url;
                         console.log(`Using PulseChain RPC: ${url}`);
+                        updateRpcStatusUI(url);
                         return provider;
                     } catch (err) {
                         console.warn(`RPC unavailable (${url}):`, err.message);
                     }
                 }
+                updateRpcStatusUI(null);
                 throw new Error("All PulseChain RPC endpoints are unavailable");
             })();
 
