@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://rpc.pulsechain.com; img-src 'none'; font-src 'none';">
+    <!-- connect-src widened from a single RPC host to https: so failover + custom RPC endpoints aren't blocked -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'none'; font-src 'none';">
     <title>SnipeHead Mining</title>
     
     
@@ -66,6 +67,47 @@
 
         @media (max-width: 768px) { input, button { padding: 1rem 1.25rem; font-size: 1.125rem; } }
         .status-link { color: #67e8f9; text-decoration: underline; margin-left: 0.5rem; }
+
+        /* ── RPC controls: keep compact on all screen sizes ──
+           The generic "input, button" mobile rule above is intentionally
+           overridden here (via higher-specificity ID selectors) so the
+           RPC select/input/buttons don't inflate to full-size touch targets
+           and overflow the mobile viewport. */
+        #rpcSelect, #customRpcInput, #addRpcButton, #cancelRpcButton {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .rpc-controls-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.375rem;
+            width: 100%;
+        }
+        /* Higher specificity (id + class) than ".rpc-controls-wrap" (class-only),
+           so toggling classList.add('hidden') always wins and actually hides
+           the wrapper, no matter where each rule sits in the stylesheet. */
+        #customRpcWrapper.hidden {
+            display: none;
+        }
+        #customRpcInput {
+            flex: 1 1 12rem;
+            min-width: 0;
+            width: auto;
+            max-width: 100%;
+        }
+        #addRpcButton, #cancelRpcButton {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            border-radius: 0.5rem;
+        }
+        #addRpcButton { background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.4); color: #67e8f9; }
+        #addRpcButton:hover { background: rgba(6,182,212,0.3); }
+        #cancelRpcButton { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #9ca3af; }
+        #cancelRpcButton:hover { background: rgba(255,255,255,0.1); color: #e5e7eb; }
+        @media (max-width: 480px) {
+            #customRpcInput { flex-basis: 100%; }
+        }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col relative">
@@ -75,7 +117,24 @@
 <header class="bg-gradient-to-r from-blue-900/80 to-cyan-900/80 py-4 glassmorphism sticky top-0 z-10">
     <div class="container mx-auto px-4">
         <h1 class="text-4xl font-bold text-cyan-400 tracking-wider neon-glow header-animation">SnipeHead Mining</h1>
-        <p class="text-cyan-300 text-sm mt-1">PulseChain Mainnet</p>
+        <div class="flex flex-wrap items-center gap-2 mt-1">
+            <p class="text-cyan-300 text-sm">PulseChain Mainnet</p>
+            <span class="tip-wrap">
+                <select id="rpcSelect" class="bg-gray-800/50 border border-gray-600/50 text-gray-200 text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option value="https://rpc.pulsechain.com">RPC: rpc.pulsechain.com</option>
+                    <option value="https://rpc-pulsechain.g4mm4.io">RPC: rpc-pulsechain.g4mm4.io</option>
+                    <option value="https://pulsechain-rpc.publicnode.com">RPC: pulsechain-rpc.publicnode.com</option>
+                    <option value="https://rpc.pulsechainstats.com">RPC: rpc.pulsechainstats.com</option>
+                    <option value="__custom__">RPC: Custom…</option>
+                </select>
+            </span>
+            <div id="customRpcWrapper" class="hidden rpc-controls-wrap">
+                <input id="customRpcInput" type="text" placeholder="https://your-rpc-url" class="bg-gray-800/50 border border-gray-600/50 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <button type="button" id="addRpcButton" class="px-2 py-1 font-medium">Add</button>
+                <button type="button" id="cancelRpcButton" class="px-2 py-1 font-medium">Cancel</button>
+            </div>
+            <span id="rpcStatus" class="text-xs text-gray-500"></span>
+        </div>
     </div>
 </header>
 
@@ -204,7 +263,7 @@
             </div>
         </div>
         <p class="text-gray-400 text-base">© <span id="copyright-year">2026</span> SnipeHead Mining. All rights reserved.</p>
-        <p class="text-gray-500 text-sm mt-2">v2.1.1 (Mainnet · Secured Reward Reserve)</p>
+        <p class="text-gray-500 text-sm mt-2">v2.2.1 (Mainnet · Secured Reward Reserve)</p>
     </div>
 </footer>
 
@@ -229,9 +288,21 @@
     // ── Config — original addresses + chain ───────────────────────────────────
     const MINING_CONTRACT_ADDRESS = "0xa16C1FA26F13803083f0fd222D1EA083c1d6D650";
     const TOKEN_CONTRACT_ADDRESS  = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
-    const PULSECHAIN_RPC          = "https://rpc.pulsechain.com";
+    const PULSECHAIN_RPC          = "https://rpc.pulsechain.com"; // default/primary — always first in the failover order
     const EXPLORER_URL            = "https://ipfs.scan.pulsechain.com/tx/";
     const CHAIN_ID                = 369;
+
+    // ── NEW: RPC failover config ────────────────────────────────────────────
+    const RPC_ENDPOINTS = [
+        PULSECHAIN_RPC,
+        "https://rpc-pulsechain.g4mm4.io",
+        "https://pulsechain-rpc.publicnode.com",
+        "https://rpc.pulsechainstats.com"
+        
+    ];
+    const CUSTOM_RPC_OPTION   = "__custom__";
+    const RPC_PREF_STORAGE_KEY = "shd_rpc_preference"; // { type: 'preset'|'custom', url }
+    const RPC_TEST_TIMEOUT_MS  = 6000;
 
     // ── ABI — original functions + getRewardReserve() ─────────────────────────
     const MINING_ABI = [
@@ -253,10 +324,95 @@
         "function allowance(address owner, address spender) view returns (uint256)"
     ];
 
+    // ── NEW: RPC failover manager — isolated, doesn't touch mining logic ───────
+    // Tests endpoints with a raw eth_chainId call (no ethers dependency needed),
+    // keeps an ordered failover list starting with the user's preferred RPC,
+    // and remembers the last working choice across page loads.
+    const rpcManager = (function () {
+        let order = RPC_ENDPOINTS.slice();
+        let activeIndex = 0;
+
+        function loadPreference() {
+            try {
+                const raw = localStorage.getItem(RPC_PREF_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) { return null; }
+        }
+
+        function savePreference(pref) {
+            try { localStorage.setItem(RPC_PREF_STORAGE_KEY, JSON.stringify(pref)); } catch (e) {}
+        }
+
+        function buildOrder(preferredUrl) {
+            const list = [];
+            if (preferredUrl) list.push(preferredUrl);
+            RPC_ENDPOINTS.forEach(u => { if (!list.includes(u)) list.push(u); });
+            return list;
+        }
+
+        async function testEndpoint(url, timeoutMs) {
+            if (!/^https:\/\//i.test(url)) return false;
+            let controller = null, timer = null;
+            try {
+                controller = new AbortController();
+                timer = setTimeout(() => controller.abort(), timeoutMs || RPC_TEST_TIMEOUT_MS);
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_chainId', params: [] }),
+                    signal: controller.signal
+                });
+                clearTimeout(timer);
+                if (!res.ok) return false;
+                const data = await res.json();
+                return !!(data && (data.result || data.result === '0x0'));
+            } catch (err) {
+                if (timer) clearTimeout(timer);
+                return false;
+            }
+        }
+
+        // Walks the failover order starting from a preferred URL, returns the first reachable one.
+        async function selectWorkingUrl(preferredUrl) {
+            order = buildOrder(preferredUrl);
+            for (let i = 0; i < order.length; i++) {
+                if (await testEndpoint(order[i])) {
+                    activeIndex = i;
+                    return order[i];
+                }
+            }
+            // Nothing answered — keep the preferred one so the app still attempts to use it
+            activeIndex = 0;
+            return order[0];
+        }
+
+        // Walks forward from the current position (wrapping) — used when the active RPC fails mid-session.
+        async function failoverFromCurrent() {
+            for (let step = 1; step <= order.length; step++) {
+                const idx = (activeIndex + step) % order.length;
+                if (await testEndpoint(order[idx])) {
+                    activeIndex = idx;
+                    return order[idx];
+                }
+            }
+            return order[activeIndex]; // nothing reachable — caller keeps using the last known URL
+        }
+
+        return {
+            loadPreference,
+            savePreference,
+            selectWorkingUrl,
+            failoverFromCurrent,
+            testEndpoint,
+            getActiveUrl: () => order[activeIndex]
+        };
+    })();
+
     // ── State ─────────────────────────────────────────────────────────────────
     let provider, signer, account, miningContract, tokenContract;
     let balanceInterval;
     let statsLastUpdated = null;
+    let usingManagedRpc = false; // true when `provider` is our own failover-managed JsonRpcProvider (no wallet, or pre-connect)
 
     // ── DOM refs — original ids preserved ─────────────────────────────────────
     const connectButton     = document.getElementById('connectButton');
@@ -269,6 +425,12 @@
     const amountInput       = document.getElementById('amountInput');
     const statusElement     = document.getElementById('status');
     const chainIndicator    = document.getElementById('chainIndicator');
+    const rpcSelect          = document.getElementById('rpcSelect');
+    const customRpcWrapper   = document.getElementById('customRpcWrapper');
+    const customRpcInput     = document.getElementById('customRpcInput');
+    const addRpcButton       = document.getElementById('addRpcButton');
+    const cancelRpcButton    = document.getElementById('cancelRpcButton');
+    const rpcStatusElement   = document.getElementById('rpcStatus');
 
     // ── Formatters — original ─────────────────────────────────────────────────
     function formatNumberFull(num) {
@@ -320,12 +482,120 @@
         }
     }
 
+    // ── NEW: RPC selector UI wiring ─────────────────────────────────────────────
+    function updateRpcStatusUI(url, ok) {
+        if (!rpcStatusElement) return;
+        if (ok === undefined) { rpcStatusElement.textContent = ''; return; }
+        rpcStatusElement.textContent = ok ? '● connected' : '● unreachable, using last working RPC';
+        rpcStatusElement.className = 'text-xs ' + (ok ? 'text-green-500' : 'text-red-500');
+    }
+
+    // Rebuilds the read-only miningContract/tokenContract against a new RPC endpoint.
+    // Only touches things when we're on our own managed provider (no wallet connected) —
+    // never interferes with a connected wallet's signer/provider.
+    function rebindManagedProvider(url) {
+        provider = new ethers.providers.JsonRpcProvider(url);
+        miningContract = new ethers.Contract(MINING_CONTRACT_ADDRESS, MINING_ABI, provider);
+        tokenContract  = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, TOKEN_ABI, provider);
+        usingManagedRpc = true;
+    }
+
+    // Applies a newly selected RPC (preset or custom): validates it, and — if we're not
+    // mid-wallet-session — switches the active read provider over to it.
+    async function applyRpcSelection(url, isCustom) {
+        updateRpcStatusUI(url, undefined);
+        rpcStatusElement.textContent = 'checking…';
+        rpcStatusElement.className = 'text-xs text-gray-500';
+        const ok = await rpcManager.testEndpoint(url);
+        if (!ok) {
+            setStatus(`Custom RPC unreachable or invalid — continuing with ${rpcManager.getActiveUrl()}`, "text-red-500");
+            updateRpcStatusUI(rpcManager.getActiveUrl(), true);
+            // restore the selector to whatever is actually active
+            const activeUrl = rpcManager.getActiveUrl();
+            if (RPC_ENDPOINTS.includes(activeUrl)) {
+                rpcSelect.value = activeUrl;
+                customRpcWrapper.classList.add('hidden');
+            }
+            return;
+        }
+        rpcManager.savePreference({ type: isCustom ? 'custom' : 'preset', url });
+        const workingUrl = await rpcManager.selectWorkingUrl(url);
+        if (!signer) rebindManagedProvider(workingUrl);
+        updateRpcStatusUI(workingUrl, true);
+        updateNetworkStats();
+    }
+
+    function initRpcSelectorUI(activeUrl) {
+        if (RPC_ENDPOINTS.includes(activeUrl)) {
+            rpcSelect.value = activeUrl;
+            customRpcWrapper.classList.add('hidden');
+        } else if (activeUrl) {
+            rpcSelect.value = CUSTOM_RPC_OPTION;
+            customRpcInput.value = activeUrl;
+            customRpcWrapper.classList.remove('hidden');
+        }
+        updateRpcStatusUI(activeUrl, true);
+
+        rpcSelect.addEventListener('change', () => {
+            if (rpcSelect.value === CUSTOM_RPC_OPTION) {
+                customRpcWrapper.classList.remove('hidden');
+                customRpcInput.focus();
+                return;
+            }
+            customRpcWrapper.classList.add('hidden');
+            applyRpcSelection(rpcSelect.value, false);
+        });
+
+        function submitCustomRpc() {
+            const val = customRpcInput.value.trim();
+            if (!val) return;
+            try { new URL(val); } catch (e) {
+                setStatus("Enter a valid RPC URL (https://...)", "text-red-500");
+                return;
+            }
+            applyRpcSelection(val, true);
+        }
+
+        // NEW: closes the custom-RPC input and returns to the standard dropdown
+        // view without submitting anything.
+        function cancelCustomRpc() {
+            const activeUrl = rpcManager.getActiveUrl();
+            if (RPC_ENDPOINTS.includes(activeUrl)) {
+                rpcSelect.value = activeUrl;
+            }
+            customRpcInput.value = '';
+            customRpcWrapper.classList.add('hidden');
+            updateRpcStatusUI(activeUrl, true);
+        }
+
+        customRpcInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitCustomRpc(); });
+        customRpcInput.addEventListener('blur', submitCustomRpc);
+
+        // NEW: "Add" / "Cancel" buttons give mobile users (who have no physical
+        // Enter key) a way to submit or back out of the custom RPC field.
+        // mousedown+preventDefault stops the input's blur handler from firing
+        // (and re-submitting/racing) before the button's own click runs.
+        [addRpcButton, cancelRpcButton].forEach((btn) => {
+            btn.addEventListener('mousedown', (e) => e.preventDefault());
+        });
+        addRpcButton.addEventListener('click', submitCustomRpc);
+        cancelRpcButton.addEventListener('click', cancelCustomRpc);
+    }
+
     // ── init() — original structure, nothing moved ────────────────────────────
     async function init() {
         try {
+            // NEW: resolve a working RPC endpoint (user's saved preference, falling back
+            // through the failover list) before doing anything else. Used below both for
+            // the no-wallet read provider and as the RPC MetaMask is told about.
+            const pref = rpcManager.loadPreference();
+            const workingRpcUrl = await rpcManager.selectWorkingUrl(pref ? pref.url : PULSECHAIN_RPC);
+            initRpcSelectorUI(workingRpcUrl);
+
             provider = window.ethereum
                 ? new ethers.providers.Web3Provider(window.ethereum)
-                : new ethers.providers.JsonRpcProvider(PULSECHAIN_RPC);
+                : new ethers.providers.JsonRpcProvider(workingRpcUrl);
+            usingManagedRpc = !window.ethereum;
 
             const network = await provider.getNetwork();
             if (network.chainId !== CHAIN_ID && provider instanceof ethers.providers.Web3Provider) {
@@ -341,7 +611,7 @@
                             params: [{
                                 chainId: '0x' + CHAIN_ID.toString(16),
                                 chainName: 'PulseChain',
-                                rpcUrls: [PULSECHAIN_RPC],
+                                rpcUrls: [workingRpcUrl],
                                 nativeCurrency: { name: 'Pulse', symbol: 'PLS', decimals: 18 },
                                 blockExplorerUrls: ['https://ipfs.scan.pulsechain.com']
                             }]
@@ -441,7 +711,8 @@
     }
 
     // ── updateNetworkStats — parseFloat replaces Number() for precision ──────
-    async function updateNetworkStats() {
+    // NEW: retryOnFailover=true is used internally after switching RPCs; callers don't pass it.
+    async function updateNetworkStats(retryOnFailover) {
         try {
             const totalMined = await miningContract.totalMined();
             const totalMinedNum = parseFloat(ethers.utils.formatEther(totalMined));
@@ -470,6 +741,17 @@
             statsLastUpdated = Date.now();
             updateLastUpdated();
         } catch (err) {
+            // NEW: if we're on our own managed RPC (no wallet, or pre-connect) and haven't
+            // already retried, fail over to the next working endpoint and try once more —
+            // this is what makes "primary RPC down" self-heal without a page reload.
+            if (usingManagedRpc && !retryOnFailover) {
+                const nextUrl = await rpcManager.failoverFromCurrent();
+                if (nextUrl && nextUrl !== provider.connection.url) {
+                    rebindManagedProvider(nextUrl);
+                    updateRpcStatusUI(nextUrl, true);
+                    return updateNetworkStats(true);
+                }
+            }
             document.getElementById('apy').textContent = 'Error';
             document.getElementById('totalMined').textContent = 'Error';
             document.getElementById('contractBalance').textContent = 'Error';
