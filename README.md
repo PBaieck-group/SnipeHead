@@ -15,8 +15,8 @@
 - **Faucet V2 Address:** [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
 - **Mining V2 Address:** [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
-- **IPFS Faucet dApp Fallback:** [bafybeib255ieyhgogtv6m3z23fxviypfa4bott7hupqfox6b3ytftl35vy](https://bafybeib255ieyhgogtv6m3z23fxviypfa4bott7hupqfox6b3ytftl35vy.ipfs.dweb.link)
-- **IPFS Mining dApp Fallback:** [bafybeievscw62fgitz7cyywnqavzxfbhbzoibpqwgmuc3xjk5bssqxvste](https://bafybeievscw62fgitz7cyywnqavzxfbhbzoibpqwgmuc3xjk5bssqxvste.ipfs.dweb.link)
+- **IPFS Faucet dApp Fallback:** [bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva](https://bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva.ipfs.dweb.link)
+- **IPFS Mining dApp Fallback:** [bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja](https://bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja.ipfs.dweb.link)
 
 ---
 
