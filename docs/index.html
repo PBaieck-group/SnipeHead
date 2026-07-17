@@ -1192,7 +1192,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.1.0
+                v3.2.0
             </div>
         </div>
     </footer>
@@ -1390,10 +1390,12 @@
         // widget's internal data fetch stall on "Loading pair..." until the page is
         // reloaded (and everything else is already cached). On top of that, mobile
         // browsers deprioritize network activity for off-screen iframes, so loading
-        // it on window.load still doesn't reliably work on mobile until the user
-        // scrolls it into view. So instead, we load it via IntersectionObserver right
-        // as it's about to scroll into view (with some margin so it has a head start),
-        // and give it one automatic "refresh" a few seconds after that as a safety net.
+        // it early (e.g. via a big rootMargin "head start", or on window.load before
+        // it's scrolled into view) is itself what causes the permanent stall.
+        //
+        // So we wait until the chart is genuinely visible on screen and only load it
+        // then, once. No rootMargin head start, no repeated reloading on every
+        // scroll-away/scroll-back — once it's loaded correctly it's left alone.
         function loadDexscreenerEmbed() {
             const iframe = document.getElementById('dexscreener-iframe');
             if (!iframe || iframe.dataset.loaded) return;
@@ -1402,12 +1404,6 @@
 
             iframe.dataset.loaded = 'true';
             iframe.src = chartUrl;
-
-            // Safety net: if the widget silently stalled, force one reload of just
-            // this iframe (not the whole page) a few seconds after it first loads.
-            setTimeout(() => {
-                iframe.src = chartUrl;
-            }, 4000);
         }
 
         const dexscreenerContainer = document.getElementById('dexscreener-embed');
@@ -1419,7 +1415,7 @@
                         dexscreenerObserver.disconnect();
                     }
                 });
-            }, { rootMargin: '600px 0px' }); // start loading well before it's on screen
+            }, { threshold: 0.1 }); // no rootMargin — only act once it's genuinely on screen
             dexscreenerObserver.observe(dexscreenerContainer);
         } else {
             // Fallback for browsers without IntersectionObserver support
