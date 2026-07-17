@@ -937,8 +937,20 @@
                             <p class="text-xs text-gray-500 mt-2">Liquidity</p>
                         </div>
                     </div>
+                    <div class="mt-3 pt-3 border-t border-white/10 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">V1 Pool</span>
+                            <span class="text-sm font-bold text-white truncate text-right" id="liquidity-v1">Loading...</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">V2 Pool</span>
+                            <span class="text-sm font-bold text-white truncate text-right" id="liquidity-v2">Loading...</span>
+                        </div>
+                    </div>
                     <div class="rpc-status">
-                        <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Fetched from DexScreener</a>
+                        <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Cap &amp; Liquidity via DexScreener</a>
+                        <span class="mx-1">·</span>
+                        <span>Pools via Connected RPC</span>
                     </div>
                 </div>
             </div>
@@ -1180,7 +1192,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.0.0
+                v3.1.0
             </div>
         </div>
     </footer>
@@ -1463,7 +1475,7 @@
             setInterval(tick, 1000);
         }
 
-        let priceInterval, minedInterval, faucetInterval;
+        let priceInterval, minedInterval, faucetInterval, liquidityInterval;
 
         async function fetchPrices() {
             if (document.hidden) return;
@@ -1674,13 +1686,65 @@ function formatTokenAmount(formatted) {
             }
         }
 
+        // --- V1 / V2 liquidity pool reserves, read straight from the RPC ---
+        const SHD_TOKEN_ADDRESS = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
+        const LIQUIDITY_PAIRS = {
+            v1: "0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8",
+            v2: "0x6d8a9F5726A5e67aC1Cd7F558Fe5B289e95ba232"
+        };
+        const PAIR_ABI = [
+            "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+            "function token0() view returns (address)",
+            "function token1() view returns (address)"
+        ];
+
+        function formatFullTokenAmount(value) {
+            return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        async function readPoolReserves(provider, pairAddress) {
+            const contract = new ethers.Contract(pairAddress, PAIR_ABI, provider);
+            const [reserves, token0] = await Promise.all([contract.getReserves(), contract.token0()]);
+            const isShdToken0 = token0.toLowerCase() === SHD_TOKEN_ADDRESS.toLowerCase();
+            const shdReserve = isShdToken0 ? reserves.reserve0 : reserves.reserve1;
+            const plsReserve = isShdToken0 ? reserves.reserve1 : reserves.reserve0;
+            return {
+                shd: Number(ethers.utils.formatEther(shdReserve)),
+                pls: Number(ethers.utils.formatEther(plsReserve))
+            };
+        }
+
+        function renderPoolLiquidity(elementId, pool) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = `${formatTokenAmount(pool.shd)} SHD / ${formatTokenAmount(pool.pls)} PLS`;
+            el.title = `${formatFullTokenAmount(pool.shd)} SHD / ${formatFullTokenAmount(pool.pls)} PLS`;
+        }
+
+        async function fetchLiquidityPools() {
+            try {
+                const [v1, v2] = await withRpcFallback((provider) => Promise.all([
+                    readPoolReserves(provider, LIQUIDITY_PAIRS.v1),
+                    readPoolReserves(provider, LIQUIDITY_PAIRS.v2)
+                ]));
+                renderPoolLiquidity('liquidity-v1', v1);
+                renderPoolLiquidity('liquidity-v2', v2);
+            } catch (err) {
+                console.error("Failed to load pool liquidity:", err);
+                document.getElementById('liquidity-v1').textContent = "Error";
+                document.getElementById('liquidity-v2').textContent = "Error";
+            }
+        }
+
         function startPolling() {
             fetchPrices();
             fetchTotalMined();
             fetchFaucetBalance();
+            fetchLiquidityPools();
             priceInterval = setInterval(fetchPrices, 45000);
             minedInterval = setInterval(fetchTotalMined, 60000);
             faucetInterval = setInterval(fetchFaucetBalance, 60000);
+            liquidityInterval = setInterval(fetchLiquidityPools, 60000);
         }
 
         // Pause polling when hidden
@@ -1689,6 +1753,7 @@ function formatTokenAmount(formatted) {
                 if (priceInterval) clearInterval(priceInterval);
                 if (minedInterval) clearInterval(minedInterval);
                 if (faucetInterval) clearInterval(faucetInterval);
+                if (liquidityInterval) clearInterval(liquidityInterval);
             } else {
                 startPolling();
             }
