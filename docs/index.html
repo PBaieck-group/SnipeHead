@@ -1192,7 +1192,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.2.0
+                v3.2.1
             </div>
         </div>
     </footer>
@@ -1317,7 +1317,24 @@
         resizeCanvas();
         initParticles();
         startParticles();
-        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+        // Only react to real size changes (orientation/window resize), not to
+        // mobile browsers showing/hiding their address bar, which fires 'resize'
+        // with the same width but a different height and previously caused
+        // the canvas + particles to reset repeatedly, producing a visible shake
+        // on Chromium-based mobile browsers (e.g. Brave).
+        let lastWidth = window.innerWidth;
+        let resizeDebounce;
+        window.addEventListener('resize', () => {
+            const newWidth = window.innerWidth;
+            if (newWidth === lastWidth) return; // height-only change, ignore
+            lastWidth = newWidth;
+            clearTimeout(resizeDebounce);
+            resizeDebounce = setTimeout(() => {
+                resizeCanvas();
+                initParticles();
+            }, 100);
+        });
 
         // Visibility handling
         document.addEventListener('visibilitychange', () => {
