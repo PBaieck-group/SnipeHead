@@ -2,8 +2,10 @@
 node_modules/
 npm-debug.log
 
-# Environment Variables
+# Environment Variables (everywhere)
 .env
+**/.env
+**/.env.*
 
 # IDEs and Editors
 .vscode/
@@ -16,4 +18,7 @@ Thumbs.db
 # Build artifacts
 dist/
 build/
-SNFT/
+SNFT/lib/
+SNFT/cache/
+SNFT/out/
+SNFT/broadcast/

@@ -1,0 +1,89 @@
+# Ignore SNFT generated files
+SNFT/lib/
+SNFT/cache/
+SNFT/out/
+SNFT/broadcast/
+__________________________________________________________________
+## Install dependencies
+
+After cloning:
+
+```bash
+forge install OpenZeppelin/openzeppelin-contracts
+
+forge test 
+
+
+---
+
+### 3. When someone forks/clones
+
+They do:
+
+```bash
+git clone your-repo
+cd SNFT
+forge install
+forge test
+__________________________________________________________
+001.png
+3000px × 3000px
+PNG
+RGB color
+
+assets/
+└── images/
+    ├── 001.png
+    ├── 002.png
+    ├── 003.png
+
+    {
+  "name": "SNFT #001",
+  "description": "The first SNFT collectible.",
+  "image": "ipfs://IMAGE_CID/001.png",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    }
+  ]
+}
+
+#Read state:
+cast call $NFT "owner()(address)" --rpc-url $RPC
+cast call $NFT "mintingActive()(bool)" --rpc-url $RPC
+cast call $NFT "mintPrice()(uint256)" --rpc-url $RPC
+
+#Drop price to something testable (0.000001 tPLS, matching the comment's intent) and flip minting on:
+cast send $NFT "setMintPrice(uint256)" 1000000000000 --rpc-url $RPC --private-key $PK
+cast send $NFT "setMintingActive(bool)" true --rpc-url $RPC --private-key $PK
+
+#Mint one and check it landed:
+cast send $NFT "mint(uint256)" 1 --value 1000000000000 --rpc-url $RPC --private-key $PK
+cast call $NFT "ownerOf(uint256)(address)" 1 --rpc-url $RPC
+cast call $NFT "tokenURI(uint256)(string)" 1 --rpc-url $RPC
+cast call $NFT "totalSupply()(uint256)" --rpc-url $RPC
+
+#Test withdraw:
+cast send $NFT "withdraw()" --rpc-url $RPC --private-key $PK
+
+export RPC=https://pulsechain-testnet.publicnode.com
+# or
+export RPC=https://943.rpc.thirdweb.com
+# or
+export RPC=https://pulsechain-testnet-v4.rpc.thirdweb.com
+
+# Check contract balance first (should be the 0.000001 tPLS you sent)
+cast balance $NFT --rpc-url $RPC
+
+# Withdraw (only owner can call this)
+cast send $NFT "withdraw()" --rpc-url $RPC --private-key $PK
+
+# Confirm it went to your wallet
+cast balance $NFT --rpc-url $RPC
+cast balance 0xD3BBcBdb5a1f3caE2dC757aC5E6F23CD941828Bf --rpc-url $RPC
+
+forge script script/SmokeTestSnipeHeadNFT.s.sol:SmokeTestSnipeHeadNFT \
+  --rpc-url https://pulsechain-testnet.publicnode.com \
+  --broadcast \
+  -vvvv

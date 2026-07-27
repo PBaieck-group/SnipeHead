@@ -1,0 +1,57 @@
+{
+  "name": "Graveyard",
+  "description": "SnipeHead NFT (SNFT) — Past Pain. Future Mission. Dog tags of Honor, Loyalty, Sacrifice. Scars that never healed, only hardened.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/013.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Military / Veteran"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Scars + Soldiers"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Resolute"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Dog Tags + Bullet Earring"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale with Scars"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 88,
+      "display_type": "number"
+    }
+  ]
+}

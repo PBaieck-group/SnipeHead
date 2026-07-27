@@ -1,0 +1,57 @@
+{
+  "name": "Calligraphy",
+  "description": "SnipeHead NFT (SNFT) — Calm in gold calligraphy. Turban, emerald and pearl jewelry, serene closed eyes. Faith under the target.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/030.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Islamic / Devotional"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Covered (Turban)"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Calligraphy"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Emerald Star Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Devout"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Turban + Emerald Jewelry + Pearls"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 91,
+      "display_type": "number"
+    }
+  ]
+}
