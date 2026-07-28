@@ -1,0 +1,57 @@
+{
+  "name": "4.0 Protocol",
+  "description": "SnipeHead NFT (SNFT) — GPA 4.0. University crest, sticky note to-do list, glasses, pencil, E=mc². Future is Ours. Grind never stops.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/034.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Academic / Student"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Academic Icons"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "University Crest Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Determined"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Glasses + Pencil + Sticky Note"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 71,
+      "display_type": "number"
+    }
+  ]
+}

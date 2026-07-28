@@ -1,0 +1,57 @@
+{
+  "name": "Bird Cage",
+  "description": "SnipeHead NFT (SNFT) — Freedom written on the cheek, prison bars as the target, a swallow on the head, and the number 1312. The cage is already open.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/031.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Prison / Freedom"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Jailbird + Freedom + 1312"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Prison Bars Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Liberated"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Bird on Head + Open Cage"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 83,
+      "display_type": "number"
+    }
+  ]
+}

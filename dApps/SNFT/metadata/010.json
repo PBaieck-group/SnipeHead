@@ -1,0 +1,57 @@
+{
+  "name": "Rules",
+  "description": "SnipeHead NFT (SNFT) — Rules Are Suggestions. Bullet hole, grenade earring, bullet earring. The manifesto is written on the face.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/010.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Anarchist / Tactical"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Bullet Hole + Text"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Defiant"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Grenade + Bullet Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale with Blood"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 80,
+      "display_type": "number"
+    }
+  ]
+}

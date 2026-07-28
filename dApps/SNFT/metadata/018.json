@@ -1,0 +1,57 @@
+{
+  "name": "Double Target",
+  "description": "SnipeHead NFT (SNFT) — Two heads. One body. Two targets. Conjoined twins sharing the same crosshairs. Double the presence, double the aim.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/018.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Surreal / Dual"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald (Dual)"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Cracks + Ink"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Dual Red Targets"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Serene"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Spike + Cross Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 95,
+      "display_type": "number"
+    }
+  ]
+}

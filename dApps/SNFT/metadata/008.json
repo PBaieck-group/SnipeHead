@@ -1,0 +1,57 @@
+{
+  "name": "Gey Boi",
+  "description": "SnipeHead NFT (SNFT) — Soft and sticky-sweet. Hello Kitty bandaid, teddy bear earring, MOMMY'S BOY tattoo, and a heart locket just for her.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/008.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Cute / Soft"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Stick Figure + Lip Print"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Pink Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Innocent"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Teddy Earring + Heart Locket + Bandaid"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 75,
+      "display_type": "number"
+    }
+  ]
+}
