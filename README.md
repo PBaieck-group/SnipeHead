@@ -67,7 +67,7 @@ A secure and fair community faucet to help new users get started with SHD.
 #### 4. SnipeHead NFT (SNFT)
 A limited-edition **ERC-721** collection of **35 unique NFTs** on PulseChain.
 
-**Contract Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
+**Contract Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://ipfs.scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
 
 **Key details:**
 - **Max Supply:** 35
@@ -91,7 +91,8 @@ A limited-edition **ERC-721** collection of **35 unique NFTs** on PulseChain.
 | SnipeHead (SHD)            | Live       | `0xB95bC84f9B6D0373642D586b81979B067572f7bc`     | [SnipeHead.sol](https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/0xB95bC84f9B6D0373642D586b81979B067572f7bc?tab=contract) | — |
 | Faucet V2              | Live       | `0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98`     | [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2) | [dApps/SnipeHeadFaucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeHeadFaucetV2) |
 | Decentralized Mining   | Live       | `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`     | [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2) | [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeheadMiningDecentralizedV2) |
-| SnipeHead NFT (SNFT)   | Live       | `0x4A345c962DFA2492023a1D19bc88062B532a43c3`     | — | — |
+| SnipeHead NFT (SNFT)   | Live       | `0x4A345c962DFA2492023a1D19bc88062B532a43c3`     |
+[SNFT](https://github.com/PBaieck-group/SnipeHead/tree/main/SNFT) | [dApps/SNFT](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SNFT) |
 
 ---
 
@@ -144,8 +145,9 @@ Always do your own research (DYOR) before interacting with any smart contracts o
 - **Mining Contract V2**: [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **Mining V2 contract README**: [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeheadMiningDecentralizedV2/README.md)
 - **Mining V2 dApp README**: [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeheadMiningDecentralizedV2/README.md)
-- **SnipeHead NFT (SNFT)**: [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
+- **SnipeHead NFT (SNFT)**: [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link)
 - **IPFS NFT dApp Fallback**: [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
+- **SnipeHead NFT dApp README**: [dApps/SNFT](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SNFT/README.md)
 - **Trade on PulseX**: [ipfs.app.pulsex.com](https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 
 ---
