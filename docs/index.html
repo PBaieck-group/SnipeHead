@@ -560,17 +560,7 @@
             }
         }
 
-        @media (min-width: 768px) and (max-width: 900px) {
-            .nav-menu .nav-link {
-                font-size: 0.75rem;
-                padding: 0.25rem 0.5rem;
-            }
-            .nav-menu {
-                gap: 0.25rem;
-            }
-        }
-
-        @media (max-width: 767px) {
+        @media (max-width: 1280px) {
             .hamburger {
                 display: flex;
                 position: absolute;
@@ -849,6 +839,7 @@
                 <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="nav-link" target="_blank" rel="noopener noreferrer">Swap</a>
                 <a href="https://bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva.ipfs.dweb.link/" class="nav-link" target="_blank" rel="noopener noreferrer" title="SnipeHead Faucet - Claim free SHD daily">Faucet</a>
                 <a href="https://bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja.ipfs.dweb.link/" class="nav-link" target="_blank" rel="noopener noreferrer" title="SnipeHead Mining - Earn more SHD">Mining</a>
+                <a href="https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/" class="nav-link" target="_blank" rel="noopener noreferrer" title="SnipeHead NFT - Mint the SNFT collection">SNFT</a>
             </div>
         </nav>
     </header>
@@ -904,7 +895,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">SHD Price</h3>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider font-display">SHD Price &amp; SNFT</h3>
                     </div>
                     <p class="text-2xl md:text-3xl font-bold text-white" id="shd-price">Loading...</p>
                     <p class="text-sm font-semibold mt-1" id="shd-change">&nbsp;</p>
@@ -912,8 +903,24 @@
                         <span class="text-green-400 font-semibold" id="shd-buys">&nbsp;</span>
                         <span class="text-red-400 font-semibold" id="shd-sells">&nbsp;</span>
                     </div>
+                    <div class="mt-3 pt-3 border-t border-white/10 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">SNFT Minted</span>
+                            <span class="text-sm font-bold text-white truncate text-right" id="snft-minted">Loading...</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">SNFT PLS Raised</span>
+                            <span class="text-sm font-bold text-white truncate text-right" id="snft-pls">Loading...</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">SNFT Holders</span>
+                            <span class="text-sm font-bold text-white truncate text-right" id="snft-holders">Loading...</span>
+                        </div>
+                    </div>
                     <div class="rpc-status">
                         <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Fetched from DexScreener</a>
+                        <span class="mx-1">·</span>
+                        <a href="https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">View SNFT</a>
                     </div>
                 </div>
             </div>
@@ -1192,7 +1199,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.2.2
+                v3.3.0
             </div>
         </div>
     </footer>
@@ -1538,6 +1545,8 @@
         }
 
         const MINING_CONTRACT = "0xa16c1fa26f13803083f0fd222d1ea083c1d6d650";
+        const SNFT_CONTRACT = "0x4A345c962DFA2492023a1D19bc88062B532a43c3";
+        const SNFT_MAX_SUPPLY = 35;
 
         // Truncates (never rounds up)
 function formatTokenAmount(formatted) {
@@ -1686,7 +1695,10 @@ function formatTokenAmount(formatted) {
             "function getRewardReserve() view returns (uint256)",
             "function getFaucetBalance() view returns (uint256)",
             "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
-            "function token0() view returns (address)"
+            "function token0() view returns (address)",
+            "function totalMinted() view returns (uint256)",
+            "function getEthBalance(address addr) view returns (uint256 balance)",
+            "function ownerOf(uint256 tokenId) view returns (address)"
         ]);
 
         // token0() never changes for an existing pair, so once we learn which
@@ -1700,7 +1712,9 @@ function formatTokenAmount(formatted) {
                 { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getRewardReserve") },
                 { target: FAUCET_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getFaucetBalance") },
                 { target: LIQUIDITY_PAIRS.v1, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
-                { target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") }
+                { target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
+                { target: SNFT_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalMinted") },
+                { target: MULTICALL3_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getEthBalance", [SNFT_CONTRACT]) }
             ];
             if (!poolToken0Cache.v1) calls.push({ target: LIQUIDITY_PAIRS.v1, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
             if (!poolToken0Cache.v2) calls.push({ target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
@@ -1742,6 +1756,8 @@ function formatTokenAmount(formatted) {
                 const faucetBalance = decodeResult("getFaucetBalance", results[i++]);
                 const v1Reserves = decodeResult("getReserves", results[i++]);
                 const v2Reserves = decodeResult("getReserves", results[i++]);
+                const snftMinted = decodeResult("totalMinted", results[i++]);
+                const snftPlsBalance = decodeResult("getEthBalance", results[i++]);
                 if (!poolToken0Cache.v1) {
                     const token0 = decodeResult("token0", results[i++]);
                     if (token0) poolToken0Cache.v1 = token0[0];
@@ -1764,11 +1780,54 @@ function formatTokenAmount(formatted) {
                     const pool = reservesToPool(v2Reserves, poolToken0Cache.v2);
                     if (pool) renderPoolLiquidity('liquidity-v2', pool);
                 }
+
+                if (snftMinted) document.getElementById('snft-minted').textContent = `${snftMinted[0].toString()}/${SNFT_MAX_SUPPLY}`;
+                if (snftPlsBalance) document.getElementById('snft-pls').textContent = formatTokenAmount(Number(ethers.utils.formatEther(snftPlsBalance[0]))) + " PLS";
+
+                if (snftMinted) await fetchSnftHolders(Number(snftMinted[0]));
             } catch (err) {
                 console.error("Failed to load on-chain data:", err);
-                ['total-mined', 'contract-balance', 'reward-reserve', 'faucet-balance', 'liquidity-v1', 'liquidity-v2'].forEach((id) => {
+                ['total-mined', 'contract-balance', 'reward-reserve', 'faucet-balance', 'liquidity-v1', 'liquidity-v2', 'snft-minted', 'snft-pls', 'snft-holders'].forEach((id) => {
                     document.getElementById(id).textContent = "Error";
                 });
+            }
+        }
+
+        // The NFT contract doesn't track a holder count directly, but since
+        // supply is capped at 35 tokens we can cheaply derive it: batch an
+        // ownerOf() call for every minted token ID through Multicall3, then
+        // count the unique addresses that come back.
+        async function fetchSnftHolders(totalMintedCount) {
+            const el = document.getElementById('snft-holders');
+            if (!el) return;
+            if (!totalMintedCount || totalMintedCount <= 0) {
+                el.textContent = "0";
+                return;
+            }
+            try {
+                const ownerCalls = [];
+                for (let tokenId = 1; tokenId <= totalMintedCount; tokenId++) {
+                    ownerCalls.push({
+                        target: SNFT_CONTRACT,
+                        allowFailure: true,
+                        callData: ON_CHAIN_ABI.encodeFunctionData("ownerOf", [tokenId])
+                    });
+                }
+                const ownerResults = await withRpcFallback((provider) => {
+                    const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+                    return multicall.callStatic.aggregate3(ownerCalls);
+                });
+
+                const holders = new Set();
+                ownerResults.forEach((result) => {
+                    const decoded = decodeResult("ownerOf", result);
+                    if (decoded) holders.add(decoded[0].toLowerCase());
+                });
+
+                el.textContent = holders.size.toString();
+            } catch (err) {
+                console.error("Failed to load SNFT holders:", err);
+                el.textContent = "Error";
             }
         }
 
