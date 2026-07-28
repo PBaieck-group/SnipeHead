@@ -14,27 +14,14 @@
 - **Token Address:** [0xB95bC84f9B6D0373642D586b81979B067572f7bc](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 - **Faucet V2 Address:** [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
 - **Mining V2 Address:** [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
+- **SnipeHead NFT (SNFT) Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
 - **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
 - **IPFS Faucet dApp Fallback:** [bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva](https://bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva.ipfs.dweb.link)
 - **IPFS Mining dApp Fallback:** [bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja](https://bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja.ipfs.dweb.link)
+- **IPFS SnipeHead NFT dApp Fallback:** [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
 
 ---
 
-## 📚 Documentation
-
-This repo has five READMEs, each covering a different layer:
-
-| README | Covers |
-|---|---|
-| **This file** | The SHD token, the ecosystem, addresses, and how everything fits together |
-| [SnipeHead-faucetV2/README.md](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeHead-faucetV2/README.md) | The **faucet contracts** — Solidity source, Foundry tests, how the claim logic works |
-| [SnipeheadMiningDecentralizedV2/README.md](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeheadMiningDecentralizedV2/README.md) | The **mining contract** — Solidity source, reward-reserve design, Foundry tests, deployment |
-| [dApps/SnipeHeadFaucetV2/README.md](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeHeadFaucetV2/README.md) | The **faucet frontend** — single-file, zero-dependency, self-hostable `index.html` |
-| [dApps/SnipeheadMiningDecentralizedV2/README.md](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeheadMiningDecentralizedV2/README.md) | The **mining frontend** — single-file, zero-dependency, self-hostable `index.html` |
-
-Start here for the token, addresses, and how the pieces relate. For the on-chain logic, go to the two contract READMEs. For how to run, fork, or self-host the actual web apps, go to the two dApp READMEs.
-
----
 
 ## 🧱 Ecosystem
 
@@ -77,6 +64,24 @@ A secure and fair community faucet to help new users get started with SHD.
 **Contract Repository:** [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2)
 **dApp Repository:** [dApps/SnipeHeadFaucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeHeadFaucetV2)
 
+#### 4. SnipeHead NFT (SNFT)
+A limited-edition **ERC-721** collection of **35 unique NFTs** on PulseChain.
+
+**Contract Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
+
+**Key details:**
+- **Max Supply:** 35
+- **Max per wallet (public mint):** 2
+- **Mint Price (mainnet):** 3,000,000 PLS
+- **Royalty:** 1% (EIP-2981)
+- **Metadata:** Fully on IPFS (`bafybeiaathkuhqmyfvjssilwqeri57cbe3n3ely7ga2iipqhxjtx52k4ju`)
+- Sequential minting (token IDs 1 → 35)
+- Owner-only reserve mint (`ownerMint`) that does **not** count against the public per-wallet limit
+- Reentrancy protection, Ownable + pull-pattern withdraw, Enumerable support
+- Thoroughly tested with Foundry (43 tests including fuzz tests)
+
+**IPFS NFT dApp Fallback:** [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
+
 ---
 
 ## 📁 Repositories & Contracts
@@ -86,6 +91,7 @@ A secure and fair community faucet to help new users get started with SHD.
 | SnipeHead (SHD)            | Live       | `0xB95bC84f9B6D0373642D586b81979B067572f7bc`     | [SnipeHead.sol](https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/0xB95bC84f9B6D0373642D586b81979B067572f7bc?tab=contract) | — |
 | Faucet V2              | Live       | `0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98`     | [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2) | [dApps/SnipeHeadFaucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeHeadFaucetV2) |
 | Decentralized Mining   | Live       | `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`     | [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2) | [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeheadMiningDecentralizedV2) |
+| SnipeHead NFT (SNFT)   | Live       | `0x4A345c962DFA2492023a1D19bc88062B532a43c3`     | — | — |
 
 ---
 
@@ -95,13 +101,15 @@ A secure and fair community faucet to help new users get started with SHD.
 2. **Buy on PulseX** — SHD has graduated and trades freely, no bonding curve
 3. Participate in decentralized mining
 
+**How to get SNFT:** Mint on the NFT dApp (public mint, max 2 per wallet) or via the contract. See the IPFS NFT dApp Fallback above.
+
 ---
 
 ## 🔄 About V2
 
 SnipeHead V2 is a complete upgrade from the original token. The old ecosystem components are now **deprecated** but still accessible for reference.
 
-V2 focuses on cleaner architecture, better security, and modular expansion.
+V2 focuses on cleaner architecture, better security, and modular expansion — now including a limited NFT collection as part of the broader ecosystem.
 
 ---
 
@@ -115,7 +123,7 @@ V2 focuses on cleaner architecture, better security, and modular expansion.
 
 ## 💡 Vision
 
-SnipeHead V2 aims to grow from a token into a **sustainable DeFi ecosystem** on PulseChain by providing transparent, trustless, and community-friendly tools.
+SnipeHead V2 aims to grow from a token into a **sustainable DeFi ecosystem** on PulseChain by providing transparent, trustless, and community-friendly tools — including decentralized mining, a fair faucet, and a limited-edition NFT collection.
 
 ---
 
@@ -136,6 +144,8 @@ Always do your own research (DYOR) before interacting with any smart contracts o
 - **Mining Contract V2**: [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **Mining V2 contract README**: [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeheadMiningDecentralizedV2/README.md)
 - **Mining V2 dApp README**: [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeheadMiningDecentralizedV2/README.md)
+- **SnipeHead NFT (SNFT)**: [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
+- **IPFS NFT dApp Fallback**: [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
 - **Trade on PulseX**: [ipfs.app.pulsex.com](https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 
 ---
