@@ -16,10 +16,20 @@
 - **Mining V2 Address:** [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **SnipeHead NFT (SNFT) Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
 - **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
+
+### 🖼️ NFT Assets
+
+- **NFT Metadata (IPFS):**  
+  https://bafybeiaathkuhqmyfvjssilwqeri57cbe3n3ely7ga2iipqhxjtx52k4ju.ipfs.inbrowser.link/
+
+- **NFT Images (IPFS):**  
+  https://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy.ipfs.inbrowser.link/
+
+### 🌐 IPFS Fallbacks
+
 - **IPFS Faucet dApp Fallback:** [bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva](https://bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva.ipfs.dweb.link)
 - **IPFS Mining dApp Fallback:** [bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja](https://bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja.ipfs.dweb.link)
 - **IPFS SnipeHead NFT dApp Fallback:** [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
-
 ---
 
 
