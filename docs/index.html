@@ -801,6 +801,167 @@
                 padding: 1.25rem;
             }
         }
+
+        /* ---- PulseChain CORE ---- */
+        .core-section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            background: rgba(0, 255, 204, 0.06);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+
+        .core-section-badge .core-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .core-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .core-card {
+            position: relative;
+            border-radius: 18px;
+            padding: 1.5px;
+            background: linear-gradient(135deg, rgba(0, 255, 204, 0.18), rgba(139, 92, 246, 0.12) 50%, rgba(0, 255, 204, 0.08));
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+        }
+
+        .core-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45), 0 0 30px rgba(0, 255, 204, 0.12);
+        }
+
+        .core-card-inner {
+            position: relative;
+            height: 100%;
+            border-radius: 16.5px;
+            background: linear-gradient(160deg, rgba(13, 13, 22, 0.97) 0%, rgba(18, 18, 30, 0.95) 100%);
+            padding: 1.25rem 1.1rem;
+            overflow: hidden;
+        }
+
+        .core-card-inner::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -40%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .core-token-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+
+        .core-token-icon-wrap {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+
+        .core-token-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .core-token-symbol {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            letter-spacing: 0.03em;
+        }
+
+        .core-token-name {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 1px;
+        }
+
+        .core-token-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.85rem, 1vw + 0.6rem, 1.15rem);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.4rem;
+            min-height: 1.4rem;
+            letter-spacing: 0.01em;
+            overflow-wrap: anywhere;
+        }
+
+        .core-token-price.core-loading {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .core-token-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 8px;
+        }
+
+        .core-token-change.core-up {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .core-token-change.core-down {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .core-token-change.core-flat {
+            color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .core-footnote {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 1.75rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        @media (max-width: 480px) {
+            .core-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body class="text-white">
@@ -1206,6 +1367,134 @@
                 </a>
             </div>
         </section>
+
+        <section class="text-center glass-card p-8 md:p-12">
+            <div class="core-section-badge">
+                <span class="core-live-dot"></span>
+                On-Chain Snapshot
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold mt-5 mb-4 font-display">
+                <span class="glow-text">PulseChain</span>
+                <span class="text-white"> CORE</span>
+            </h3>
+            <p class="text-lg text-gray-400 mb-2 max-w-xl mx-auto">
+                A quick pulse-check on the core tokens powering the PulseChain ecosystem.
+            </p>
+
+            <div class="core-grid" id="core-token-grid">
+                <div class="core-card" data-symbol="PLS">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/pls-3d-token-v1.png" alt="PLS" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">PLS</div>
+                                <div class="core-token-name">PulseChain</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-pls">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-pls">—</div>
+                    </div>
+                </div>
+
+                <div class="core-card" data-symbol="SHD">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/shd-3d-token-v1.png.png" alt="SHD" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">SHD</div>
+                                <div class="core-token-name">SnipeHead</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-shd">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-shd">—</div>
+                    </div>
+                </div>
+
+                <div class="core-card" data-symbol="HEX">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/hex-3d-token-v5.png" alt="HEX" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">HEX</div>
+                                <div class="core-token-name">PulseChain</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-hex">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-hex">—</div>
+                    </div>
+                </div>
+
+                <div class="core-card" data-symbol="eHEX">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/hex-3d-token-v5.png" alt="eHEX" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">eHEX</div>
+                                <div class="core-token-name">From Ethereum</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-ehex">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-ehex">—</div>
+                    </div>
+                </div>
+
+                <div class="core-card" data-symbol="PLSX">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/plsx-3d-token-v1.png" alt="PLSX" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">PLSX</div>
+                                <div class="core-token-name">PulseX</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-plsx">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-plsx">—</div>
+                    </div>
+                </div>
+
+                <div class="core-card" data-symbol="INC">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/inc-3d-token-v1.png" alt="INC" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">INC</div>
+                                <div class="core-token-name">Incentive</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-inc">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-inc">—</div>
+                    </div>
+                </div>
+
+                <div class="core-card" data-symbol="PRVX">
+                    <div class="core-card-inner">
+                        <div class="core-token-header">
+                            <div class="core-token-icon-wrap">
+                                <img class="core-token-icon" src="3d_logo/prvx-3d-token-v5.png" alt="PRVX" loading="lazy" onerror="this.style.display='none';">
+                            </div>
+                            <div>
+                                <div class="core-token-symbol">PRVX</div>
+                                <div class="core-token-name">PulseChain</div>
+                            </div>
+                        </div>
+                        <div class="core-token-price core-loading" id="core-price-prvx">Loading…</div>
+                        <div class="core-token-change core-flat" id="core-change-prvx">—</div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="py-8 px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -1222,7 +1511,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.3.3
+                v3.4.0
             </div>
         </div>
     </footer>
@@ -1501,7 +1790,92 @@
             updateCountdown();
             const currentYear = new Date().getFullYear();
             document.getElementById('copyright-year').textContent = currentYear;
+
+            fetchPulseChainCore();
         });
+
+        // ---- PulseChain CORE: one-time snapshot on page load (no live polling) ----
+        function formatCorePrice(price) {
+            if (typeof price !== 'number' || isNaN(price)) return '—';
+            if (price >= 1000) return `$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+            if (price >= 1) return `$${price.toFixed(2)}`;
+            if (price >= 0.01) return `$${price.toFixed(4)}`;
+            if (price >= 0.0001) return `$${price.toFixed(6)}`;
+            return `$${price.toFixed(8)}`;
+        }
+
+        function renderCoreToken(key, pair) {
+            const priceEl = document.getElementById(`core-price-${key}`);
+            const changeEl = document.getElementById(`core-change-${key}`);
+            if (!priceEl || !changeEl) return;
+
+            if (!pair || !pair.priceUsd) {
+                priceEl.textContent = 'N/A';
+                priceEl.classList.remove('core-loading');
+                changeEl.textContent = '—';
+                return;
+            }
+
+            priceEl.textContent = formatCorePrice(parseFloat(pair.priceUsd));
+            priceEl.classList.remove('core-loading');
+
+            const change24h = pair.priceChange?.h24;
+            changeEl.classList.remove('core-flat', 'core-up', 'core-down');
+            if (typeof change24h === 'number') {
+                const isUp = change24h >= 0;
+                changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}%`;
+                changeEl.classList.add(isUp ? 'core-up' : 'core-down');
+            } else {
+                changeEl.textContent = '—';
+                changeEl.classList.add('core-flat');
+            }
+        }
+
+        function bestPulsechainPair(pairs) {
+            if (!Array.isArray(pairs) || pairs.length === 0) return null;
+            const onChain = pairs.filter(p => p.chainId === 'pulsechain');
+            const pool = onChain.length ? onChain : pairs;
+            return pool.reduce((best, p) => {
+                const liq = p.liquidity?.usd || 0;
+                const bestLiq = best?.liquidity?.usd || 0;
+                return liq > bestLiq ? p : best;
+            }, pool[0]);
+        }
+
+        async function fetchCorePairByPairAddress(key, pairAddress) {
+            try {
+                const res = await fetch(`https://api.dexscreener.com/latest/dex/pairs/pulsechain/${pairAddress}`, { signal: AbortSignal.timeout(10000) });
+                const data = await res.json();
+                renderCoreToken(key, data.pairs?.[0] || null);
+            } catch (e) {
+                console.error(`PulseChain CORE fetch error (${key}):`, e);
+                renderCoreToken(key, null);
+            }
+        }
+
+        async function fetchCorePairByTokenAddress(key, tokenAddress) {
+            try {
+                const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`, { signal: AbortSignal.timeout(10000) });
+                const data = await res.json();
+                renderCoreToken(key, bestPulsechainPair(data.pairs));
+            } catch (e) {
+                console.error(`PulseChain CORE fetch error (${key}):`, e);
+                renderCoreToken(key, null);
+            }
+        }
+
+        function fetchPulseChainCore() {
+            // Reuse the pair addresses the site already tracks for PLS & SHD
+            fetchCorePairByPairAddress('pls', '0xE56043671df55dE5CDf8459710433C10324DE0aE');
+            fetchCorePairByPairAddress('shd', '0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8');
+
+            // New CORE tokens, resolved by token address (best liquidity PulseChain pair)
+            fetchCorePairByTokenAddress('hex', '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39');
+            fetchCorePairByTokenAddress('ehex', '0x57fde0a71132198BBeC939B98976993d8D89D225');
+            fetchCorePairByTokenAddress('plsx', '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab');
+            fetchCorePairByTokenAddress('inc', '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d');
+            fetchCorePairByTokenAddress('prvx', '0xf6f8db0aBa00007681f8fAf16A0FDa1c9b030b11');
+        }
 
         function updateCountdown() {
             const creation = new Date('2026-03-26T10:03:55-04:00');
