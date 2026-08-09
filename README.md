@@ -29,7 +29,7 @@
 
 - **IPFS Faucet dApp Fallback:** [bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva](https://bafybeify4vlff6g4dl5oibtzy5ie4de6ipl2sg7zibie2vlw74ql7y4nva.ipfs.dweb.link)
 - **IPFS Mining dApp Fallback:** [bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja](https://bafybeienqnmtb4xgeovqqn3qjtld4v3hzpjesy7q5klyq2t42ejliwzlja.ipfs.dweb.link)
-- **IPFS SnipeHead SNFT dApp Fallback:** [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
+- **IPFS SnipeHead SNFT dApp Fallback:** [bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4](https://bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4.ipfs.inbrowser.link/)
 ---
 
 
