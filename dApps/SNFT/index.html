@@ -287,13 +287,14 @@
   .wallet-modal p{ color:var(--muted); font-size:13px; margin:0 0 24px; line-height:1.6; }
   .wallet-options{ display:flex; flex-direction:column; gap:10px; }
   .wallet-option{
-    display:flex; align-items:center; gap:12px; padding:13px 16px;
+    display:flex; align-items:center; justify-content:center; gap:12px; padding:13px 16px;
     border:1px solid var(--line-soft); border-radius:8px; background:var(--panel-2);
     text-decoration:none; color:var(--paper); font-size:14px; font-weight:600;
-    transition:border-color 0.15s ease;
+    transition:border-color 0.15s ease; text-align:center;
   }
   .wallet-option:hover{ border-color:var(--scope); }
   .wallet-option .ico{ width:26px; height:26px; flex:none; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .wallet-option .ico img{ width:100%; height:100%; object-fit:contain; border-radius:4px; }
   .wallet-option small{ display:block; color:var(--muted); font-weight:400; font-size:11px; margin-top:2px; }
 
   /* listing detail modal */
@@ -494,11 +495,15 @@
     <div class="wallet-options">
       <a class="wallet-option" href="https://metamask.io/download/" target="_blank" rel="noopener">
         <span class="ico">🦊</span>
-        <span>Get MetaMask<small>Most widely used browser wallet</small></span>
+        <span>Get MetaMask<small>MetaMask - Most widely used browser wallet</small></span>
       </a>
       <a class="wallet-option" href="https://zkxwallet.com/" target="_blank" rel="noopener">
-        <span class="ico">🛡️</span>
+        <span class="ico"><img src="zkx.png" alt="ZKX Wallet logo"></span>
         <span>Get ZKX Wallet<small>Privacy-focused, native PulseChain support</small></span>
+      </a>
+      <a class="wallet-option" href="https://internetmoney.io/" target="_blank" rel="noopener">
+        <span class="ico"><img src="IM.png" alt="Internet Money Wallet logo"></span>
+        <span>Get Internet Money Wallet<small>Non-custodial, native PulseChain support</small></span>
       </a>
     </div>
   </div>
@@ -537,6 +542,7 @@ const CONFIG = {
   // If your metadata folder has a different name, change this one line.
   metadataFolder: 'metadata/',
   imagesFolder: 'images/',
+  thumbsFolder: 'images-web/',
   contractAddressRaw: '0x4A345c962DFA2492023a1D19bc88062B532a43c3',
   rpcUrl: 'https://rpc.pulsechain.com',
   chainIdDec: 369,
@@ -770,7 +776,7 @@ function renderGrid(){
     card.dataset.id = l.id;
     card.innerHTML = `
       <div class="thumb-wrap">
-        <img src="${CONFIG.imagesFolder}${pad3(l.id)}.png" alt="${l.name}" loading="lazy">
+        <img src="${CONFIG.thumbsFolder}${pad3(l.id)}.webp" alt="${l.name}" loading="lazy">
         ${isMine(l) ? `<div class="ribbon mine">★ YOU OWN THIS</div>` : ribbonHtml(status, l)}
         <svg class="reticle" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="20" cy="20" r="13" stroke="#38f2c4" stroke-width="2"/>

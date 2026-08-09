@@ -46,7 +46,8 @@ Fork it. Download it. Put it on a USB stick. It doesn't matter what happens to t
 |---|---|
 | `index.html` | The entire front-end (HTML + CSS + JS + self-hosted ethers.js v6) |
 | `metadata/` | 35 JSON files (`001.json` … `035.json`) — name, description, attributes |
-| `images/` | 35 PNG artworks (`001.png` … `035.png`) |
+| `images/` | 35 full-resolution PNG artworks (`001.png` … `035.png`) — used for the detail/modal view |
+| `images-web/` | 35 resized WebP thumbnails (`001.webp` … `035.webp`) — used for the gallery grid, much faster to load |
 | `Logo_200.png` | Small logo used in the nav and wallet modal |
 | `Logo_500.png` | Larger logo asset (available for other uses) |
 
@@ -57,16 +58,16 @@ Fork it. Download it. Put it on a USB stick. It doesn't matter what happens to t
 | Analytics / tracking | ❌ None |
 | Third-party API calls | ❌ None, except the one thing the app *needs*: your chosen PulseChain RPC |
 | RPC provider | ✅ **User-selectable** — pick from a dropdown or paste your own custom RPC URL |
-| Images & metadata | ✅ Served from the local `images/` and `metadata/` folders |
+| Images & metadata | ✅ Served from the local `images/`, `images-web/`, and `metadata/` folders |
 
 Don't take our word for it — open `index.html` and check the `Content-Security-Policy` meta tag near the top of `<head>`:
 
 ```html
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'self'; font-src 'none';">
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self'; font-src 'none';">
 ```
 
-`connect-src https:` is the only network permission the page has — used exclusively for talking to whichever RPC endpoint *you* choose. Images are restricted to `'self'` (the local `images/` folder and logos).
+`connect-src 'self' https:` is the only network permission the page has — `'self'` allows the page to load its own local resources, and `https:` is used for talking to whichever RPC endpoint *you* choose. Images are restricted to `'self'` (the local `images/` and `images-web/` folders, plus logos).
 
 ## How the collection works
 
@@ -88,7 +89,7 @@ The front-end reads live state from the contract (total minted, price, per-walle
 
 You don't need Node, npm, a build tool, or a server. Pick whichever you're comfortable with.
 
-📁 All commands below assume your terminal is inside the folder that contains `index.html`, `metadata/`, and `images/`.
+📁 All commands below assume your terminal is inside the folder that contains `index.html`, `metadata/`, `images/`, and `images-web/`.
 
 ### Option 1 — just open the file
 
@@ -110,14 +111,14 @@ Then visit `http://localhost:8080`.
 ### Option 3 — host it anywhere static files are served
 
 GitHub Pages, IPFS, Netlify, Cloudflare Pages, your own VPS — it's static files, it doesn't care where it lives.  
-Just keep the folder structure intact (`index.html` next to `metadata/` and `images/`).
+Just keep the folder structure intact (`index.html` next to `metadata/`, `images/`, and `images-web/`).
 
 ## Forking this repo
 
 1. Click **Fork** ↗️ in the top right of the repository.
 2. Clone your fork:
    ```bash
-   https://github.com/<your-username>/SnipeHead.git
+   git clone https://github.com/<your-username>/SnipeHead.git
    cd SnipeHead/dApps/SNFTS
    ```
 3. That's it. There's no `npm install`, no `package.json`, nothing to build.  
@@ -141,12 +142,18 @@ To point at a different contract or change the metadata/image paths, edit the `C
 const CONFIG = {
   metadataFolder: 'metadata/',
   imagesFolder: 'images/',
+  thumbsFolder: 'images-web/',
   contractAddressRaw: '0x4A345c962DFA2492023a1D19bc88062B532a43c3',
   // ...
 };
 ```
 
-Artwork and traits live in the `images/` and `metadata/` folders — replace those files if you ever re-issue or update the collection.
+Artwork and traits live in the `images/`, `images-web/`, and `metadata/` folders — replace those files if you ever re-issue or update the collection.
+
+> **Note on `images-web/`:** these are resized (600px) WebP copies of the artwork in `images/`, used only for the gallery grid so the page loads fast. The full-resolution PNGs in `images/` are still what's shown in the detail/modal view and are the canonical artwork files. If you replace an image in `images/`, regenerate the matching thumbnail:
+> ```bash
+> cwebp -q 85 -resize 600 0 images/001.png -o images-web/001.webp
+> ```
 
 ## If this repo or website ever goes offline
 
