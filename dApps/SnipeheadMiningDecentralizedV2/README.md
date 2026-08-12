@@ -41,7 +41,7 @@ Fork it. Download it. Put it on a USB stick. It doesn't matter what happens to t
 | Concern | Status |
 |---|---|
 | Web fonts | ❌ None — `Inter` / `Exo 2` are named in the CSS but never fetched; falls back to your OS's default fonts |
-| Images | ❌ None — CSP sets `img-src 'none'` |
+| Images | ⚠️ One — a self-hosted `favicon.png` (see below); CSP sets `img-src 'self'` so only same-folder images can load, nothing remote |
 | CDN-loaded scripts/styles | ❌ None — ethers.js v5.7.2 and the Tailwind utility CSS are both pasted directly inline, not loaded from a CDN |
 | Analytics / tracking | ❌ None |
 | Third-party API calls | ❌ None, except the one thing the app *needs*: your chosen PulseChain RPC |
@@ -51,14 +51,18 @@ Don't take our word for it — open `index.html` and check the `Content-Security
 
 ```html
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'none'; font-src 'none';">
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'self'; font-src 'none';">
 ```
 
-`connect-src https:` is the only network permission the page has — and that's used exclusively for talking to whichever RPC endpoint *you* choose.
+`connect-src https:` is the only network permission the page has for talking to your chosen RPC endpoint. `img-src 'self'` permits loading local, same-folder image files (currently just the favicon) — it does **not** allow images from any remote domain.
 
 ### A note on your RPC preference
 
 This app remembers your chosen RPC endpoint using `localStorage` so you don't have to re-select it on every visit. That preference **never leaves your browser** — it isn't sent anywhere, isn't synced to any server, and doesn't compromise the "fully self-contained" nature of this app. It's purely a local convenience.
+
+### A note on the favicon
+
+The page links to `favicon.png` for its browser tab icon. This file must sit in the **same folder** as `index.html` — the reference is a relative path, not a remote URL, so nothing is fetched off your machine. If `favicon.png` is missing, the tab simply falls back to your browser's default icon; nothing else breaks.
 
 ## Quick start
 
@@ -104,6 +108,7 @@ Everything — HTML, CSS, and JS — lives in the single `index.html` file. Usef
 
 | Section | What's there |
 |---|---|
+| `<link rel="icon">` near the top of `<head>` | Points to `favicon.png`, expected alongside `index.html` |
 | `<style>` block near the top | Tailwind utility CSS (inlined) plus custom page styling |
 | `rpcSelect`, `customRpcInput`, `addRpcButton`, `cancelRpcButton` | RPC dropdown + custom RPC input UI and logic |
 | `RPC_PREF_STORAGE_KEY` | Local `localStorage` persistence of the user's chosen RPC |

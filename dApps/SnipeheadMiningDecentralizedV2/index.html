@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- connect-src widened from a single RPC host to https: so failover + custom RPC endpoints aren't blocked -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'none'; font-src 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'self'; font-src 'none';">
     <title>SnipeHead Mining</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     
     
     
@@ -116,7 +117,9 @@
 <!-- Header -->
 <header class="bg-gradient-to-r from-blue-900/80 to-cyan-900/80 py-4 glassmorphism sticky top-0 z-10">
     <div class="container mx-auto px-4">
-        <h1 class="text-4xl font-bold text-cyan-400 tracking-wider neon-glow header-animation">SnipeHead Mining</h1>
+        <div class="flex items-center gap-3">
+            <h1 class="text-4xl font-bold text-cyan-400 tracking-wider neon-glow header-animation">SnipeHead Mining</h1>
+        </div>
         <div class="flex flex-wrap items-center gap-2 mt-1">
             <p class="text-cyan-300 text-sm">PulseChain Mainnet</p>
             <span class="tip-wrap">
@@ -263,7 +266,7 @@
             </div>
         </div>
         <p class="text-gray-400 text-base">© <span id="copyright-year">2026</span> SnipeHead Mining. All rights reserved.</p>
-        <p class="text-gray-500 text-sm mt-2">v2.2.1 (Mainnet · Secured Reward Reserve)</p>
+        <p class="text-gray-500 text-sm mt-2">v2.2.2 (Mainnet · Secured Reward Reserve)</p>
     </div>
 </footer>
 
@@ -634,7 +637,7 @@
             if (window.ethereum) {
                 connectButton.addEventListener('click', connectWallet);
             } else {
-                setStatus("No wallet detected. Install MetaMask or ZKxWallet.", "text-yellow-500");
+                setStatus("No PulseChain wallet detected. Install MetaMask or ZKX Wallet.", "text-yellow-500");
                 connectButton.disabled = true;
             }
         } catch (err) {
