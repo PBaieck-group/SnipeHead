@@ -463,9 +463,16 @@
         #dexscreener-embed, #pulsex-embed {
             position: relative;
             width: 100%;
-            height: 560px;
             border-radius: 16px;
             overflow: hidden;
+        }
+
+        /* Both cards share one height so they line up evenly side by side.
+           PulseX's own app content doesn't stretch to fill extra space, so
+           this value is tuned to the swap widget, not the chart (the chart
+           adapts to any height fine, the swap app doesn't). */
+        #dexscreener-embed, #pulsex-embed {
+            height: 640px;
         }
 
         #dexscreener-embed iframe, #pulsex-embed iframe {
@@ -482,7 +489,7 @@
             display: flex;
             flex-direction: row;
             gap: 1.15rem;
-            min-height: 560px;
+            min-height: 640px;
         }
 
         .chart-swap-container > div:first-child {
@@ -491,7 +498,7 @@
 
         .chart-swap-container > div:last-child {
             flex: 1;
-            min-width: 320px;
+            min-width: 0;
         }
 
         .section-header {
@@ -573,10 +580,26 @@
         @media (max-width: 1024px) {
             .chart-swap-container {
                 flex-direction: column;
+                min-height: 0;
             }
             .chart-swap-container > div:first-child,
             .chart-swap-container > div:last-child {
+                flex: 0 0 auto;
                 width: 100%;
+                max-width: 100%;
+                min-width: 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #dexscreener-embed {
+                height: 400px;
+            }
+            /* Mobile widget layout may need a different height than desktop
+               (the widget reflows internally on narrow screens) — check this
+               separately and tune if you see the same black-space issue here. */
+            #pulsex-embed {
+                height: 640px;
             }
         }
 
@@ -1594,7 +1617,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.7.0
+                v3.7.1
             </div>
         </div>
     </footer>
