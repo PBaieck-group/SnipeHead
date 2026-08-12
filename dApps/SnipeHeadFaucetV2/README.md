@@ -30,18 +30,18 @@ No build step. No backend. No CDN. No fonts pulled from the internet. No point o
 
 ## Why this exists
 
-Websites disappear. Domains lapse, hosts go down, front-ends get taken offline overnight. This project is built so that can never happen to *you*: everything the app needs to run lives inside one file, `index.html`.
+Websites disappear. Domains lapse, hosts go down, front-ends get taken offline overnight. This project is built so that can never happen to *you*: nearly everything the app needs to run lives inside one file, `index.html` — the only companions it needs are two small local image files, `Logo_200.png` and `favicon.png`, sitting in the same folder.
 
-> **As long as you have a copy of that file and a browser, the app works** — with or without this repo, with or without a live website, with or without the internet (aside from talking to an RPC node).
+> **As long as you have those three files and a browser, the app works** — with or without this repo, with or without a live website, with or without the internet (aside from talking to an RPC node).
 
-Fork it. Download it. Put it on a USB stick. It doesn't matter what happens to this GitHub repo or any site hosting it — your copy keeps working.
+Fork it. Download it. Put the whole folder on a USB stick. It doesn't matter what happens to this GitHub repo or any site hosting it — your copy keeps working.
 
 ## What's actually in the file
 
 | Concern | Status |
 |---|---|
 | Web fonts | ❌ None — falls back to your OS's default fonts |
-| Images | ❌ None — CSP sets `img-src 'none'` |
+| Images | ✅ Two local files only — `Logo_200.png` (header) and `favicon.png` (browser tab). CSP sets `img-src 'self'`, so no remote images can load |
 | CDN-loaded scripts | ❌ None — ethers.js v5.7.2 is pasted directly into a `<script>` tag |
 | Analytics / tracking | ❌ None |
 | Third-party API calls | ❌ None, except the one thing the app *needs*: your chosen PulseChain RPC |
@@ -51,7 +51,7 @@ Don't take our word for it — open `index.html` and check the `Content-Security
 
 ```html
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'none'; font-src 'none';">
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'self'; font-src 'none';">
 ```
 
 `connect-src https:` is the only network permission the page has — and that's used exclusively for talking to whichever RPC endpoint *you* choose.
@@ -60,7 +60,7 @@ Don't take our word for it — open `index.html` and check the `Content-Security
 
 You don't need Node, npm, a build tool, or a server. Pick whichever you're comfortable with.
 
-📁 All commands below assume your terminal is inside `dApps/SnipeHeadFaucetV2/` — the folder that actually contains `index.html`.
+📁 All commands below assume your terminal is inside `dApps/SnipeHeadFaucetV2/` — the folder that actually contains `index.html`, `Logo_200.png`, and `favicon.png`. Keep all three together; the logo and tab icon are loaded as relative paths.
 
 ### Option 1 — just open the file
 
