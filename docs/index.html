@@ -42,6 +42,15 @@
             box-sizing: border-box;
         }
 
+        .no-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
         body {
             background: var(--bg-dark);
             font-family: 'Inter', sans-serif;
@@ -1374,12 +1383,12 @@
             </div>
 
             <div class="glass-card p-6 mt-6">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="min-w-0">
                         <p class="text-sm text-gray-400 uppercase tracking-wider mb-2">SnipeHead Contract Address</p>
-                        <p id="contract-address" class="text-[#00ffcc] font-mono text-sm sm:text-base break-all">0xb95bc84f9b6d0373642d586b81979b067572f7bc</p>
+                        <p id="contract-address" class="text-[#00ffcc] font-mono text-sm sm:text-base whitespace-nowrap overflow-x-auto no-scrollbar" data-full-address="0xb95bc84f9b6d0373642d586b81979b067572f7bc" title="0xb95bc84f9b6d0373642d586b81979b067572f7bc">0xb95bc84f9b6d0373642d586b81979b067572f7bc</p>
                     </div>
-                    <div class="flex gap-3 flex-shrink-0">
+                    <div class="flex flex-wrap gap-3 md:flex-shrink-0">
                         <button onclick="copyContract(this)" class="btn-primary text-sm">
                             <span class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1617,7 +1626,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.8.0
+                v3.8.1
             </div>
         </div>
     </footer>
@@ -1848,17 +1857,55 @@
             iframe.src = chartUrl;
         }
 
+        // Once the iframe has been off-screen (or the tab backgrounded) for more
+        // than this long, its internal websocket/polling gets throttled by the
+        // browser and never recovers on its own — it just sits on "Loading
+        // pair...". So instead of loading it once and forgetting about it, we
+        // keep watching, and force a real reload (blank the src, then restore
+        // it — re-setting the same URL is a no-op) whenever it comes back into
+        // view after a long enough absence.
+        const DEXSCREENER_STALL_MS = 20000;
+        let dexscreenerHiddenSince = null;
+
+        function reloadDexscreenerEmbed() {
+            const iframe = document.getElementById('dexscreener-iframe');
+            const chartUrl = iframe && iframe.dataset.src;
+            if (!iframe || !chartUrl) return;
+            iframe.src = 'about:blank';
+            requestAnimationFrame(() => { iframe.src = chartUrl; });
+        }
+
         const dexscreenerContainer = document.getElementById('dexscreener-embed');
         if (dexscreenerContainer && 'IntersectionObserver' in window) {
             const dexscreenerObserver = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        loadDexscreenerEmbed();
-                        dexscreenerObserver.disconnect();
+                        const iframe = document.getElementById('dexscreener-iframe');
+                        if (!iframe.dataset.loaded) {
+                            loadDexscreenerEmbed();
+                        } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
+                            reloadDexscreenerEmbed();
+                        }
+                        dexscreenerHiddenSince = null;
+                    } else if (dexscreenerHiddenSince === null) {
+                        dexscreenerHiddenSince = Date.now();
                     }
                 });
-            }, { threshold: 0.1 }); // no rootMargin — only act once it's genuinely on screen
+            }, { threshold: 0.1 }); // no rootMargin — only act once it's genuinely on screen; keep observing indefinitely, don't disconnect
             dexscreenerObserver.observe(dexscreenerContainer);
+
+            // Backgrounding the whole browser tab throttles the iframe the same
+            // way scrolling it off-screen does, so track that separately too.
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    if (dexscreenerHiddenSince === null) dexscreenerHiddenSince = Date.now();
+                } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
+                    if (document.getElementById('dexscreener-iframe').dataset.loaded) {
+                        reloadDexscreenerEmbed();
+                    }
+                    dexscreenerHiddenSince = null;
+                }
+            });
         } else {
             // Fallback for browsers without IntersectionObserver support
             if (document.readyState === 'complete') {
@@ -2381,6 +2428,31 @@ function formatTokenAmount(formatted) {
         });
 
         startPolling();
+
+        // Below ~480px there isn't room for the full 42-char address on one
+        // line at a readable font size, so we show a shortened form
+        // (0xb95b…72f7bc) instead of letting it overflow/scroll and get cut
+        // off. copyContract() and the View link both use the full literal
+        // address separately, so this is display-only and never affects
+        // what gets copied or linked.
+        function truncateAddress(addr, front = 6, back = 6) {
+            if (!addr || addr.length <= front + back + 1) return addr;
+            return `${addr.slice(0, front)}…${addr.slice(-back)}`;
+        }
+
+        function updateContractAddressDisplay() {
+            const el = document.getElementById('contract-address');
+            if (!el) return;
+            const full = el.dataset.fullAddress;
+            el.textContent = window.innerWidth < 480 ? truncateAddress(full) : full;
+        }
+
+        updateContractAddressDisplay();
+        let addressResizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(addressResizeTimer);
+            addressResizeTimer = setTimeout(updateContractAddressDisplay, 150);
+        });
 
         function copyContract(btn) {
             navigator.clipboard.writeText('0xb95bc84f9b6d0373642d586b81979b067572f7bc').then(() => {
