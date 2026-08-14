@@ -6,7 +6,7 @@
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.gigatheminter.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.gigatheminter.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -1187,6 +1187,10 @@
                     </div>
                     <div class="mt-3 pt-3 border-t border-white/10 space-y-2">
                         <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">SHD Holders</span>
+                            <span class="text-sm font-bold text-white truncate text-right" id="shd-holders">Loading...</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
                             <span class="text-xs text-gray-500 uppercase tracking-wider shrink-0">SNFT Minted</span>
                             <span class="text-sm font-bold text-white truncate text-right" id="snft-minted">Loading...</span>
                         </div>
@@ -1200,7 +1204,9 @@
                         </div>
                     </div>
                     <div class="rpc-status">
-                        <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Fetched from DexScreener</a>
+                        <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Price via DexScreener</a>
+                        <span class="mx-1">·</span>
+                        <a href="https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc?tab=holders" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">Holders</a>
                         <span class="mx-1">·</span>
                         <a href="https://bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4.ipfs.inbrowser.link/" target="_blank" rel="noopener noreferrer" class="hover:text-white hover:underline">View SNFT</a>
                     </div>
@@ -1626,7 +1632,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.8.1
+                v3.8.2
             </div>
         </div>
     </footer>
@@ -1864,8 +1870,15 @@
         // keep watching, and force a real reload (blank the src, then restore
         // it — re-setting the same URL is a no-op) whenever it comes back into
         // view after a long enough absence.
-        const DEXSCREENER_STALL_MS = 20000;
+        const DEXSCREENER_STALL_MS = 45000;
+        // A quick scroll-past shouldn't start the "hidden" clock at all — only
+        // a sustained absence should count. This is the debounce that was
+        // missing before: without it, a 1-frame flicker near the viewport
+        // edge counted the same as genuinely leaving the chart, which made
+        // the eventual reload feel random/jarring.
+        const DEXSCREENER_HIDDEN_DEBOUNCE_MS = 1500;
         let dexscreenerHiddenSince = null;
+        let dexscreenerHiddenTimer = null;
 
         function reloadDexscreenerEmbed() {
             const iframe = document.getElementById('dexscreener-iframe');
@@ -1875,20 +1888,33 @@
             requestAnimationFrame(() => { iframe.src = chartUrl; });
         }
 
+        function markDexscreenerVisible() {
+            clearTimeout(dexscreenerHiddenTimer);
+            const iframe = document.getElementById('dexscreener-iframe');
+            if (!iframe) return;
+            if (!iframe.dataset.loaded) {
+                loadDexscreenerEmbed();
+            } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
+                reloadDexscreenerEmbed();
+            }
+            dexscreenerHiddenSince = null;
+        }
+
+        function markDexscreenerHidden() {
+            clearTimeout(dexscreenerHiddenTimer);
+            dexscreenerHiddenTimer = setTimeout(() => {
+                if (dexscreenerHiddenSince === null) dexscreenerHiddenSince = Date.now();
+            }, DEXSCREENER_HIDDEN_DEBOUNCE_MS);
+        }
+
         const dexscreenerContainer = document.getElementById('dexscreener-embed');
         if (dexscreenerContainer && 'IntersectionObserver' in window) {
             const dexscreenerObserver = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        const iframe = document.getElementById('dexscreener-iframe');
-                        if (!iframe.dataset.loaded) {
-                            loadDexscreenerEmbed();
-                        } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
-                            reloadDexscreenerEmbed();
-                        }
-                        dexscreenerHiddenSince = null;
-                    } else if (dexscreenerHiddenSince === null) {
-                        dexscreenerHiddenSince = Date.now();
+                        markDexscreenerVisible();
+                    } else {
+                        markDexscreenerHidden();
                     }
                 });
             }, { threshold: 0.1 }); // no rootMargin — only act once it's genuinely on screen; keep observing indefinitely, don't disconnect
@@ -1898,12 +1924,9 @@
             // way scrolling it off-screen does, so track that separately too.
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
-                    if (dexscreenerHiddenSince === null) dexscreenerHiddenSince = Date.now();
-                } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
-                    if (document.getElementById('dexscreener-iframe').dataset.loaded) {
-                        reloadDexscreenerEmbed();
-                    }
-                    dexscreenerHiddenSince = null;
+                    markDexscreenerHidden();
+                } else {
+                    markDexscreenerVisible();
                 }
             });
         } else {
@@ -1943,11 +1966,15 @@
             updateCountdown();
             const currentYear = new Date().getFullYear();
             document.getElementById('copyright-year').textContent = currentYear;
-
-            fetchPulseChainCore();
         });
 
-        // ---- PulseChain CORE: one-time snapshot on page load (no live polling) ----
+        // ---- PulseChain CORE ----
+        // Polled on the same 45s cadence as the price ticker (see startPolling
+        // below) and paused whenever the tab is hidden. 7 requests per cycle
+        // against DexScreener's free /latest/dex/pairs and /latest/dex/tokens
+        // endpoints, which are rate-limited to 300 req/min — at 45s intervals
+        // that's ~65 req/min, comfortably under the limit even accounting for
+        // multiple tabs/visitors sharing an IP.
         const CORE_PRICE_DECIMALS = {
             inc: 2,
             hex: 5,
@@ -2044,6 +2071,7 @@
         }
 
         function fetchPulseChainCore() {
+            if (document.hidden) return;
             // Reuse the pair addresses the site already tracks for PLS & SHD
             fetchCorePairByPairAddress('pls', '0xE56043671df55dE5CDf8459710433C10324DE0aE');
             fetchCorePairByPairAddress('shd', '0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8');
@@ -2054,6 +2082,28 @@
             fetchCorePairByTokenAddress('plsx', '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab');
             fetchCorePairByTokenAddress('inc', '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d');
             fetchCorePairByTokenAddress('prvx', '0xf6f8db0aBa00007681f8fAf16A0FDa1c9b030b11');
+        }
+
+        // SHD is a regular ERC-20 with no capped supply, so unlike the SNFT
+        // count (35 tokens, walked directly over RPC) we can't enumerate
+        // holders ourselves. PulseChain's own Blockscout explorer indexes
+        // this and exposes it as a plain counter, so we read it from there.
+        // This is the raw on-chain "addresses with a nonzero balance" count —
+        // it includes the LP pair, and any of our own contracts (faucet,
+        // mining, etc.) that happen to hold SHD, same as any block explorer.
+        async function fetchShdHolderCount() {
+            if (document.hidden) return;
+            const el = document.getElementById('shd-holders');
+            if (!el) return;
+            try {
+                const res = await fetch(`https://api.scan.pulsechain.com/api/v2/tokens/${SHD_TOKEN_ADDRESS}/counters`, { signal: AbortSignal.timeout(10000) });
+                const data = await res.json();
+                const count = data.token_holders_count;
+                el.textContent = (count !== undefined && count !== null) ? Number(count).toLocaleString() : 'N/A';
+            } catch (e) {
+                console.error('SHD holder count fetch error:', e);
+                el.textContent = 'Error';
+            }
         }
 
         function updateCountdown() {
@@ -2071,7 +2121,7 @@
             setInterval(tick, 1000);
         }
 
-        let priceInterval, onChainInterval;
+        let priceInterval, onChainInterval, coreInterval, holderInterval;
 
         async function fetchPrices() {
             if (document.hidden) return;
@@ -2410,11 +2460,17 @@ function formatTokenAmount(formatted) {
         function startPolling() {
             fetchPrices();
             fetchOnChainData();
+            fetchPulseChainCore();
+            fetchShdHolderCount();
             priceInterval = setInterval(fetchPrices, 45000);
             // All mining/faucet/liquidity stats now ride in a single batched
             // multicall, so one interval covers everything that used to be
             // three separate 60s timers.
             onChainInterval = setInterval(fetchOnChainData, 60000);
+            coreInterval = setInterval(fetchPulseChainCore, 45000);
+            // Holder count moves far more slowly than price, so it gets its
+            // own slower cadence rather than riding the 45s ticker.
+            holderInterval = setInterval(fetchShdHolderCount, 90000);
         }
 
         // Pause polling when hidden
@@ -2422,6 +2478,8 @@ function formatTokenAmount(formatted) {
             if (document.hidden) {
                 if (priceInterval) clearInterval(priceInterval);
                 if (onChainInterval) clearInterval(onChainInterval);
+                if (coreInterval) clearInterval(coreInterval);
+                if (holderInterval) clearInterval(holderInterval);
             } else {
                 startPolling();
             }
