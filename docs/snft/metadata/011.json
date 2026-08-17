@@ -1,0 +1,57 @@
+{
+  "name": "Chicken Wing",
+  "description": "SnipeHead NFT (SNFT) — Schrödinger's headshot. Quantum equations, molecular diagrams, green test-tube earring. Science is the only religion.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/011.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Scientific / Academic"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Equations + Molecules"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Focused"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Test Tube + Spike Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark with Green Accents"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 85,
+      "display_type": "number"
+    }
+  ]
+}
