@@ -1632,7 +1632,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.9.0
+                v3.9.1
             </div>
         </div>
     </footer>
@@ -1851,8 +1851,7 @@
         // it's scrolled into view) is itself what causes the permanent stall.
         //
         // So we wait until the chart is genuinely visible on screen and only load it
-        // then, once. No rootMargin head start, no repeated reloading on every
-        // scroll-away/scroll-back — once it's loaded correctly it's left alone.
+        // then, once.
         function loadDexscreenerEmbed() {
             const iframe = document.getElementById('dexscreener-iframe');
             if (!iframe || iframe.dataset.loaded) return;
@@ -1866,16 +1865,20 @@
         // Once the iframe has been off-screen (or the tab backgrounded) for more
         // than this long, its internal websocket/polling gets throttled by the
         // browser and never recovers on its own — it just sits on "Loading
-        // pair...". So instead of loading it once and forgetting about it, we
-        // keep watching, and force a real reload (blank the src, then restore
-        // it — re-setting the same URL is a no-op) whenever it comes back into
-        // view after a long enough absence.
-        const DEXSCREENER_STALL_MS = 45000;
+        // pair...". That throttling is tied to the iframe actually being
+        // off-screen, which means a "reload it quietly while hidden" approach
+        // doesn't work — the reload attempt itself gets throttled the same way
+        // and never completes. The only state where its network reliably runs
+        // is while it's actually visible, so the reload has to happen at the
+        // moment you scroll back to it (you'll see one brief "Loading pair..."
+        // flash in that case — that's the trade-off for it working at all).
+        //
+        // The threshold is set well above normal in-page browsing (reading
+        // other sections, checking stats, etc.) so a short detour never
+        // triggers it — only a genuinely long absence does.
+        const DEXSCREENER_STALL_MS = 3 * 60 * 1000; // 3 minutes
         // A quick scroll-past shouldn't start the "hidden" clock at all — only
-        // a sustained absence should count. This is the debounce that was
-        // missing before: without it, a 1-frame flicker near the viewport
-        // edge counted the same as genuinely leaving the chart, which made
-        // the eventual reload feel random/jarring.
+        // a sustained absence should count.
         const DEXSCREENER_HIDDEN_DEBOUNCE_MS = 1500;
         let dexscreenerHiddenSince = null;
         let dexscreenerHiddenTimer = null;
