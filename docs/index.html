@@ -484,7 +484,7 @@
             height: 640px;
         }
 
-        #dexscreener-embed iframe, #pulsex-embed iframe {
+        #pulsex-embed iframe {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -492,6 +492,106 @@
             left: 0;
             border: 0;
             border-radius: 16px;
+        }
+
+        /* The dexscreener card now has a header bar above the chart, so
+           instead of the iframe filling the whole card (like pulsex-embed
+           does), it stacks a fixed-height header + a flexible chart body
+           that fills whatever height is left. Total card height is
+           untouched, the chart just gives up a few px to the header. */
+        #dexscreener-embed {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dexscreener-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 0 0 auto;
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.1);
+            background: rgba(10, 10, 15, 0.4);
+        }
+
+        .dexscreener-header .live-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .dexscreener-header .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .dexscreener-reload-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(0, 255, 204, 0.08);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dexscreener-reload-btn:hover {
+            background: rgba(0, 255, 204, 0.15);
+            border-color: rgba(0, 255, 204, 0.5);
+            color: #fff;
+        }
+
+        .dexscreener-reload-btn:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .dexscreener-reload-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .dexscreener-reload-btn.reloading svg {
+            animation: spin-reload 0.6s linear infinite;
+        }
+
+        @keyframes spin-reload {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .dexscreener-chart-body {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .dexscreener-chart-body iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border: 0;
         }
 
         .chart-swap-container {
@@ -1292,7 +1392,16 @@
             <h3 class="text-2xl font-bold glow-text-subtle mb-6 font-display section-header">Price Chart & Swap</h3>
             <div class="chart-swap-container">
                 <div id="dexscreener-embed" class="glass-card overflow-hidden">
-                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
+                    <div class="dexscreener-header">
+                        <span class="live-label"><span class="live-dot"></span>Live Chart</span>
+                        <button type="button" id="dexscreener-reload-btn" class="dexscreener-reload-btn" onclick="manualReloadDexscreenerEmbed(this)" aria-label="Reload chart">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                            Reload
+                        </button>
+                    </div>
+                    <div class="dexscreener-chart-body">
+                        <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
+                    </div>
                 </div>
                 <div id="pulsex-embed" class="glass-card">
                     <iframe
@@ -1634,7 +1743,7 @@
                 </p>
             </div>
             <div class="mt-4 text-xs text-gray-500">
-                v3.9.2
+                v3.9.3
             </div>
         </div>
     </footer>
@@ -1688,13 +1797,19 @@
 
     <script>
         const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
+        // Some privacy-hardened browsers/extensions block canvas entirely
+        // (getContext returns null). Since every script on this page shares
+        // one <script> block, an uncaught error here would have stopped
+        // everything below it too — price polling, the chart reload logic,
+        // wallet buttons, all of it. So this degrades gracefully instead.
+        const ctx = canvas ? canvas.getContext('2d') : null;
         let particles = [];
         const particleCount = 50;
         let animationFrame;
         let isVisible = true;
 
         function resizeCanvas() {
+            if (!canvas) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
@@ -1729,7 +1844,7 @@
         }
 
         function animateParticles() {
-            if (!isVisible) return;
+            if (!isVisible || !ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
             // Optimized connections: limit checks
@@ -1752,13 +1867,16 @@
         }
 
         function startParticles() {
+            if (!ctx) return;
             if (animationFrame) cancelAnimationFrame(animationFrame);
             animateParticles();
         }
 
-        resizeCanvas();
-        initParticles();
-        startParticles();
+        if (canvas && ctx) {
+            resizeCanvas();
+            initParticles();
+            startParticles();
+        }
 
         // Only react to real size changes (orientation/window resize), not to
         // mobile browsers showing/hiding their address bar, which fires 'resize'
@@ -1768,6 +1886,7 @@
         let lastWidth = window.innerWidth;
         let resizeDebounce;
         window.addEventListener('resize', () => {
+            if (!ctx) return;
             const newWidth = window.innerWidth;
             if (newWidth === lastWidth) return; // height-only change, ignore
             lastWidth = newWidth;
@@ -1781,6 +1900,7 @@
         // Visibility handling
         document.addEventListener('visibilitychange', () => {
             isVisible = !document.hidden;
+            if (!ctx) return;
             if (isVisible) {
                 startParticles();
             } else if (animationFrame) {
@@ -1891,6 +2011,26 @@
             if (!iframe || !chartUrl) return;
             iframe.src = 'about:blank';
             requestAnimationFrame(() => { iframe.src = chartUrl; });
+        }
+
+        // User-triggered reload from the header button, for whenever the
+        // chart hangs despite the automatic visibility-based recovery above.
+        // Reuses the same reload path, just with a bit of button feedback
+        // and a reset of the "hidden since" tracker so a manual reload
+        // doesn't get immediately re-triggered by the stall logic.
+        function manualReloadDexscreenerEmbed(btn) {
+            if (btn) {
+                btn.classList.add('reloading');
+                btn.disabled = true;
+            }
+            reloadDexscreenerEmbed();
+            dexscreenerHiddenSince = null;
+            if (btn) {
+                setTimeout(() => {
+                    btn.classList.remove('reloading');
+                    btn.disabled = false;
+                }, 1200);
+            }
         }
 
         function markDexscreenerVisible() {
@@ -2137,8 +2277,6 @@
                 if (shdPair && shdPair.priceUsd) {
                     const shdPrice = parseFloat(shdPair.priceUsd);
                     document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
-                    document.getElementById('shd-market-cap').textContent = `$${Math.round(shdPair.marketCap || 0).toLocaleString()}`;
-                    document.getElementById('shd-liquidity').textContent = `$${Math.round(shdPair.liquidity?.usd || 0).toLocaleString()}`;
 
                     const changeEl = document.getElementById('shd-change');
                     const change24h = shdPair.priceChange?.h24;
@@ -2162,6 +2300,25 @@
                         buysEl.textContent = '';
                         sellsEl.textContent = '';
                     }
+                }
+
+                // Market Cap card: liquidity is a true sum of both pools'
+                // depth (each pool genuinely holds separate funds). Market
+                // cap is NOT summed — it's price × total supply, a property
+                // of the token itself, so v1 and v2 report (near) the same
+                // number. Adding them would double-count it. Instead, just
+                // take whichever pair actually returned a valid, non-zero
+                // market cap (a low-liquidity pool sometimes can't compute
+                // one and reports 0/undefined).
+                const mcapRes = await fetch(`https://api.dexscreener.com/latest/dex/pairs/pulsechain/${LIQUIDITY_PAIRS.v1},${LIQUIDITY_PAIRS.v2}`, { signal: AbortSignal.timeout(10000) });
+                const mcapData = await mcapRes.json();
+                const mcapPairs = (mcapData.pairs || []).filter(p => p && p.priceUsd);
+                if (mcapPairs.length) {
+                    const totalLiquidity = mcapPairs.reduce((sum, p) => sum + (p.liquidity?.usd || 0), 0);
+                    const marketCap = mcapPairs.reduce((val, p) => val || p.marketCap || 0, 0);
+
+                    document.getElementById('shd-market-cap').textContent = `$${Math.round(marketCap).toLocaleString()}`;
+                    document.getElementById('shd-liquidity').textContent = `$${Math.round(totalLiquidity).toLocaleString()}`;
                 }
 
                 const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE', { signal: AbortSignal.timeout(10000) });
@@ -2320,17 +2477,31 @@ function formatTokenAmount(formatted) {
             "function aggregate3(tuple(address target, bool allowFailure, bytes callData)[] calls) returns (tuple(bool success, bytes returnData)[] returnData)"
         ];
 
-        const ON_CHAIN_ABI = new ethers.utils.Interface([
-            "function totalMined() view returns (uint256)",
-            "function getContractSHDBalance() view returns (uint256)",
-            "function getRewardReserve() view returns (uint256)",
-            "function getFaucetBalance() view returns (uint256)",
-            "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
-            "function token0() view returns (address)",
-            "function totalMinted() view returns (uint256)",
-            "function getEthBalance(address addr) view returns (uint256 balance)",
-            "function ownerOf(uint256 tokenId) view returns (address)"
-        ]);
+        // Built from the ethers.js library loaded via CDN in <head>. If that
+        // load ever fails (CDN outage, ad blocker, network hiccup, integrity
+        // hash mismatch after a version bump), this throwing unguarded would
+        // halt every statement after it in this shared <script> block —
+        // price polling, the chart reload logic, wallet buttons, all of it.
+        // On-chain functions (fetchOnChainData, fetchSnftHolders) already
+        // have their own try/catch and fall back to showing "Error" per
+        // field, so containing the failure here is enough to keep the rest
+        // of the page fully functional even without ethers.
+        let ON_CHAIN_ABI = null;
+        try {
+            ON_CHAIN_ABI = new ethers.utils.Interface([
+                "function totalMined() view returns (uint256)",
+                "function getContractSHDBalance() view returns (uint256)",
+                "function getRewardReserve() view returns (uint256)",
+                "function getFaucetBalance() view returns (uint256)",
+                "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+                "function token0() view returns (address)",
+                "function totalMinted() view returns (uint256)",
+                "function getEthBalance(address addr) view returns (uint256 balance)",
+                "function ownerOf(uint256 tokenId) view returns (address)"
+            ]);
+        } catch (err) {
+            console.error("ethers.js failed to load — on-chain stats will show as unavailable:", err);
+        }
 
         // token0() never changes for an existing pair, so once we learn which
         // side of each pool is SHD we stop asking for it again.
