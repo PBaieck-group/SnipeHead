@@ -1243,11 +1243,21 @@
         @media (max-width: 480px) {
             .core-table-head,
             .core-row {
-                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) auto;
+                gap: 0.4rem;
             }
-            .core-table-head .core-th-change,
-            .core-row .core-token-change {
-                display: none;
+            .core-token-price {
+                font-size: 0.8rem;
+            }
+            .core-token-change {
+                font-size: 0.68rem;
+                padding: 0.2rem 0.35rem;
+                min-width: 3.4rem;
+                gap: 0.1rem;
+            }
+            .core-token-icon {
+                width: 24px;
+                height: 24px;
             }
         }
 
@@ -1874,7 +1884,7 @@
                         <div class="core-table" id="core-token-grid">
                             <div class="core-table-head" aria-hidden="true">
                                 <span>Asset</span>
-                                <span>Price  -------</span>
+                                <span>Price  ------ </span>
                                 <span class="core-th-change">24h</span>
                             </div>
 
@@ -1975,7 +1985,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.1.0</p>
+                    <p class="footer-version">v4.1.1</p>
                 </div>
             </footer>
         </div>
