@@ -1060,10 +1060,10 @@
             gap: 0.65rem;
         }
 
-        /* Core tokens */
+        /* Core tokens — Aave Pro–style market table */
         .core-section {
-            text-align: center;
-            padding: 2.5rem 1.5rem;
+            text-align: left;
+            padding: 2rem 1.5rem 1rem;
         }
 
         .core-badge {
@@ -1104,85 +1104,105 @@
 
         .core-section > p {
             color: var(--text-secondary);
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.5rem;
             font-size: 0.975rem;
         }
 
-        .core-grid {
+        .core-table {
+            display: flex;
+            flex-direction: column;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .core-table-head,
+        .core-row {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+            align-items: center;
             gap: 0.75rem;
-            text-align: left;
         }
 
-        @media (min-width: 640px) {
-            .core-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        .core-table-head {
+            padding: 0 0.5rem 0.65rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
         }
 
-        @media (min-width: 900px) {
-            .core-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+        .core-table-head span:not(:first-child),
+        .core-row .core-token-price,
+        .core-row .core-token-change {
+            text-align: right;
+            justify-self: end;
         }
 
-        @media (min-width: 1100px) {
-            .core-grid {
-                grid-template-columns: repeat(7, 1fr);
-            }
+        .core-row {
+            padding: 0.7rem 0.5rem;
+            border-bottom: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: background 0.15s;
         }
 
-        .core-card {
-            padding: 1rem;
-            transition: border-color 0.15s, box-shadow 0.15s;
+        .core-row:last-child {
+            border-bottom: none;
         }
 
-        .core-card:hover {
-            border-color: var(--border-hover);
-            box-shadow: var(--shadow-md);
+        .core-row:hover {
+            background: var(--bg-card-hover);
         }
 
-        .core-token-header {
+        .core-asset {
             display: flex;
             align-items: center;
-            gap: 0.55rem;
-            margin-bottom: 0.75rem;
+            gap: 0.65rem;
+            min-width: 0;
         }
 
         .core-token-icon {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
             border-radius: 50%;
             object-fit: cover;
             border: 1px solid var(--border);
             background: var(--bg);
         }
 
+        .core-asset > div {
+            min-width: 0;
+        }
+
         .core-token-symbol {
             font-size: 0.875rem;
             font-weight: 600;
             color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .core-token-name {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .core-token-price {
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             font-weight: 600;
             color: var(--text);
-            margin-bottom: 0.3rem;
-            min-height: 1.3rem;
             overflow-wrap: anywhere;
         }
 
         .core-token-price.core-loading {
             color: var(--text-muted);
             font-weight: 400;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .core-price-zeros {
@@ -1199,8 +1219,10 @@
             gap: 0.2rem;
             font-size: 0.75rem;
             font-weight: 600;
-            padding: 0.15rem 0.45rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 6px;
+            min-width: 4.25rem;
+            justify-content: center;
         }
 
         .core-token-change.core-up {
@@ -1216,6 +1238,17 @@
         .core-token-change.core-flat {
             color: var(--text-muted);
             background: var(--bg);
+        }
+
+        @media (max-width: 480px) {
+            .core-table-head,
+            .core-row {
+                grid-template-columns: minmax(0, 1fr) auto;
+            }
+            .core-table-head .core-th-change,
+            .core-row .core-token-change {
+                display: none;
+            }
         }
 
         /* Footer */
@@ -1504,6 +1537,9 @@
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer" aria-label="X">
                             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                         </a>
+                        <a href="https://substack.com/@snipehead" target="_blank" rel="noopener noreferrer" aria-label="Substack">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.539 24V10.812H1.46zM22.539 0H1.46v2.836h21.08V0z"/></svg>
+                        </a>
                         <a href="https://github.com/PBaieck-group/SnipeHead" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 015.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .3.2.66.79.55A10.52 10.52 0 0023.5 12c0-6.27-5.23-11.5-11.5-11.5z"/></svg>
                         </a>
@@ -1527,7 +1563,7 @@
                         <span class="dot"></span>
                         <span id="shd-countdown">AGE: Calculating...</span>
                         <span style="opacity:0.4">&middot;</span>
-                        <span>PLS <span id="pls-price">$0.00000000</span></span>
+                        <span>PLS <span id="pls-price" style="color:var(--accent); font-weight:600;">$0.00000000</span></span>
                     </div>
                     <div class="topbar-spacer"></div>
                     <div class="topbar-actions">
@@ -1835,9 +1871,15 @@
                         <h2><span>PulseChain</span> CORE</h2>
                         <p>A quick pulse-check on the core tokens powering the PulseChain ecosystem.</p>
 
-                        <div class="core-grid" id="core-token-grid">
-                            <div class="card core-card" data-symbol="PLS">
-                                <div class="core-token-header">
+                        <div class="core-table" id="core-token-grid">
+                            <div class="core-table-head" aria-hidden="true">
+                                <span>Asset</span>
+                                <span>Price  -------</span>
+                                <span class="core-th-change">24h</span>
+                            </div>
+
+                            <div class="core-row" data-symbol="PLS">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/pls-3d-token-v1.png" alt="PLS" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">PLS</div>
@@ -1848,8 +1890,8 @@
                                 <div class="core-token-change core-flat" id="core-change-pls">—</div>
                             </div>
 
-                            <div class="card core-card" data-symbol="SHD">
-                                <div class="core-token-header">
+                            <div class="core-row" data-symbol="SHD">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/shd-3d-token-v1.png.png" alt="SHD" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">SHD</div>
@@ -1860,8 +1902,8 @@
                                 <div class="core-token-change core-flat" id="core-change-shd">—</div>
                             </div>
 
-                            <div class="card core-card" data-symbol="HEX">
-                                <div class="core-token-header">
+                            <div class="core-row" data-symbol="HEX">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/hex-3d-token-v5.png" alt="HEX" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">HEX</div>
@@ -1872,8 +1914,8 @@
                                 <div class="core-token-change core-flat" id="core-change-hex">—</div>
                             </div>
 
-                            <div class="card core-card" data-symbol="eHEX">
-                                <div class="core-token-header">
+                            <div class="core-row" data-symbol="eHEX">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/hex-3d-token-v5.png" alt="eHEX" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">eHEX</div>
@@ -1884,8 +1926,8 @@
                                 <div class="core-token-change core-flat" id="core-change-ehex">—</div>
                             </div>
 
-                            <div class="card core-card" data-symbol="PLSX">
-                                <div class="core-token-header">
+                            <div class="core-row" data-symbol="PLSX">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/plsx-3d-token-v1.png" alt="PLSX" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">PLSX</div>
@@ -1896,8 +1938,8 @@
                                 <div class="core-token-change core-flat" id="core-change-plsx">—</div>
                             </div>
 
-                            <div class="card core-card" data-symbol="INC">
-                                <div class="core-token-header">
+                            <div class="core-row" data-symbol="INC">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/inc-3d-token-v1.png" alt="INC" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">INC</div>
@@ -1908,8 +1950,8 @@
                                 <div class="core-token-change core-flat" id="core-change-inc">—</div>
                             </div>
 
-                            <div class="card core-card" data-symbol="PRVX">
-                                <div class="core-token-header">
+                            <div class="core-row" data-symbol="PRVX">
+                                <div class="core-asset">
                                     <img class="core-token-icon" src="3d_logo/prvx-3d-token-v5.png" alt="PRVX" loading="lazy" onerror="this.style.display='none'">
                                     <div>
                                         <div class="core-token-symbol">PRVX</div>
@@ -1933,7 +1975,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.0.0</p>
+                    <p class="footer-version">v4.1.0</p>
                 </div>
             </footer>
         </div>
@@ -2136,8 +2178,8 @@
         // ---- PulseChain CORE ----
         const CORE_PRICE_DECIMALS = {
             inc: 2,
-            hex: 5,
-            ehex: 5
+            hex: 6,
+            ehex: 6
         };
 
         function formatCorePrice(price, key) {
@@ -2153,7 +2195,7 @@
             const fixed = price.toFixed(14);
             const match = fixed.match(/^0\.(0+)(\d+)/);
             if (!match) return { text: `$${price.toFixed(8)}` };
-            return { zeroCount: match[1].length, sig: match[2].slice(0, 3) };
+            return { zeroCount: match[1].length, sig: match[2].slice(0, 4) };
         }
 
         function renderCoreToken(key, pair) {
