@@ -45,6 +45,8 @@
             --violet-soft: rgba(167, 139, 250, 0.12);
             --rose: #f472b6;
             --rose-soft: rgba(244, 114, 182, 0.12);
+            --btc-yellow: #f2a900;
+            --eth-blue: #627eea;
             --green: #4ade80;
             --green-soft: rgba(74, 222, 128, 0.1);
             --red: #f87171;
@@ -158,6 +160,20 @@
             }
         }
 
+        /* Allow the sidebar to be manually closed on desktop too */
+        @media (min-width: 1024px) {
+            body.desktop-sidebar-closed .sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+            body.desktop-sidebar-closed .content-area {
+                margin-left: 0;
+            }
+            body.desktop-sidebar-closed .hamburger {
+                display: flex;
+            }
+        }
+
         .sidebar-inner {
             display: flex;
             flex-direction: column;
@@ -207,9 +223,7 @@
             background: var(--bg);
             color: var(--text);
         }
-        @media (min-width: 1024px) {
-            .sidebar-dismiss { display: none; }
-        }
+        /* Close button stays visible on desktop so the sidebar can be dismissed there too */
 
         .side-group-label {
             font-size: 0.6875rem;
@@ -317,6 +331,7 @@
         @media (min-width: 1024px) {
             .content-area {
                 margin-left: var(--sidebar-w);
+                transition: margin-left 0.25s ease;
             }
         }
 
@@ -386,6 +401,14 @@
             }
             .topbar-ticker {
                 gap: 0;
+            }
+        }
+
+        /* BTC/ETH prices are only shown once there's room (desktop);
+           mobile and tablet keep showing just PLS, unchanged. */
+        @media (max-width: 1023px) {
+            .topbar-ticker .ticker-extra {
+                display: none;
             }
         }
 
@@ -1514,10 +1537,10 @@
                 <div class="sidebar-top">
                     <div class="logo-group">
                         <img src="Logo_200.png" alt="SnipeHead" class="logo-img">
-                        <span class="logo-text">SnipeHead</span>
+                        <span class="logo-text">SnipeHead Pro</span>
                     </div>
                     <button class="sidebar-dismiss" onclick="toggleMenu()" aria-label="Close menu">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9l-3 3 3 3"/></svg>
                     </button>
                 </div>
 
@@ -1610,13 +1633,16 @@
                     <div class="topbar-ticker">
                         <span class="dot"></span>
                         <span id="shd-countdown">AGE: Calculating...</span>
+                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
+                        <span class="ticker-extra">BTC <span id="btc-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="btc-change" style="font-weight:600;"></span></span>
+                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
+                        <span class="ticker-extra">ETH <span id="eth-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="eth-change" style="font-weight:600;"></span></span>
                         <span class="ticker-sep" style="opacity:0.4">&middot;</span>
-                        <span>PLS <span id="pls-price" style="color:var(--accent); font-weight:600;">$0.00000000</span></span>
+                        <span>PLS <span id="pls-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="pls-change" style="font-weight:600;"></span></span>
+                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
+                        <span class="ticker-extra">SHD <span id="shd-ticker-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="shd-ticker-change" style="font-weight:600;"></span></span>
                     </div>
                     <div class="topbar-spacer"></div>
-                    <div class="topbar-actions">
-                        <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
-                    </div>
                 </div>
             </header>
 
@@ -2022,7 +2048,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.1.3</p>
+                    <p class="footer-version">v4.2.0</p>
                 </div>
             </footer>
         </div>
@@ -2068,10 +2094,32 @@
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
             const hamburger = document.querySelector('.hamburger');
+
+            if (window.innerWidth >= 1024) {
+                // Desktop: the sidebar is normally always visible here, but the
+                // user can now dismiss it (via the same close button) and bring
+                // it back with the hamburger button that appears in its place.
+                const isClosed = document.body.classList.toggle('desktop-sidebar-closed');
+                hamburger.setAttribute('aria-expanded', String(!isClosed));
+                try {
+                    localStorage.setItem('sidebarClosedDesktop', isClosed ? '1' : '0');
+                } catch (e) { /* localStorage unavailable, ignore */ }
+                return;
+            }
+
             const isActive = menu.classList.toggle('active');
             hamburger.classList.toggle('active');
             hamburger.setAttribute('aria-expanded', isActive);
         }
+
+        // Remember the user's desktop sidebar preference between visits.
+        (function restoreDesktopSidebarState() {
+            try {
+                if (window.innerWidth >= 1024 && localStorage.getItem('sidebarClosedDesktop') === '1') {
+                    document.body.classList.add('desktop-sidebar-closed');
+                }
+            } catch (e) { /* localStorage unavailable, ignore */ }
+        })();
 
         // Close the mobile menu when a same-page section link (Overview,
         // Markets, Chart & Swap, Network, Tools, PulseChain Core) is tapped.
@@ -2371,6 +2419,37 @@
 
         let priceInterval, onChainInterval, coreInterval, holderInterval;
 
+        function renderTickerPrice(elId, price, subColor) {
+            const el = document.getElementById(elId);
+            if (!el || typeof price !== 'number' || isNaN(price)) return;
+            const formatted = formatCorePrice(price, null);
+            if (formatted.zeroCount) {
+                el.textContent = '';
+                el.append('$0.');
+                const sub = document.createElement('sub');
+                sub.className = 'core-price-zeros';
+                if (subColor) sub.style.color = subColor;
+                sub.textContent = String(formatted.zeroCount);
+                el.append(sub, formatted.sig);
+            } else {
+                el.textContent = formatted.text;
+            }
+        }
+
+        function renderTickerChange(elId, change24h) {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            if (typeof change24h === 'number') {
+                const isUp = change24h >= 0;
+                el.textContent = `${isUp ? '▲' : '▼'}${Math.abs(change24h).toFixed(1)}%`;
+                el.classList.toggle('text-green', isUp);
+                el.classList.toggle('text-red', !isUp);
+            } else {
+                el.textContent = '';
+                el.classList.remove('text-green', 'text-red');
+            }
+        }
+
         async function fetchPrices() {
             if (document.hidden) return;
             try {
@@ -2380,6 +2459,9 @@
                 if (shdPair && shdPair.priceUsd) {
                     const shdPrice = parseFloat(shdPair.priceUsd);
                     document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
+
+                    renderTickerPrice('shd-ticker-price', shdPrice);
+                    renderTickerChange('shd-ticker-change', shdPair.priceChange?.h24);
 
                     const changeEl = document.getElementById('shd-change');
                     const change24h = shdPair.priceChange?.h24;
@@ -2419,10 +2501,41 @@
                 const plsData = await plsRes.json();
                 const plsPair = plsData.pairs?.[0];
                 if (plsPair && plsPair.priceUsd) {
-                    document.getElementById('pls-price').textContent = `$${parseFloat(plsPair.priceUsd).toFixed(8)}`;
+                    renderTickerPrice('pls-price', parseFloat(plsPair.priceUsd));
+                    renderTickerChange('pls-change', plsPair.priceChange?.h24);
                 }
             } catch (e) {
                 console.error("Price fetch error:", e);
+            }
+
+            // BTC and ETH reference prices (via DexScreener, WBTC/WETH on Ethereum)
+            // shown only in the desktop ticker for extra market context.
+            try {
+                const [btcRes, ethRes] = await Promise.all([
+                    fetch('https://api.dexscreener.com/latest/dex/tokens/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', { signal: AbortSignal.timeout(10000) }),
+                    fetch('https://api.dexscreener.com/latest/dex/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', { signal: AbortSignal.timeout(10000) })
+                ]);
+                const [btcData, ethData] = await Promise.all([btcRes.json(), ethRes.json()]);
+
+                const mostLiquidPair = (pairs) => (pairs || [])
+                    .filter(p => p && p.priceUsd && p.chainId === 'ethereum')
+                    .sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+
+                const btcPair = mostLiquidPair(btcData.pairs);
+                if (btcPair) {
+                    document.getElementById('btc-price').textContent =
+                        `$${Math.round(parseFloat(btcPair.priceUsd)).toLocaleString()}`;
+                    renderTickerChange('btc-change', btcPair.priceChange?.h24);
+                }
+
+                const ethPair = mostLiquidPair(ethData.pairs);
+                if (ethPair) {
+                    document.getElementById('eth-price').textContent =
+                        `$${Math.round(parseFloat(ethPair.priceUsd)).toLocaleString()}`;
+                    renderTickerChange('eth-change', ethPair.priceChange?.h24);
+                }
+            } catch (e) {
+                console.error("BTC/ETH price fetch error:", e);
             }
         }
 
