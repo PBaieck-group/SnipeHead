@@ -364,7 +364,7 @@
         }
 
         .topbar-ticker {
-            display: none;
+            display: inline-flex;
             align-items: center;
             gap: 0.55rem;
             font-size: 0.8rem;
@@ -373,9 +373,47 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-pill);
+            white-space: nowrap;
+            min-width: 0;
         }
-        @media (min-width: 900px) {
-            .topbar-ticker { display: inline-flex; }
+
+        /* Below 900px there isn't room for AGE + PLS price together,
+           so keep the ticker pill visible but only show the PLS price. */
+        @media (max-width: 899px) {
+            .topbar-ticker #shd-countdown,
+            .topbar-ticker .ticker-sep {
+                display: none;
+            }
+            .topbar-ticker {
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .topbar-ticker {
+                font-size: 0.72rem;
+                padding: 0.35rem 0.65rem;
+                gap: 0.4rem;
+            }
+        }
+
+        /* Very narrow phones: trim further so the Buy button never
+           gets pushed off screen. */
+        @media (max-width: 380px) {
+            .topbar-inner {
+                gap: 0.35rem;
+            }
+            .topbar-ticker {
+                font-size: 0.66rem;
+                padding: 0.3rem 0.5rem;
+            }
+            .topbar-ticker .dot {
+                display: none;
+            }
+            .topbar-actions .btn {
+                padding: 0.45rem 0.65rem;
+                font-size: 0.72rem;
+            }
         }
 
         .topbar-ticker .dot {
@@ -1572,12 +1610,11 @@
                     <div class="topbar-ticker">
                         <span class="dot"></span>
                         <span id="shd-countdown">AGE: Calculating...</span>
-                        <span style="opacity:0.4">&middot;</span>
+                        <span class="ticker-sep" style="opacity:0.4">&middot;</span>
                         <span>PLS <span id="pls-price" style="color:var(--accent); font-weight:600;">$0.00000000</span></span>
                     </div>
                     <div class="topbar-spacer"></div>
                     <div class="topbar-actions">
-                        <a href="https://snipehead.xyz/faucet/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Claim Tokens</a>
                         <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
                     </div>
                 </div>
@@ -1985,7 +2022,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.1.1</p>
+                    <p class="footer-version">v4.1.2</p>
                 </div>
             </footer>
         </div>
