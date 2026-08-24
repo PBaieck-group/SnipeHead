@@ -1121,205 +1121,13 @@
             gap: 0.65rem;
         }
 
-        /* Core tokens — Aave Pro–style market table */
-        .core-section {
-            text-align: left;
-            padding: 2rem 1.5rem 1rem;
-        }
-
-        .core-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.3rem 0.8rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--accent);
-            background: var(--accent-soft);
-            border: 1px solid var(--accent-border);
-            border-radius: var(--radius-pill);
-            margin-bottom: 1rem;
-        }
-
-        .core-badge .dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent);
-            animation: pulse-soft 2s ease-in-out infinite;
-        }
-
-        .core-section h2 {
-            font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-size: clamp(1.5rem, 3vw, 1.875rem);
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
-        }
-
-        .core-section h2 span {
-            color: var(--accent);
-        }
-
-        .core-section > p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            font-size: 0.975rem;
-        }
-
-        .core-table {
-            display: flex;
-            flex-direction: column;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .core-table-head,
-        .core-row {
-            display: grid;
-            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .core-table-head {
-            padding: 0 0.5rem 0.65rem;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-        }
-
-        .core-table-head span:not(:first-child),
-        .core-row .core-token-price,
-        .core-row .core-token-change {
-            text-align: right;
-            justify-self: end;
-        }
-
-        .core-row {
-            padding: 0.7rem 0.5rem;
-            border-bottom: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            transition: background 0.15s;
-        }
-
-        .core-row:last-child {
-            border-bottom: none;
-        }
-
-        .core-row:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .core-asset {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            min-width: 0;
-        }
-
-        .core-token-icon {
-            width: 30px;
-            height: 30px;
-            flex-shrink: 0;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--border);
-            background: var(--bg);
-        }
-
-        .core-asset > div {
-            min-width: 0;
-        }
-
-        .core-token-symbol {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .core-token-name {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .core-token-price {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text);
-            overflow-wrap: anywhere;
-        }
-
-        .core-token-price.core-loading {
-            color: var(--text-muted);
-            font-weight: 400;
-            font-size: 0.8rem;
-        }
-
+        /* Sub-zero-count styling for tiny ticker prices (e.g. $0.0000123) */
         .core-price-zeros {
             font-size: 0.65em;
             font-weight: 600;
             color: var(--accent);
             vertical-align: baseline;
             margin: 0 1px;
-        }
-
-        .core-token-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            min-width: 4.25rem;
-            justify-content: center;
-        }
-
-        .core-token-change.core-up {
-            color: var(--green);
-            background: var(--green-soft);
-        }
-
-        .core-token-change.core-down {
-            color: var(--red);
-            background: var(--red-soft);
-        }
-
-        .core-token-change.core-flat {
-            color: var(--text-muted);
-            background: var(--bg);
-        }
-
-        @media (max-width: 480px) {
-            .core-table-head,
-            .core-row {
-                grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) auto;
-                gap: 0.4rem;
-            }
-            .core-token-price {
-                font-size: 0.8rem;
-            }
-            .core-token-change {
-                font-size: 0.68rem;
-                padding: 0.2rem 0.35rem;
-                min-width: 3.4rem;
-                gap: 0.1rem;
-            }
-            .core-token-icon {
-                width: 24px;
-                height: 24px;
-            }
         }
 
         /* Footer */
@@ -1566,11 +1374,6 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         Tools
                     </a>
-                    <a href="#core" class="side-link">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        PulseChain Core
-                    </a>
-
                     <p class="side-group-label">External</p>
                     <a href="https://ipfs.bridge.pulsechain.com/" class="side-link" target="_blank" rel="noopener noreferrer">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"/></svg>
@@ -1939,109 +1742,6 @@
                     </div>
                 </section>
 
-                <!-- PulseChain CORE -->
-                <section class="section" id="core">
-                    <div class="card core-section card-static">
-                        <div class="core-badge">
-                            <span class="dot"></span>
-                            On-Chain Snapshot
-                        </div>
-                        <h2><span>PulseChain</span> CORE</h2>
-                        <p>A quick pulse-check on the core tokens powering the PulseChain ecosystem.</p>
-
-                        <div class="core-table" id="core-token-grid">
-                            <div class="core-table-head" aria-hidden="true">
-                                <span>Asset</span>
-                                <span>Price  ------ </span>
-                                <span class="core-th-change">24h</span>
-                            </div>
-
-                            <div class="core-row" data-symbol="PLS">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/pls-3d-token-v1.png" alt="PLS" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">PLS</div>
-                                        <div class="core-token-name">PulseChain</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-pls">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-pls">—</div>
-                            </div>
-
-                            <div class="core-row" data-symbol="SHD">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/shd-3d-token-v1.png.png" alt="SHD" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">SHD</div>
-                                        <div class="core-token-name">SnipeHead</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-shd">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-shd">—</div>
-                            </div>
-
-                            <div class="core-row" data-symbol="HEX">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/hex-3d-token-v5.png" alt="HEX" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">HEX</div>
-                                        <div class="core-token-name">PulseChain</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-hex">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-hex">—</div>
-                            </div>
-
-                            <div class="core-row" data-symbol="eHEX">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/hex-3d-token-v5.png" alt="eHEX" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">eHEX</div>
-                                        <div class="core-token-name">Ethereum</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-ehex">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-ehex">—</div>
-                            </div>
-
-                            <div class="core-row" data-symbol="PLSX">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/plsx-3d-token-v1.png" alt="PLSX" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">PLSX</div>
-                                        <div class="core-token-name">PulseX</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-plsx">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-plsx">—</div>
-                            </div>
-
-                            <div class="core-row" data-symbol="INC">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/inc-3d-token-v1.png" alt="INC" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">INC</div>
-                                        <div class="core-token-name">Incentive</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-inc">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-inc">—</div>
-                            </div>
-
-                            <div class="core-row" data-symbol="PRVX">
-                                <div class="core-asset">
-                                    <img class="core-token-icon" src="3d_logo/prvx-3d-token-v5.png" alt="PRVX" loading="lazy" onerror="this.style.display='none'">
-                                    <div>
-                                        <div class="core-token-symbol">PRVX</div>
-                                        <div class="core-token-name">PulseChain</div>
-                                    </div>
-                                </div>
-                                <div class="core-token-price core-loading" id="core-price-prvx">Loading…</div>
-                                <div class="core-token-change core-flat" id="core-change-prvx">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </main>
 
             <footer>
@@ -2053,7 +1753,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.2.4</p>
+                    <p class="footer-version">v4.2.5</p>
                 </div>
             </footer>
         </div>
@@ -2127,7 +1827,7 @@
         })();
 
         // Close the mobile menu when a same-page section link (Overview,
-        // Markets, Chart & Swap, Network, Tools, PulseChain Core) is tapped.
+        // Markets, Chart & Swap, Network, Tools) is tapped.
         // External links (Bridge, Pump.Tires, Faucet, etc.) open in a new
         // tab already, so they're left alone.
         document.querySelectorAll('#mobile-menu .side-link[href^="#"]').forEach(link => {
@@ -2288,17 +1988,17 @@
             document.getElementById('copyright-year').textContent = currentYear;
         });
 
-        // ---- PulseChain CORE ----
-        const CORE_PRICE_DECIMALS = {
+        const TICKER_PRICE_DECIMALS = {
             inc: 2,
             hex: 6,
             ehex: 6
         };
 
-        function formatCorePrice(price, key) {
+        // Shared USD price formatter used by the top ticker (PLS/SHD/BTC/ETH etc).
+        function formatTickerPrice(price, key) {
             if (typeof price !== 'number' || isNaN(price)) return { text: '—' };
-            if (Object.prototype.hasOwnProperty.call(CORE_PRICE_DECIMALS, key)) {
-                return { text: `$${price.toFixed(CORE_PRICE_DECIMALS[key])}` };
+            if (Object.prototype.hasOwnProperty.call(TICKER_PRICE_DECIMALS, key)) {
+                return { text: `$${price.toFixed(TICKER_PRICE_DECIMALS[key])}` };
             }
             if (price >= 1000) return { text: `$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}` };
             if (price >= 1) return { text: `$${price.toFixed(2)}` };
@@ -2309,183 +2009,6 @@
             const match = fixed.match(/^0\.(0+)(\d+)/);
             if (!match) return { text: `$${price.toFixed(8)}` };
             return { zeroCount: match[1].length, sig: match[2].slice(0, 4) };
-        }
-
-        function renderCoreToken(key, pair) {
-            const priceEl = document.getElementById(`core-price-${key}`);
-            const changeEl = document.getElementById(`core-change-${key}`);
-            if (!priceEl || !changeEl) return;
-
-            if (!pair || !pair.priceUsd) {
-                priceEl.textContent = 'N/A';
-                priceEl.classList.remove('core-loading');
-                changeEl.textContent = '—';
-                return;
-            }
-
-            const formatted = formatCorePrice(parseFloat(pair.priceUsd), key);
-            if (formatted.zeroCount) {
-                priceEl.textContent = '';
-                priceEl.append('$0.');
-                const sub = document.createElement('sub');
-                sub.className = 'core-price-zeros';
-                sub.textContent = String(formatted.zeroCount);
-                priceEl.append(sub, formatted.sig);
-            } else {
-                priceEl.textContent = formatted.text;
-            }
-            priceEl.classList.remove('core-loading');
-
-            const change24h = pair.priceChange?.h24;
-            changeEl.classList.remove('core-flat', 'core-up', 'core-down');
-            if (typeof change24h === 'number') {
-                const isUp = change24h >= 0;
-                changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}%`;
-                changeEl.classList.add(isUp ? 'core-up' : 'core-down');
-            } else {
-                changeEl.textContent = '—';
-                changeEl.classList.add('core-flat');
-            }
-        }
-
-        function bestPulsechainPair(pairs) {
-            if (!Array.isArray(pairs) || pairs.length === 0) return null;
-            const onChain = pairs.filter(p => p.chainId === 'pulsechain');
-            const pool = onChain.length ? onChain : pairs;
-            return pool.reduce((best, p) => {
-                const liq = p.liquidity?.usd || 0;
-                const bestLiq = best?.liquidity?.usd || 0;
-                return liq > bestLiq ? p : best;
-            }, pool[0]);
-        }
-
-        // Tracks whether each PulseChain CORE row has ever loaded a real price.
-        // Mirrors the pattern used for PLS/SHD/BTC/ETH in the top ticker: once a
-        // token has shown a real price, a later transient fetch failure just
-        // leaves that last-known-good value on screen instead of flashing N/A.
-        const corePriceLoaded = { pls: false, shd: false, hex: false, ehex: false, plsx: false, inc: false, prvx: false };
-
-        // PLS + SHD are fetched by pair address, batched into ONE request via
-        // dexscreener's comma-separated pairs endpoint (was 2 separate calls).
-        const CORE_PAIR_ADDRESSES = {
-            pls: '0xE56043671df55dE5CDf8459710433C10324DE0aE',
-            shd: '0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8'
-        };
-
-        // HEX/eHEX/PLSX/INC/PRVX are fetched by token address, batched into ONE
-        // request via dexscreener's comma-separated tokens endpoint (was 5 calls).
-        const CORE_TOKEN_ADDRESSES = {
-            hex: '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39',
-            ehex: '0x57fde0a71132198BBeC939B98976993d8D89D225',
-            plsx: '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab',
-            inc: '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d',
-            prvx: '0xf6f8db0aBa00007681f8fAf16A0FDa1c9b030b11'
-        };
-
-        async function fetchCorePairsBatch() {
-            const keys = Object.keys(CORE_PAIR_ADDRESSES);
-            const addrs = Object.values(CORE_PAIR_ADDRESSES).map(a => a.toLowerCase());
-            try {
-                const data = await fetchJsonWithRetry(
-                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${Object.values(CORE_PAIR_ADDRESSES).join(',')}`,
-                    {
-                        retries: 3,
-                        baseDelayMs: 900,
-                        validate: d => {
-                            const pairs = d?.pairs || [];
-                            if (!pairs.some(p => p && p.priceUsd)) return false;
-                            return addrs.every(addr => pairs.some(p => p?.pairAddress?.toLowerCase() === addr));
-                        }
-                    }
-                );
-                renderCorePairsFromPayload(keys, data.pairs || []);
-            } catch (e) {
-                console.error('PulseChain CORE pair-batch fetch error:', e);
-                if (e?.partialData) {
-                    renderCorePairsFromPayload(keys, e.partialData.pairs || []);
-                } else {
-                    keys.forEach(key => { if (!corePriceLoaded[key]) renderCoreToken(key, null); });
-                }
-            }
-        }
-
-        function renderCorePairsFromPayload(keys, pairs) {
-            keys.forEach(key => {
-                const addr = CORE_PAIR_ADDRESSES[key].toLowerCase();
-                const match = pairs.find(p => p?.pairAddress?.toLowerCase() === addr);
-                if (match) {
-                    renderCoreToken(key, match);
-                    corePriceLoaded[key] = true;
-                } else if (!corePriceLoaded[key]) {
-                    renderCoreToken(key, null);
-                }
-            });
-        }
-
-        async function fetchCoreTokensBatch() {
-            const keys = Object.keys(CORE_TOKEN_ADDRESSES);
-            const addrs = Object.values(CORE_TOKEN_ADDRESSES).map(a => a.toLowerCase());
-            try {
-                const data = await fetchJsonWithRetry(
-                    `https://api.dexscreener.com/latest/dex/tokens/${Object.values(CORE_TOKEN_ADDRESSES).join(',')}`,
-                    {
-                        retries: 3,
-                        baseDelayMs: 900,
-                        validate: d => {
-                            const pairs = d?.pairs || [];
-                            if (!pairs.some(p => p && p.priceUsd)) return false;
-                            // A multi-address DexScreener response occasionally comes back
-                            // with SOME but not all of the requested tokens represented
-                            // (the least-liquid ones -- e.g. eHEX -- are the most likely to
-                            // be missing). Checking "at least one pair has a price" let
-                            // those partial responses slip through as "valid" and skip the
-                            // retry entirely. Require every requested token to have at
-                            // least one matching pair before accepting the response.
-                            return addrs.every(addr => pairs.some(p =>
-                                p?.baseToken?.address?.toLowerCase() === addr ||
-                                p?.quoteToken?.address?.toLowerCase() === addr
-                            ));
-                        }
-                    }
-                );
-                renderCoreTokensFromPayload(keys, data.pairs || []);
-            } catch (e) {
-                console.error('PulseChain CORE token-batch fetch error:', e);
-                // Even after retries the response may still be missing one token while
-                // having the rest -- render whatever we did get instead of nuking every
-                // row, so a chronically slow eHEX doesn't take PLSX/INC/PRVX down with it.
-                if (e?.partialData) {
-                    renderCoreTokensFromPayload(keys, e.partialData.pairs || []);
-                } else {
-                    keys.forEach(key => { if (!corePriceLoaded[key]) renderCoreToken(key, null); });
-                }
-            }
-        }
-
-        function renderCoreTokensFromPayload(keys, pairs) {
-            keys.forEach(key => {
-                const addr = CORE_TOKEN_ADDRESSES[key].toLowerCase();
-                const tokenPairs = pairs.filter(p =>
-                    p?.baseToken?.address?.toLowerCase() === addr ||
-                    p?.quoteToken?.address?.toLowerCase() === addr
-                );
-                const best = bestPulsechainPair(tokenPairs);
-                if (best) {
-                    renderCoreToken(key, best);
-                    corePriceLoaded[key] = true;
-                } else if (!corePriceLoaded[key]) {
-                    renderCoreToken(key, null);
-                }
-            });
-        }
-
-        function fetchPulseChainCore() {
-            if (document.hidden) return;
-            // Two batched requests instead of 7 individual ones -- see fetchCorePairsBatch /
-            // fetchCoreTokensBatch. Fewer simultaneous requests means less chance of tripping
-            // DexScreener's burst rate limiting on first page load.
-            fetchCorePairsBatch();
-            fetchCoreTokensBatch();
         }
 
         let shdHolderCountLoaded = false; // becomes true after the first successful holder count fetch
@@ -2527,12 +2050,12 @@
             setInterval(tick, 1000);
         }
 
-        let priceInterval, onChainInterval, coreInterval, holderInterval;
+        let priceInterval, onChainInterval, holderInterval;
 
         function renderTickerPrice(elId, price, subColor) {
             const el = document.getElementById(elId);
             if (!el || typeof price !== 'number' || isNaN(price)) return;
-            const formatted = formatCorePrice(price, null);
+            const formatted = formatTickerPrice(price, null);
             if (formatted.zeroCount) {
                 el.textContent = '';
                 el.append('$0.');
@@ -2609,29 +2132,41 @@
 
         const PLS_PAIR_ADDRESS = '0xE56043671df55dE5CDf8459710433C10324DE0aE';
 
+        // Only PLS_PAIR_ADDRESS (USD reference) and LIQUIDITY_PAIRS.v1 (the primary
+        // SHD pool) are required for the numbers people actually look at (PLS price,
+        // SHD price, market cap). LIQUIDITY_PAIRS.v2 is a secondary, lower-liquidity
+        // pool that's only ever used additively for market cap/liquidity totals, so
+        // it's treated as optional below rather than blocking the whole fetch.
+        // Computed lazily (not as a top-level const) because LIQUIDITY_PAIRS isn't
+        // declared until later in this script block - evaluating this eagerly at
+        // parse time would throw a temporal-dead-zone ReferenceError and halt the
+        // whole script. This function is only ever called at runtime, by which point
+        // LIQUIDITY_PAIRS has long since been initialized.
+        function essentialPairsPresent(pairs) {
+            if (!pairs.some(p => p && p.priceUsd)) return false;
+            const essentialAddresses = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1].map(a => a.toLowerCase());
+            return essentialAddresses.every(addr => pairs.some(p => p?.pairAddress?.toLowerCase() === addr));
+        }
+
         async function fetchPrimaryMarketData() {
+            const addrList = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1, LIQUIDITY_PAIRS.v2];
+            const addrs = addrList.join(',');
             try {
-                const addrList = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1, LIQUIDITY_PAIRS.v2];
-                const addrs = addrList.join(',');
-                const lowerAddrs = addrList.map(a => a.toLowerCase());
                 const data = await fetchJsonWithRetry(
                     `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${addrs}`,
                     {
                         retries: 3,
                         baseDelayMs: 900,
-                        // Same reasoning as the CORE token batch: require every requested
-                        // pair to actually be present, not just "any one of them", so a
-                        // response that's silently missing one pair (e.g. the smaller of
-                        // the two SHD liquidity pools) triggers a retry instead of being
-                        // treated as fully valid.
-                        validate: d => {
-                            const pairs = d?.pairs || [];
-                            if (!pairs.some(p => p && p.priceUsd)) return false;
-                            return lowerAddrs.every(addr => pairs.some(p => p?.pairAddress?.toLowerCase() === addr));
-                        }
+                        // Only require the two pairs we actually need (PLS ref pair +
+                        // the primary SHD pool). The smaller v2 pool is allowed to be
+                        // missing from the payload without failing validation - it's
+                        // rendered when present, but its absence shouldn't force a
+                        // retry (or block partial-data rendering) of data we already have.
+                        validate: d => essentialPairsPresent(d?.pairs || [])
                     }
                 );
                 renderPrimaryMarketDataFromPayload(data.pairs || []);
+                return;
             } catch (e) {
                 console.error("Primary market data fetch error (after retries):", e);
                 // If we at least got a partial, still-incomplete response, render what's
@@ -2639,21 +2174,49 @@
                 if (e?.partialData) {
                     renderPrimaryMarketDataFromPayload(e.partialData.pairs || []);
                 }
-                if (!plsPriceLoaded) {
-                    const plsEl = document.getElementById('pls-price');
-                    if (plsEl) plsEl.textContent = 'Unavailable';
-                }
-                if (!shdPriceLoaded) {
-                    const priceEl = document.getElementById('shd-price');
-                    if (priceEl) priceEl.textContent = 'Unavailable';
-                    const tickerEl = document.getElementById('shd-ticker-price');
-                    if (tickerEl) tickerEl.textContent = 'Unavailable';
-                }
-                const mcapEl = document.getElementById('shd-market-cap');
-                const liqEl = document.getElementById('shd-liquidity');
-                if (mcapEl && mcapEl.textContent === 'Loading...') mcapEl.textContent = 'Unavailable';
-                if (liqEl && liqEl.textContent === 'Loading...') liqEl.textContent = 'Unavailable';
             }
+
+            // The combined 3-pair request failed outright (no parseable JSON on any
+            // attempt) - most likely a transient rate limit or network blip on
+            // DexScreener's side. Before giving up, try one lean fallback request for
+            // just the two essential pairs: a smaller request is less likely to trip
+            // the same limit, and it's the minimum needed to avoid showing
+            // "Unavailable" for numbers we might otherwise still be able to get.
+            if (!plsPriceLoaded || !shdPriceLoaded) {
+                try {
+                    const essentialAddrs = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1].join(',');
+                    const fallbackData = await fetchJsonWithRetry(
+                        `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${essentialAddrs}`,
+                        {
+                            retries: 1,
+                            baseDelayMs: 1200,
+                            validate: d => essentialPairsPresent(d?.pairs || [])
+                        }
+                    );
+                    renderPrimaryMarketDataFromPayload(fallbackData.pairs || []);
+                    return;
+                } catch (fallbackErr) {
+                    console.error("Fallback primary market data fetch error:", fallbackErr);
+                    if (fallbackErr?.partialData) {
+                        renderPrimaryMarketDataFromPayload(fallbackErr.partialData.pairs || []);
+                    }
+                }
+            }
+
+            if (!plsPriceLoaded) {
+                const plsEl = document.getElementById('pls-price');
+                if (plsEl) plsEl.textContent = 'Unavailable';
+            }
+            if (!shdPriceLoaded) {
+                const priceEl = document.getElementById('shd-price');
+                if (priceEl) priceEl.textContent = 'Unavailable';
+                const tickerEl = document.getElementById('shd-ticker-price');
+                if (tickerEl) tickerEl.textContent = 'Unavailable';
+            }
+            const mcapEl = document.getElementById('shd-market-cap');
+            const liqEl = document.getElementById('shd-liquidity');
+            if (mcapEl && mcapEl.textContent === 'Loading...') mcapEl.textContent = 'Unavailable';
+            if (liqEl && liqEl.textContent === 'Loading...') liqEl.textContent = 'Unavailable';
         }
 
         function renderPrimaryMarketDataFromPayload(pairs) {
@@ -3076,8 +2639,7 @@
 
         function startPolling() {
             // Stagger the initial calls slightly instead of firing them all in the same
-            // instant. fetchPrices() and fetchPulseChainCore() both hit api.dexscreener.com,
-            // so spacing them out avoids a burst of simultaneous requests on first load
+            // instant, to avoid a burst of simultaneous requests on first load
             // (which was tripping DexScreener's rate limiting and showing N/A/Unavailable
             // before the retry logic could catch up).
             fetchPrices();
@@ -3086,58 +2648,12 @@
             priceInterval = setInterval(fetchPrices, 45000);
             onChainInterval = setInterval(fetchOnChainData, 60000);
             holderInterval = setInterval(fetchShdHolderCount, 90000);
-
-            // The CORE section sits near the bottom of the page, so don't spend any of
-            // the initial-load request budget on it -- wait until the visitor has
-            // actually scrolled close to it. This both trims the first-load burst
-            // further and avoids fetching data most visitors won't even see right away.
-            startCorePollingWhenNearViewport();
-        }
-
-        let corePollingStarted = false;
-
-        function startCorePollingWhenNearViewport() {
-            const coreSection = document.getElementById('core');
-            if (!coreSection) {
-                // Section not found for some reason -- fall back to the old behavior
-                // rather than silently never loading CORE prices.
-                fetchPulseChainCore();
-                coreInterval = setInterval(fetchPulseChainCore, 45000);
-                return;
-            }
-
-            const beginCorePolling = () => {
-                if (corePollingStarted) return;
-                corePollingStarted = true;
-                fetchPulseChainCore();
-                coreInterval = setInterval(fetchPulseChainCore, 45000);
-            };
-
-            if ('IntersectionObserver' in window) {
-                const coreObserver = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            beginCorePolling();
-                            coreObserver.disconnect();
-                        }
-                    });
-                    // rootMargin below starts the fetch a bit before the section is
-                    // actually on screen, so the data is ready by the time it scrolls
-                    // into view rather than showing "Loading..." at that point.
-                }, { rootMargin: '600px 0px' });
-                coreObserver.observe(coreSection);
-            } else {
-                // No IntersectionObserver support -- just load it a little after
-                // everything else instead of blocking on it.
-                setTimeout(beginCorePolling, 1500);
-            }
         }
 
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 if (priceInterval) clearInterval(priceInterval);
                 if (onChainInterval) clearInterval(onChainInterval);
-                if (coreInterval) clearInterval(coreInterval);
                 if (holderInterval) clearInterval(holderInterval);
             } else {
                 startPolling();
