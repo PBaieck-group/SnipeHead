@@ -6,7 +6,7 @@
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.gigatheminter.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.gigatheminter.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -2048,7 +2048,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.2.0</p>
+                    <p class="footer-version">v4.2.1</p>
                 </div>
             </footer>
         </div>
@@ -2508,31 +2508,27 @@
                 console.error("Price fetch error:", e);
             }
 
-            // BTC and ETH reference prices (via DexScreener, WBTC/WETH on Ethereum)
+            // BTC and ETH reference prices (via CoinGecko simple price API)
             // shown only in the desktop ticker for extra market context.
             try {
-                const [btcRes, ethRes] = await Promise.all([
-                    fetch('https://api.dexscreener.com/latest/dex/tokens/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', { signal: AbortSignal.timeout(10000) }),
-                    fetch('https://api.dexscreener.com/latest/dex/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', { signal: AbortSignal.timeout(10000) })
-                ]);
-                const [btcData, ethData] = await Promise.all([btcRes.json(), ethRes.json()]);
+                const cgRes = await fetch(
+                    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true',
+                    { signal: AbortSignal.timeout(10000) }
+                );
+                const cgData = await cgRes.json();
 
-                const mostLiquidPair = (pairs) => (pairs || [])
-                    .filter(p => p && p.priceUsd && p.chainId === 'ethereum')
-                    .sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
-
-                const btcPair = mostLiquidPair(btcData.pairs);
-                if (btcPair) {
+                const btc = cgData?.bitcoin;
+                if (btc && btc.usd) {
                     document.getElementById('btc-price').textContent =
-                        `$${Math.round(parseFloat(btcPair.priceUsd)).toLocaleString()}`;
-                    renderTickerChange('btc-change', btcPair.priceChange?.h24);
+                        `$${Math.round(btc.usd).toLocaleString()}`;
+                    renderTickerChange('btc-change', btc.usd_24h_change);
                 }
 
-                const ethPair = mostLiquidPair(ethData.pairs);
-                if (ethPair) {
+                const eth = cgData?.ethereum;
+                if (eth && eth.usd) {
                     document.getElementById('eth-price').textContent =
-                        `$${Math.round(parseFloat(ethPair.priceUsd)).toLocaleString()}`;
-                    renderTickerChange('eth-change', ethPair.priceChange?.h24);
+                        `$${Math.round(eth.usd).toLocaleString()}`;
+                    renderTickerChange('eth-change', eth.usd_24h_change);
                 }
             } catch (e) {
                 console.error("BTC/ETH price fetch error:", e);
