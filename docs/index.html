@@ -1577,6 +1577,11 @@
                         Bridge
                         <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
+                    <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c1.11 0 2.08.402 2.599 1M12 8V6m0 14v-2m0-10c-1.11 0-2.08.402-2.599 1"/></svg>
+                        Buy SHD
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
                     <a href="https://pump.tires/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc/" class="side-link" target="_blank" rel="noopener noreferrer">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm6 0V9a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         Pump.Tires
@@ -2048,7 +2053,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.2.2</p>
+                    <p class="footer-version">v4.2.3</p>
                 </div>
             </footer>
         </div>
@@ -2399,6 +2404,8 @@
             fetchCorePairByTokenAddress('prvx', '0xf6f8db0aBa00007681f8fAf16A0FDa1c9b030b11');
         }
 
+        let shdHolderCountLoaded = false; // becomes true after the first successful holder count fetch
+
         async function fetchShdHolderCount() {
             if (document.hidden) return;
             const el = document.getElementById('shd-holders');
@@ -2407,10 +2414,17 @@
                 const res = await fetch(`https://api.scan.pulsechain.com/api/v2/tokens/${SHD_TOKEN_ADDRESS}/counters`, { signal: AbortSignal.timeout(10000) });
                 const data = await res.json();
                 const count = data.token_holders_count;
-                el.textContent = (count !== undefined && count !== null) ? Number(count).toLocaleString() : 'N/A';
+                if (count !== undefined && count !== null) {
+                    el.textContent = Number(count).toLocaleString();
+                    shdHolderCountLoaded = true;
+                } else if (!shdHolderCountLoaded) {
+                    el.textContent = 'N/A';
+                }
             } catch (e) {
                 console.error('SHD holder count fetch error:', e);
-                el.textContent = 'Error';
+                // Only show an error state if we've never loaded a real count yet;
+                // otherwise leave the last-known-good value on screen.
+                if (!shdHolderCountLoaded) el.textContent = 'Error';
             }
         }
 
@@ -2830,6 +2844,16 @@
             };
         }
 
+        // Tracks whether each on-chain stat field has ever loaded a real value.
+        // Once a field has shown real data, a later fetch failure (RPC hiccup,
+        // multicall revert, etc.) leaves that last-known-good value on screen
+        // instead of blanking it to "Error".
+        const onChainFieldLoaded = {
+            'total-mined': false, 'contract-balance': false, 'reward-reserve': false,
+            'faucet-balance': false, 'liquidity-v1': false, 'liquidity-v2': false,
+            'snft-minted': false, 'snft-pls': false, 'snft-holders': false
+        };
+
         async function fetchOnChainData() {
             try {
                 const calls = buildOnChainCalls();
@@ -2856,28 +2880,33 @@
                     if (token0) poolToken0Cache.v2 = token0[0];
                 }
 
-                if (totalMined) document.getElementById('total-mined').textContent = formatTokenAmount(Number(ethers.utils.formatEther(totalMined[0]))) + " SHD";
-                if (contractBalance) document.getElementById('contract-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(contractBalance[0]))) + " SHD";
-                if (rewardReserve) document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD";
-                if (faucetBalance) document.getElementById('faucet-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(faucetBalance[0]))) + " SHD";
+                if (totalMined) { document.getElementById('total-mined').textContent = formatTokenAmount(Number(ethers.utils.formatEther(totalMined[0]))) + " SHD"; onChainFieldLoaded['total-mined'] = true; }
+                if (contractBalance) { document.getElementById('contract-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(contractBalance[0]))) + " SHD"; onChainFieldLoaded['contract-balance'] = true; }
+                if (rewardReserve) { document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD"; onChainFieldLoaded['reward-reserve'] = true; }
+                if (faucetBalance) { document.getElementById('faucet-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(faucetBalance[0]))) + " SHD"; onChainFieldLoaded['faucet-balance'] = true; }
 
                 if (poolToken0Cache.v1) {
                     const pool = reservesToPool(v1Reserves, poolToken0Cache.v1);
-                    if (pool) renderPoolLiquidity('liquidity-v1', pool);
+                    if (pool) { renderPoolLiquidity('liquidity-v1', pool); onChainFieldLoaded['liquidity-v1'] = true; }
                 }
                 if (poolToken0Cache.v2) {
                     const pool = reservesToPool(v2Reserves, poolToken0Cache.v2);
-                    if (pool) renderPoolLiquidity('liquidity-v2', pool);
+                    if (pool) { renderPoolLiquidity('liquidity-v2', pool); onChainFieldLoaded['liquidity-v2'] = true; }
                 }
 
-                if (snftMinted) document.getElementById('snft-minted').textContent = `${snftMinted[0].toString()}/${SNFT_MAX_SUPPLY}`;
-                if (snftPlsBalance) document.getElementById('snft-pls').textContent = formatTokenAmount(Number(ethers.utils.formatEther(snftPlsBalance[0]))) + " PLS";
+                if (snftMinted) { document.getElementById('snft-minted').textContent = `${snftMinted[0].toString()}/${SNFT_MAX_SUPPLY}`; onChainFieldLoaded['snft-minted'] = true; }
+                if (snftPlsBalance) { document.getElementById('snft-pls').textContent = formatTokenAmount(Number(ethers.utils.formatEther(snftPlsBalance[0]))) + " PLS"; onChainFieldLoaded['snft-pls'] = true; }
 
                 if (snftMinted) await fetchSnftHolders(Number(snftMinted[0]));
             } catch (err) {
                 console.error("Failed to load on-chain data:", err);
-                ['total-mined', 'contract-balance', 'reward-reserve', 'faucet-balance', 'liquidity-v1', 'liquidity-v2', 'snft-minted', 'snft-pls', 'snft-holders'].forEach((id) => {
-                    document.getElementById(id).textContent = "Error";
+                // Only blank fields that have never successfully loaded; fields that
+                // already show a real value keep it instead of flashing "Error".
+                Object.keys(onChainFieldLoaded).forEach((id) => {
+                    if (!onChainFieldLoaded[id]) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = "Error";
+                    }
                 });
             }
         }
@@ -2887,6 +2916,7 @@
             if (!el) return;
             if (!totalMintedCount || totalMintedCount <= 0) {
                 el.textContent = "0";
+                onChainFieldLoaded['snft-holders'] = true;
                 return;
             }
             try {
@@ -2910,9 +2940,12 @@
                 });
 
                 el.textContent = holders.size.toString();
+                onChainFieldLoaded['snft-holders'] = true;
             } catch (err) {
                 console.error("Failed to load SNFT holders:", err);
-                el.textContent = "Error";
+                // Only show an error state if we've never loaded a real count yet;
+                // otherwise leave the last-known-good value on screen.
+                if (!onChainFieldLoaded['snft-holders']) el.textContent = "Error";
             }
         }
 
