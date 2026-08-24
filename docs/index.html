@@ -2048,7 +2048,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.2.1</p>
+                    <p class="footer-version">v4.2.2</p>
                 </div>
             </footer>
         </div>
@@ -2354,25 +2354,37 @@
             }, pool[0]);
         }
 
+        // Tracks whether each PulseChain CORE row has ever loaded a real price.
+        // Mirrors the pattern used for PLS/SHD/BTC/ETH in the top ticker: once a
+        // token has shown a real price, a later transient fetch failure just
+        // leaves that last-known-good value on screen instead of flashing N/A.
+        const corePriceLoaded = { pls: false, shd: false, hex: false, ehex: false, plsx: false, inc: false, prvx: false };
+
         async function fetchCorePairByPairAddress(key, pairAddress) {
             try {
-                const res = await fetch(`https://api.dexscreener.com/latest/dex/pairs/pulsechain/${pairAddress}`, { signal: AbortSignal.timeout(10000) });
-                const data = await res.json();
-                renderCoreToken(key, data.pairs?.[0] || null);
+                const data = await fetchJsonWithRetry(
+                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${pairAddress}`,
+                    { validate: d => !!d?.pairs?.[0]?.priceUsd }
+                );
+                renderCoreToken(key, data.pairs[0]);
+                corePriceLoaded[key] = true;
             } catch (e) {
                 console.error(`PulseChain CORE fetch error (${key}):`, e);
-                renderCoreToken(key, null);
+                if (!corePriceLoaded[key]) renderCoreToken(key, null);
             }
         }
 
         async function fetchCorePairByTokenAddress(key, tokenAddress) {
             try {
-                const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`, { signal: AbortSignal.timeout(10000) });
-                const data = await res.json();
+                const data = await fetchJsonWithRetry(
+                    `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`,
+                    { validate: d => !!bestPulsechainPair(d?.pairs)?.priceUsd }
+                );
                 renderCoreToken(key, bestPulsechainPair(data.pairs));
+                corePriceLoaded[key] = true;
             } catch (e) {
                 console.error(`PulseChain CORE fetch error (${key}):`, e);
-                renderCoreToken(key, null);
+                if (!corePriceLoaded[key]) renderCoreToken(key, null);
             }
         }
 
@@ -2450,78 +2462,145 @@
             }
         }
 
-        async function fetchPrices() {
-            if (document.hidden) return;
+        // --- Retry-with-backoff fetch helper ---
+        // Retries transient failures (timeouts, network errors, non-2xx, rate limits)
+        // with short exponential backoff before giving up. Each caller decides what
+        // "success" means via an optional validate() check on the parsed JSON, so we
+        // don't retry forever on a response that came back 200 but had no usable data.
+        async function fetchJsonWithRetry(url, { retries = 2, baseDelayMs = 800, timeoutMs = 10000, validate = null } = {}) {
+            let lastErr;
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    if (validate && !validate(data)) throw new Error('Response failed validation (empty/unexpected payload)');
+                    return data;
+                } catch (e) {
+                    lastErr = e;
+                    if (attempt < retries) {
+                        const delay = baseDelayMs * Math.pow(2, attempt); // 800ms, 1600ms, ...
+                        await new Promise(r => setTimeout(r, delay));
+                    }
+                }
+            }
+            throw lastErr;
+        }
+
+        let shdPriceLoaded = false; // becomes true after the first successful SHD price fetch (covers both the big stat and the ticker, since they come from the same response)
+
+        async function fetchShdPrice() {
             try {
-                const shdRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8', { signal: AbortSignal.timeout(10000) });
-                const shdData = await shdRes.json();
-                const shdPair = shdData.pairs?.[0];
-                if (shdPair && shdPair.priceUsd) {
-                    const shdPrice = parseFloat(shdPair.priceUsd);
-                    document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
+                const shdData = await fetchJsonWithRetry(
+                    'https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8',
+                    { validate: d => !!d?.pairs?.[0]?.priceUsd }
+                );
+                const shdPair = shdData.pairs[0];
+                const shdPrice = parseFloat(shdPair.priceUsd);
+                document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
+                shdPriceLoaded = true;
 
-                    renderTickerPrice('shd-ticker-price', shdPrice);
-                    renderTickerChange('shd-ticker-change', shdPair.priceChange?.h24);
+                renderTickerPrice('shd-ticker-price', shdPrice);
+                renderTickerChange('shd-ticker-change', shdPair.priceChange?.h24);
 
-                    const changeEl = document.getElementById('shd-change');
-                    const change24h = shdPair.priceChange?.h24;
-                    if (changeEl && typeof change24h === 'number') {
-                        const isUp = change24h >= 0;
-                        changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}% (24h)`;
-                        changeEl.classList.toggle('text-green', isUp);
-                        changeEl.classList.toggle('text-red', !isUp);
-                    } else if (changeEl) {
-                        changeEl.textContent = '';
-                    }
-
-                    const buysEl = document.getElementById('shd-buys');
-                    const sellsEl = document.getElementById('shd-sells');
-                    const txns24h = shdPair.txns?.h24;
-                    if (buysEl && sellsEl && txns24h) {
-                        buysEl.textContent = `${txns24h.buys ?? 0} buys`;
-                        sellsEl.textContent = `${txns24h.sells ?? 0} sells`;
-                    } else if (buysEl && sellsEl) {
-                        buysEl.textContent = '';
-                        sellsEl.textContent = '';
-                    }
+                const changeEl = document.getElementById('shd-change');
+                const change24h = shdPair.priceChange?.h24;
+                if (changeEl && typeof change24h === 'number') {
+                    const isUp = change24h >= 0;
+                    changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}% (24h)`;
+                    changeEl.classList.toggle('text-green', isUp);
+                    changeEl.classList.toggle('text-red', !isUp);
+                } else if (changeEl) {
+                    changeEl.textContent = '';
                 }
 
-                const mcapRes = await fetch(`https://api.dexscreener.com/latest/dex/pairs/pulsechain/${LIQUIDITY_PAIRS.v1},${LIQUIDITY_PAIRS.v2}`, { signal: AbortSignal.timeout(10000) });
-                const mcapData = await mcapRes.json();
-                const mcapPairs = (mcapData.pairs || []).filter(p => p && p.priceUsd);
-                if (mcapPairs.length) {
-                    const totalLiquidity = mcapPairs.reduce((sum, p) => sum + (p.liquidity?.usd || 0), 0);
-                    const marketCap = mcapPairs.reduce((val, p) => val || p.marketCap || 0, 0);
-
-                    document.getElementById('shd-market-cap').textContent = `$${Math.round(marketCap).toLocaleString()}`;
-                    document.getElementById('shd-liquidity').textContent = `$${Math.round(totalLiquidity).toLocaleString()}`;
-                }
-
-                const plsRes = await fetch('https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE', { signal: AbortSignal.timeout(10000) });
-                const plsData = await plsRes.json();
-                const plsPair = plsData.pairs?.[0];
-                if (plsPair && plsPair.priceUsd) {
-                    renderTickerPrice('pls-price', parseFloat(plsPair.priceUsd));
-                    renderTickerChange('pls-change', plsPair.priceChange?.h24);
+                const buysEl = document.getElementById('shd-buys');
+                const sellsEl = document.getElementById('shd-sells');
+                const txns24h = shdPair.txns?.h24;
+                if (buysEl && sellsEl && txns24h) {
+                    buysEl.textContent = `${txns24h.buys ?? 0} buys`;
+                    sellsEl.textContent = `${txns24h.sells ?? 0} sells`;
+                } else if (buysEl && sellsEl) {
+                    buysEl.textContent = '';
+                    sellsEl.textContent = '';
                 }
             } catch (e) {
-                console.error("Price fetch error:", e);
+                console.error("SHD price fetch error (after retries):", e);
+                // Only show an error state if we never managed to load a real price yet;
+                // otherwise leave the last-known-good value on screen instead of blanking it.
+                if (!shdPriceLoaded) {
+                    const priceEl = document.getElementById('shd-price');
+                    if (priceEl) priceEl.textContent = 'Unavailable';
+                    const tickerEl = document.getElementById('shd-ticker-price');
+                    if (tickerEl) tickerEl.textContent = 'Unavailable';
+                }
             }
+        }
 
+        async function fetchShdMarketCap() {
+            try {
+                const mcapData = await fetchJsonWithRetry(
+                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${LIQUIDITY_PAIRS.v1},${LIQUIDITY_PAIRS.v2}`,
+                    { validate: d => (d?.pairs || []).some(p => p && p.priceUsd) }
+                );
+                const mcapPairs = mcapData.pairs.filter(p => p && p.priceUsd);
+                const totalLiquidity = mcapPairs.reduce((sum, p) => sum + (p.liquidity?.usd || 0), 0);
+                const marketCap = mcapPairs.reduce((val, p) => val || p.marketCap || 0, 0);
+
+                document.getElementById('shd-market-cap').textContent = `$${Math.round(marketCap).toLocaleString()}`;
+                document.getElementById('shd-liquidity').textContent = `$${Math.round(totalLiquidity).toLocaleString()}`;
+            } catch (e) {
+                console.error("SHD market cap fetch error (after retries):", e);
+                const mcapEl = document.getElementById('shd-market-cap');
+                const liqEl = document.getElementById('shd-liquidity');
+                if (mcapEl && mcapEl.textContent === 'Loading...') mcapEl.textContent = 'Unavailable';
+                if (liqEl && liqEl.textContent === 'Loading...') liqEl.textContent = 'Unavailable';
+            }
+        }
+
+        let plsPriceLoaded = false; // becomes true after the first successful PLS price fetch
+
+        async function fetchPlsPrice() {
+            try {
+                const plsData = await fetchJsonWithRetry(
+                    'https://api.dexscreener.com/latest/dex/pairs/pulsechain/0xE56043671df55dE5CDf8459710433C10324DE0aE',
+                    { validate: d => !!d?.pairs?.[0]?.priceUsd }
+                );
+                const plsPair = plsData.pairs[0];
+                renderTickerPrice('pls-price', parseFloat(plsPair.priceUsd));
+                renderTickerChange('pls-change', plsPair.priceChange?.h24);
+                plsPriceLoaded = true;
+            } catch (e) {
+                console.error("PLS price fetch error (after retries):", e);
+                // The markup ships with a placeholder "$0.00000000" so a silent failure
+                // here would look identical to a real zero price. Only show "Unavailable"
+                // if we've never successfully loaded a real price yet; once we have one,
+                // a later transient failure just leaves the last-known-good value shown.
+                if (!plsPriceLoaded) {
+                    const plsEl = document.getElementById('pls-price');
+                    if (plsEl) plsEl.textContent = 'Unavailable';
+                }
+            }
+        }
+
+        let btcPriceLoaded = false; // becomes true after the first successful BTC price fetch
+        let ethPriceLoaded = false; // becomes true after the first successful ETH price fetch
+
+        async function fetchBtcEthPrices() {
             // BTC and ETH reference prices (via CoinGecko simple price API)
             // shown only in the desktop ticker for extra market context.
             try {
-                const cgRes = await fetch(
+                const cgData = await fetchJsonWithRetry(
                     'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true',
-                    { signal: AbortSignal.timeout(10000) }
+                    { validate: d => !!(d?.bitcoin?.usd || d?.ethereum?.usd) }
                 );
-                const cgData = await cgRes.json();
 
                 const btc = cgData?.bitcoin;
                 if (btc && btc.usd) {
                     document.getElementById('btc-price').textContent =
                         `$${Math.round(btc.usd).toLocaleString()}`;
                     renderTickerChange('btc-change', btc.usd_24h_change);
+                    btcPriceLoaded = true;
                 }
 
                 const eth = cgData?.ethereum;
@@ -2529,10 +2608,46 @@
                     document.getElementById('eth-price').textContent =
                         `$${Math.round(eth.usd).toLocaleString()}`;
                     renderTickerChange('eth-change', eth.usd_24h_change);
+                    ethPriceLoaded = true;
+                }
+
+                // If the response came back but was missing one side (validate only
+                // requires one of the two), treat the missing one as a failure below.
+                if (!btc?.usd && !btcPriceLoaded) {
+                    const btcEl = document.getElementById('btc-price');
+                    if (btcEl) btcEl.textContent = 'Unavailable';
+                }
+                if (!eth?.usd && !ethPriceLoaded) {
+                    const ethEl = document.getElementById('eth-price');
+                    if (ethEl) ethEl.textContent = 'Unavailable';
                 }
             } catch (e) {
-                console.error("BTC/ETH price fetch error:", e);
+                console.error("BTC/ETH price fetch error (after retries):", e);
+                // The markup ships with placeholder "$0.00" text for both, which would
+                // look like a real zero price on silent failure. Only show "Unavailable"
+                // if we've never successfully loaded a real price yet; once we have one,
+                // a later transient failure just leaves the last-known-good value shown.
+                if (!btcPriceLoaded) {
+                    const btcEl = document.getElementById('btc-price');
+                    if (btcEl) btcEl.textContent = 'Unavailable';
+                }
+                if (!ethPriceLoaded) {
+                    const ethEl = document.getElementById('eth-price');
+                    if (ethEl) ethEl.textContent = 'Unavailable';
+                }
             }
+        }
+
+        async function fetchPrices() {
+            if (document.hidden) return;
+            // Run independently so a DexScreener hiccup on one pair (e.g. SHD)
+            // doesn't prevent the others (market cap, PLS, BTC/ETH) from updating.
+            await Promise.allSettled([
+                fetchShdPrice(),
+                fetchShdMarketCap(),
+                fetchPlsPrice(),
+                fetchBtcEthPrices(),
+            ]);
         }
 
         const MINING_CONTRACT = "0xa16c1fa26f13803083f0fd222d1ea083c1d6d650";
