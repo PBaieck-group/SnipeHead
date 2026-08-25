@@ -1507,8 +1507,6 @@
                             </div>
                         </div>
                         <div class="stat-footer">
-                            <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer">Price via DexScreener</a>
-                            <span>&middot;</span>
                             <a href="https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc?tab=holders" target="_blank" rel="noopener noreferrer">Holders</a>
                             <span>&middot;</span>
                             <a href="https://snipehead.xyz/snft/" target="_blank" rel="noopener noreferrer">View SNFT</a>
@@ -1543,8 +1541,6 @@
                             </div>
                         </div>
                         <div class="stat-footer">
-                            <a href="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc" target="_blank" rel="noopener noreferrer">Cap &amp; Liquidity via DexScreener</a>
-                            <span>&middot;</span>
                             <span>Pools via Connected RPC</span>
                         </div>
                     </div>
@@ -1753,7 +1749,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.2.6</p>
+                    <p class="footer-version">v4.2.7</p>
                 </div>
             </footer>
         </div>
@@ -2119,26 +2115,21 @@
             throw lastErr;
         }
 
-        // PLS price, SHD price, and SHD market cap are the numbers people actually
-        // care about most, so they're combined into ONE dexscreener request instead
-        // of 3 separate concurrent ones (the SHD-price pair and LIQUIDITY_PAIRS.v1
-        // were literally the same pair address, so two of those three calls were
-        // partially redundant anyway). One request is far less likely to trip
-        // DexScreener's rate limiting than three at once, and it gets extra retries
-        // since it's the most important data on the page.
-        // Track whether PLS/SHD have ever loaded a real price. Once true, a later
-        // transient fetch failure just leaves the last-known-good value on screen
-        // instead of flashing "Unavailable".
-        let plsPriceLoaded = false;
-        let shdPriceLoaded = false;
+        // pls-price and shd-price are now computed straight from on-chain pool
+        // reserves in fetchOnChainData() (see reservesToPlsUsdPrice / the SHD
+        // price block there) instead of DexScreener, so they're no longer at the
+        // mercy of DexScreener's rate limits. Market cap and liquidity are also
+        // computed on-chain there now (totalSupply x price, and 2x each pool's
+        // PLS-side value). DexScreener is only used here for numbers that
+        // genuinely require an indexer/history and can't come from a single
+        // reserves snapshot: 24h % change and buy/sell counts.
+        let plsChangeLoaded = false;
+        let shdExtrasLoaded = false;
 
         const PLS_PAIR_ADDRESS = '0xE56043671df55dE5CDf8459710433C10324DE0aE';
 
-        // Only PLS_PAIR_ADDRESS (USD reference) and LIQUIDITY_PAIRS.v1 (the primary
-        // SHD pool) are required for the numbers people actually look at (PLS price,
-        // SHD price, market cap). LIQUIDITY_PAIRS.v2 is a secondary, lower-liquidity
-        // pool that's only ever used additively for market cap/liquidity totals, so
-        // it's treated as optional below rather than blocking the whole fetch.
+        // LIQUIDITY_PAIRS.v1 (the primary SHD pool) is the only pair required here -
+        // it's the one used for the SHD 24h change/buys-sells numbers.
         // Computed lazily (not as a top-level const) because LIQUIDITY_PAIRS isn't
         // declared until later in this script block - evaluating this eagerly at
         // parse time would throw a temporal-dead-zone ReferenceError and halt the
@@ -2146,12 +2137,14 @@
         // LIQUIDITY_PAIRS has long since been initialized.
         function essentialPairsPresent(pairs) {
             if (!pairs.some(p => p && p.priceUsd)) return false;
-            const essentialAddresses = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1].map(a => a.toLowerCase());
-            return essentialAddresses.every(addr => pairs.some(p => p?.pairAddress?.toLowerCase() === addr));
+            return pairs.some(p => p?.pairAddress?.toLowerCase() === LIQUIDITY_PAIRS.v1.toLowerCase());
         }
 
         async function fetchPrimaryMarketData() {
-            const addrList = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1, LIQUIDITY_PAIRS.v2];
+            // LIQUIDITY_PAIRS.v2 isn't fetched here anymore - its liquidity is
+            // computed on-chain in fetchOnChainData() alongside v1's, and it was
+            // only ever needed here for market cap/liquidity aggregation.
+            const addrList = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1];
             const addrs = addrList.join(',');
             try {
                 const data = await fetchJsonWithRetry(
@@ -2159,11 +2152,11 @@
                     {
                         retries: 3,
                         baseDelayMs: 900,
-                        // Only require the two pairs we actually need (PLS ref pair +
-                        // the primary SHD pool). The smaller v2 pool is allowed to be
-                        // missing from the payload without failing validation - it's
-                        // rendered when present, but its absence shouldn't force a
-                        // retry (or block partial-data rendering) of data we already have.
+                        // Only require the primary SHD pool. PLS_PAIR_ADDRESS is
+                        // allowed to be missing from the payload without failing
+                        // validation - it's rendered when present, but its absence
+                        // shouldn't force a retry (or block partial-data rendering)
+                        // of data we already have.
                         validate: d => essentialPairsPresent(d?.pairs || [])
                     }
                 );
@@ -2181,14 +2174,13 @@
             // The combined 3-pair request failed outright (no parseable JSON on any
             // attempt) - most likely a transient rate limit or network blip on
             // DexScreener's side. Before giving up, try one lean fallback request for
-            // just the two essential pairs: a smaller request is less likely to trip
-            // the same limit, and it's the minimum needed to avoid showing
+            // just the pair we actually need: a smaller request is less likely to
+            // trip the same limit, and it's the minimum needed to avoid showing
             // "Unavailable" for numbers we might otherwise still be able to get.
-            if (!plsPriceLoaded || !shdPriceLoaded) {
+            if (!shdExtrasLoaded) {
                 try {
-                    const essentialAddrs = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1].join(',');
                     const fallbackData = await fetchJsonWithRetry(
-                        `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${essentialAddrs}`,
+                        `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${LIQUIDITY_PAIRS.v1}`,
                         {
                             retries: 1,
                             baseDelayMs: 1200,
@@ -2204,43 +2196,21 @@
                     }
                 }
             }
-
-            if (!plsPriceLoaded) {
-                const plsEl = document.getElementById('pls-price');
-                if (plsEl) plsEl.textContent = 'Unavailable';
-            }
-            if (!shdPriceLoaded) {
-                const priceEl = document.getElementById('shd-price');
-                if (priceEl) priceEl.textContent = 'Unavailable';
-                const tickerEl = document.getElementById('shd-ticker-price');
-                if (tickerEl) tickerEl.textContent = 'Unavailable';
-            }
-            const mcapEl = document.getElementById('shd-market-cap');
-            const liqEl = document.getElementById('shd-liquidity');
-            if (mcapEl && mcapEl.textContent === 'Loading...') mcapEl.textContent = 'Unavailable';
-            if (liqEl && liqEl.textContent === 'Loading...') liqEl.textContent = 'Unavailable';
         }
 
         function renderPrimaryMarketDataFromPayload(pairs) {
-            // --- PLS ---
+            // --- PLS 24h change only (price itself comes from on-chain reserves) ---
             const plsPair = pairs.find(p => p?.pairAddress?.toLowerCase() === PLS_PAIR_ADDRESS.toLowerCase());
             if (plsPair && plsPair.priceUsd) {
-                renderTickerPrice('pls-price', parseFloat(plsPair.priceUsd));
                 renderTickerChange('pls-change', plsPair.priceChange?.h24);
-                plsPriceLoaded = true;
-            } else if (!plsPriceLoaded) {
-                const plsEl = document.getElementById('pls-price');
-                if (plsEl) plsEl.textContent = 'Unavailable';
+                plsChangeLoaded = true;
             }
 
-            // --- SHD price (primary pool, same pair used for the big stat before) ---
+            // --- SHD 24h change / buys-sells only (price comes from on-chain reserves) ---
             const shdPair = pairs.find(p => p?.pairAddress?.toLowerCase() === LIQUIDITY_PAIRS.v1.toLowerCase());
             if (shdPair && shdPair.priceUsd) {
-                const shdPrice = parseFloat(shdPair.priceUsd);
-                document.getElementById('shd-price').textContent = `$${shdPrice.toFixed(8)}`;
-                shdPriceLoaded = true;
+                shdExtrasLoaded = true;
 
-                renderTickerPrice('shd-ticker-price', shdPrice);
                 renderTickerChange('shd-ticker-change', shdPair.priceChange?.h24);
 
                 const changeEl = document.getElementById('shd-change');
@@ -2264,29 +2234,8 @@
                     buysEl.textContent = '';
                     sellsEl.textContent = '';
                 }
-            } else if (!shdPriceLoaded) {
-                const priceEl = document.getElementById('shd-price');
-                if (priceEl) priceEl.textContent = 'Unavailable';
-                const tickerEl = document.getElementById('shd-ticker-price');
-                if (tickerEl) tickerEl.textContent = 'Unavailable';
             }
 
-            // --- Market cap / liquidity (both SHD pools) ---
-            const mcapPairs = pairs.filter(p => p && p.priceUsd && (
-                p.pairAddress?.toLowerCase() === LIQUIDITY_PAIRS.v1.toLowerCase() ||
-                p.pairAddress?.toLowerCase() === LIQUIDITY_PAIRS.v2.toLowerCase()
-            ));
-            if (mcapPairs.length) {
-                const totalLiquidity = mcapPairs.reduce((sum, p) => sum + (p.liquidity?.usd || 0), 0);
-                const marketCap = mcapPairs.reduce((val, p) => val || p.marketCap || 0, 0);
-                document.getElementById('shd-market-cap').textContent = `$${Math.round(marketCap).toLocaleString()}`;
-                document.getElementById('shd-liquidity').textContent = `$${Math.round(totalLiquidity).toLocaleString()}`;
-            } else {
-                const mcapEl = document.getElementById('shd-market-cap');
-                const liqEl = document.getElementById('shd-liquidity');
-                if (mcapEl && mcapEl.textContent === 'Loading...') mcapEl.textContent = 'Unavailable';
-                if (liqEl && liqEl.textContent === 'Loading...') liqEl.textContent = 'Unavailable';
-            }
         }
 
         let btcPriceLoaded = false; // becomes true after the first successful BTC price fetch
@@ -2458,6 +2407,7 @@
 
         const FAUCET_CONTRACT = "0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98";
         const SHD_TOKEN_ADDRESS = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
+        const WPLS_TOKEN_ADDRESS = "0xA1077a294dDE1B09bB078844df40758a5D0f9a27";
         const LIQUIDITY_PAIRS = {
             v1: "0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8",
             v2: "0x6d8a9F5726A5e67aC1Cd7F558Fe5B289e95ba232"
@@ -2490,13 +2440,20 @@
                 "function token0() view returns (address)",
                 "function totalMinted() view returns (uint256)",
                 "function getEthBalance(address addr) view returns (uint256 balance)",
-                "function ownerOf(uint256 tokenId) view returns (address)"
+                "function ownerOf(uint256 tokenId) view returns (address)",
+                "function totalSupply() view returns (uint256)"
             ]);
         } catch (err) {
             console.error("ethers.js failed to load — on-chain stats will show as unavailable:", err);
         }
 
-        const poolToken0Cache = { v1: null, v2: null };
+        // Track whether PLS/SHD have ever loaded a real on-chain price. Once true,
+        // a later transient RPC failure just leaves the last-known-good value on
+        // screen instead of flashing "Unavailable".
+        let plsPriceLoaded = false;
+        let shdPriceLoaded = false;
+
+        const poolToken0Cache = { v1: null, v2: null, pls: null };
 
         function buildOnChainCalls() {
             const calls = [
@@ -2506,11 +2463,16 @@
                 { target: FAUCET_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getFaucetBalance") },
                 { target: LIQUIDITY_PAIRS.v1, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
                 { target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
+                // WPLS/DAI reference pool - used to derive PLS's USD price directly
+                // from on-chain reserves (DAI is ~$1) instead of DexScreener.
+                { target: PLS_PAIR_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
                 { target: SNFT_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalMinted") },
-                { target: MULTICALL3_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getEthBalance", [SNFT_CONTRACT]) }
+                { target: MULTICALL3_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getEthBalance", [SNFT_CONTRACT]) },
+                { target: SHD_TOKEN_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalSupply") }
             ];
             if (!poolToken0Cache.v1) calls.push({ target: LIQUIDITY_PAIRS.v1, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
             if (!poolToken0Cache.v2) calls.push({ target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
+            if (!poolToken0Cache.pls) calls.push({ target: PLS_PAIR_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
             return calls;
         }
 
@@ -2534,6 +2496,21 @@
             };
         }
 
+        // Derives PLS's USD price straight from the WPLS/DAI pool's reserves
+        // (both 18-decimal tokens, same math as reservesToPool above), treating
+        // bridged DAI as ~$1. This is what lets pls-price and, in turn,
+        // shd-price be computed without ever calling DexScreener.
+        function reservesToPlsUsdPrice(reservesResult, token0Address) {
+            if (!reservesResult) return null;
+            const isPlsToken0 = token0Address.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase();
+            const plsReserve = isPlsToken0 ? reservesResult.reserve0 : reservesResult.reserve1;
+            const daiReserve = isPlsToken0 ? reservesResult.reserve1 : reservesResult.reserve0;
+            const pls = Number(ethers.utils.formatEther(plsReserve));
+            const dai = Number(ethers.utils.formatEther(daiReserve));
+            if (!pls) return null;
+            return dai / pls;
+        }
+
         // Tracks whether each on-chain stat field has ever loaded a real value.
         // Once a field has shown real data, a later fetch failure (RPC hiccup,
         // multicall revert, etc.) leaves that last-known-good value on screen
@@ -2541,7 +2518,8 @@
         const onChainFieldLoaded = {
             'total-mined': false, 'contract-balance': false, 'reward-reserve': false,
             'faucet-balance': false, 'liquidity-v1': false, 'liquidity-v2': false,
-            'snft-minted': false, 'snft-pls': false, 'snft-holders': false
+            'snft-minted': false, 'snft-pls': false, 'snft-holders': false,
+            'shd-market-cap': false, 'shd-liquidity': false
         };
 
         async function fetchOnChainData() {
@@ -2559,8 +2537,10 @@
                 const faucetBalance = decodeResult("getFaucetBalance", results[i++]);
                 const v1Reserves = decodeResult("getReserves", results[i++]);
                 const v2Reserves = decodeResult("getReserves", results[i++]);
+                const plsReserves = decodeResult("getReserves", results[i++]);
                 const snftMinted = decodeResult("totalMinted", results[i++]);
                 const snftPlsBalance = decodeResult("getEthBalance", results[i++]);
+                const totalSupply = decodeResult("totalSupply", results[i++]);
                 if (!poolToken0Cache.v1) {
                     const token0 = decodeResult("token0", results[i++]);
                     if (token0) poolToken0Cache.v1 = token0[0];
@@ -2569,19 +2549,88 @@
                     const token0 = decodeResult("token0", results[i++]);
                     if (token0) poolToken0Cache.v2 = token0[0];
                 }
+                if (!poolToken0Cache.pls) {
+                    const token0 = decodeResult("token0", results[i++]);
+                    if (token0) poolToken0Cache.pls = token0[0];
+                }
 
                 if (totalMined) { document.getElementById('total-mined').textContent = formatTokenAmount(Number(ethers.utils.formatEther(totalMined[0]))) + " SHD"; onChainFieldLoaded['total-mined'] = true; }
                 if (contractBalance) { document.getElementById('contract-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(contractBalance[0]))) + " SHD"; onChainFieldLoaded['contract-balance'] = true; }
                 if (rewardReserve) { document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD"; onChainFieldLoaded['reward-reserve'] = true; }
                 if (faucetBalance) { document.getElementById('faucet-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(faucetBalance[0]))) + " SHD"; onChainFieldLoaded['faucet-balance'] = true; }
 
+                // --- PLS and SHD USD prices, computed straight from pool reserves ---
+                // (DexScreener is still used elsewhere for 24h change/buys-sells/market
+                // cap, which aren't derivable from a single reserves snapshot, but the
+                // headline price numbers no longer depend on it or its rate limits.)
+                let plsUsdPrice = null;
+                if (poolToken0Cache.pls) {
+                    plsUsdPrice = reservesToPlsUsdPrice(plsReserves, poolToken0Cache.pls);
+                }
+                if (plsUsdPrice) {
+                    renderTickerPrice('pls-price', plsUsdPrice);
+                    plsPriceLoaded = true;
+                } else if (!plsPriceLoaded) {
+                    const plsEl = document.getElementById('pls-price');
+                    if (plsEl) plsEl.textContent = 'Unavailable';
+                }
+
+                let v1LiquidityUsd = null;
+                let v2LiquidityUsd = null;
+
                 if (poolToken0Cache.v1) {
                     const pool = reservesToPool(v1Reserves, poolToken0Cache.v1);
-                    if (pool) { renderPoolLiquidity('liquidity-v1', pool); onChainFieldLoaded['liquidity-v1'] = true; }
+                    if (pool) {
+                        renderPoolLiquidity('liquidity-v1', pool);
+                        onChainFieldLoaded['liquidity-v1'] = true;
+
+                        if (plsUsdPrice && pool.shd > 0) {
+                            const shdUsdPrice = (pool.pls / pool.shd) * plsUsdPrice;
+                            document.getElementById('shd-price').textContent = `$${shdUsdPrice.toFixed(8)}`;
+                            renderTickerPrice('shd-ticker-price', shdUsdPrice);
+                            shdPriceLoaded = true;
+
+                            // --- Market cap: on-chain totalSupply x on-chain SHD price ---
+                            if (totalSupply) {
+                                const supply = Number(ethers.utils.formatEther(totalSupply[0]));
+                                document.getElementById('shd-market-cap').textContent = `$${Math.round(supply * shdUsdPrice).toLocaleString()}`;
+                                onChainFieldLoaded['shd-market-cap'] = true;
+                            }
+                        }
+
+                        // --- Liquidity: in a constant-product pool both sides hold
+                        // equal USD value, so 2x the PLS side's value is the pool's
+                        // total USD liquidity. Summed with v2's below.
+                        if (plsUsdPrice) {
+                            v1LiquidityUsd = 2 * pool.pls * plsUsdPrice;
+                        }
+                    }
+                }
+                if (!shdPriceLoaded) {
+                    const priceEl = document.getElementById('shd-price');
+                    if (priceEl) priceEl.textContent = 'Unavailable';
+                    const tickerEl = document.getElementById('shd-ticker-price');
+                    if (tickerEl) tickerEl.textContent = 'Unavailable';
+                }
+                if (!onChainFieldLoaded['shd-market-cap']) {
+                    const mcapEl = document.getElementById('shd-market-cap');
+                    if (mcapEl) mcapEl.textContent = 'Unavailable';
                 }
                 if (poolToken0Cache.v2) {
                     const pool = reservesToPool(v2Reserves, poolToken0Cache.v2);
-                    if (pool) { renderPoolLiquidity('liquidity-v2', pool); onChainFieldLoaded['liquidity-v2'] = true; }
+                    if (pool) {
+                        renderPoolLiquidity('liquidity-v2', pool);
+                        onChainFieldLoaded['liquidity-v2'] = true;
+                        if (plsUsdPrice) v2LiquidityUsd = 2 * pool.pls * plsUsdPrice;
+                    }
+                }
+                if (v1LiquidityUsd !== null || v2LiquidityUsd !== null) {
+                    const totalLiquidity = (v1LiquidityUsd || 0) + (v2LiquidityUsd || 0);
+                    document.getElementById('shd-liquidity').textContent = `$${Math.round(totalLiquidity).toLocaleString()}`;
+                    onChainFieldLoaded['shd-liquidity'] = true;
+                } else if (!onChainFieldLoaded['shd-liquidity']) {
+                    const liqEl = document.getElementById('shd-liquidity');
+                    if (liqEl) liqEl.textContent = 'Unavailable';
                 }
 
                 if (snftMinted) { document.getElementById('snft-minted').textContent = `${snftMinted[0].toString()}/${SNFT_MAX_SUPPLY}`; onChainFieldLoaded['snft-minted'] = true; }
