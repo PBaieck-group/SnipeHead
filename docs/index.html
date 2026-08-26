@@ -941,6 +941,118 @@
             #pulsex-embed { height: 560px; }
         }
 
+        /* PulseChain Core */
+        .core-list {
+            padding: 0.25rem 0;
+            overflow: hidden;
+        }
+
+        .core-row {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 1fr 1fr;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.35rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .core-row:last-child {
+            border-bottom: none;
+        }
+
+        .core-row-head {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding-top: 0.9rem;
+            padding-bottom: 0.7rem;
+        }
+
+        .core-asset {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .core-icon {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .core-symbol {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .core-col {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .core-price-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .core-change {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .core-col[data-label]::before {
+            content: attr(data-label);
+            display: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .core-row {
+                grid-template-columns: 1fr 1fr;
+                row-gap: 0.9rem;
+            }
+            .core-row-head {
+                display: none;
+            }
+            .core-asset {
+                grid-column: 1 / -1;
+            }
+            .core-col[data-label]::before {
+                display: block;
+            }
+            /* Price is the figure people actually scan for, so make it the
+               visually dominant one on mobile - Market Cap and Liquidity
+               were previously sharing identical .core-col sizing, which
+               made a big-digit mcap number read as "bigger" than price
+               purely by digit count, not by design. */
+            .core-col[data-label="Price"] {
+                font-size: 1.15rem;
+                font-weight: 700;
+            }
+            .core-col[data-label="Market Cap"],
+            .core-col[data-label="Liquidity"] {
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: var(--text-secondary);
+            }
+        }
+
         /* Network details */
         .details-grid {
             display: grid;
@@ -1366,6 +1478,10 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                         Chart &amp; Swap
                     </a>
+                    <a href="#core" class="side-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m-4-5v5m8-8v8M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                        PulseChain Core
+                    </a>
                     <a href="#network" class="side-link">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
                         Network
@@ -1609,6 +1725,109 @@
                     </div>
                 </section>
 
+                <!-- PulseChain Core -->
+                <section class="section" id="core">
+                    <h3 class="section-title">PulseChain Core</h3>
+                    <div class="card core-list">
+                        <div class="core-row core-row-head">
+                            <span>Asset</span>
+                            <span>Price</span>
+                            <span>Market Cap</span>
+                            <span>Liquidity</span>
+                        </div>
+
+                        <div class="core-row">
+                            <div class="core-asset">
+                                <img src="3d_logo/pls-3d-token-v1.png" class="core-icon" alt="PLS" width="34" height="34" loading="lazy">
+                                <span class="core-symbol">PLS</span>
+                            </div>
+                            <div class="core-col" data-label="Price">
+                                <div class="core-price-wrap">
+                                    <span id="core-pls-price">Loading...</span>
+                                    <span class="core-change" id="core-pls-change">&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="core-col" data-label="Market Cap" id="core-pls-mcap">Loading...</div>
+                            <div class="core-col" data-label="Liquidity" id="core-pls-liquidity">Loading...</div>
+                        </div>
+
+                        <div class="core-row">
+                            <div class="core-asset">
+                                <img src="3d_logo/shd-3d-token-v1.png" class="core-icon" alt="SHD" width="34" height="34" loading="lazy">
+                                <span class="core-symbol">SHD</span>
+                            </div>
+                            <div class="core-col" data-label="Price">
+                                <div class="core-price-wrap">
+                                    <span id="core-shd-price">Loading...</span>
+                                    <span class="core-change" id="core-shd-change">&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="core-col" data-label="Market Cap" id="core-shd-mcap">Loading...</div>
+                            <div class="core-col" data-label="Liquidity" id="core-shd-liquidity">Loading...</div>
+                        </div>
+
+                        <div class="core-row">
+                            <div class="core-asset">
+                                <img src="3d_logo/hex-3d-token-v5.png" class="core-icon" alt="HEX" width="34" height="34" loading="lazy">
+                                <span class="core-symbol">HEX</span>
+                            </div>
+                            <div class="core-col" data-label="Price">
+                                <div class="core-price-wrap">
+                                    <span id="core-hex-price">Loading...</span>
+                                    <span class="core-change" id="core-hex-change">&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="core-col" data-label="Market Cap" id="core-hex-mcap">Loading...</div>
+                            <div class="core-col" data-label="Liquidity" id="core-hex-liquidity">Loading...</div>
+                        </div>
+
+                        <div class="core-row">
+                            <div class="core-asset">
+                                <img src="3d_logo/plsx-3d-token-v1.png" class="core-icon" alt="PLSX" width="34" height="34" loading="lazy">
+                                <span class="core-symbol">PLSX</span>
+                            </div>
+                            <div class="core-col" data-label="Price">
+                                <div class="core-price-wrap">
+                                    <span id="core-plsx-price">Loading...</span>
+                                    <span class="core-change" id="core-plsx-change">&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="core-col" data-label="Market Cap" id="core-plsx-mcap">Loading...</div>
+                            <div class="core-col" data-label="Liquidity" id="core-plsx-liquidity">Loading...</div>
+                        </div>
+
+                        <div class="core-row">
+                            <div class="core-asset">
+                                <img src="3d_logo/inc-3d-token-v1.png" class="core-icon" alt="INC" width="34" height="34" loading="lazy">
+                                <span class="core-symbol">INC</span>
+                            </div>
+                            <div class="core-col" data-label="Price">
+                                <div class="core-price-wrap">
+                                    <span id="core-inc-price">Loading...</span>
+                                    <span class="core-change" id="core-inc-change">&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="core-col" data-label="Market Cap" id="core-inc-mcap">Loading...</div>
+                            <div class="core-col" data-label="Liquidity" id="core-inc-liquidity">Loading...</div>
+                        </div>
+
+                        <div class="core-row">
+                            <div class="core-asset">
+                                <img src="3d_logo/prvx-3d-token-v5.png" class="core-icon" alt="PRVX" width="34" height="34" loading="lazy">
+                                <span class="core-symbol">PRVX</span>
+                            </div>
+                            <div class="core-col" data-label="Price">
+                                <div class="core-price-wrap">
+                                    <span id="core-prvx-price">Loading...</span>
+                                    <span class="core-change" id="core-prvx-change">&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="core-col" data-label="Market Cap" id="core-prvx-mcap">Loading...</div>
+                            <div class="core-col" data-label="Liquidity" id="core-prvx-liquidity">Loading...</div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Network Details -->
                 <section class="section" id="network">
                     <h3 class="section-title">Network Details</h3>
@@ -1749,7 +1968,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.2.7</p>
+                    <p class="footer-version">v4.3.0</p>
                 </div>
             </footer>
         </div>
@@ -2048,7 +2267,7 @@
             setInterval(tick, 1000);
         }
 
-        let priceInterval, onChainInterval, holderInterval;
+        let priceInterval, onChainInterval, holderInterval, plsSupplyInterval;
 
         function renderTickerPrice(elId, price, subColor) {
             const el = document.getElementById(elId);
@@ -2203,6 +2422,8 @@
             const plsPair = pairs.find(p => p?.pairAddress?.toLowerCase() === PLS_PAIR_ADDRESS.toLowerCase());
             if (plsPair && plsPair.priceUsd) {
                 renderTickerChange('pls-change', plsPair.priceChange?.h24);
+                renderTickerChange('core-pls-change', plsPair.priceChange?.h24);
+                coreChangeLoaded.pls = true;
                 plsChangeLoaded = true;
             }
 
@@ -2212,6 +2433,8 @@
                 shdExtrasLoaded = true;
 
                 renderTickerChange('shd-ticker-change', shdPair.priceChange?.h24);
+                renderTickerChange('core-shd-change', shdPair.priceChange?.h24);
+                coreChangeLoaded.shd = true;
 
                 const changeEl = document.getElementById('shd-change');
                 const change24h = shdPair.priceChange?.h24;
@@ -2236,6 +2459,111 @@
                 }
             }
 
+        }
+
+        // 24h % change for the PulseChain Core tokens - the only thing about
+        // them that still comes from DexScreener rather than raw reserves,
+        // since % change needs price history, not just a snapshot.
+        async function fetchCoreTokensChange() {
+            const addrs = CORE_TOKENS.map(t => t.pair).join(',');
+            try {
+                const data = await fetchJsonWithRetry(
+                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${addrs}`,
+                    {
+                        retries: 2,
+                        baseDelayMs: 900,
+                        validate: d => Array.isArray(d?.pairs) && d.pairs.length > 0
+                    }
+                );
+                const pairs = data.pairs || [];
+                CORE_TOKENS.forEach(t => {
+                    const pair = pairs.find(p => p?.pairAddress?.toLowerCase() === t.pair.toLowerCase());
+                    if (pair) {
+                        renderTickerChange(`core-${t.id}-change`, pair.priceChange?.h24);
+                        coreChangeLoaded[t.id] = true;
+                    } else if (!coreChangeLoaded[t.id]) {
+                        const el = document.getElementById(`core-${t.id}-change`);
+                        if (el) el.textContent = '';
+                    }
+                });
+            } catch (e) {
+                console.error("PulseChain Core 24h change fetch error:", e);
+            }
+        }
+
+        // PLS total supply, for the Core row's market cap - there's no
+        // ERC20 totalSupply() to call on-chain since PLS is the native coin,
+        // not a contract, so this comes from the explorer's stats API
+        // instead. Refreshed infrequently since total supply changes slowly;
+        // a failure here just leaves market cap on its last-known value (or
+        // "Loading...") rather than blanking the rest of the row.
+        //
+        // Both of the explorer's own endpoints have proven unreliable in
+        // practice - the legacy `?module=stats&action=X` API is being
+        // deprecated and reliably fails validation, and /api/v2/stats has
+        // been timing out outright rather than erroring, which points to
+        // the instance itself being slow/overloaded rather than a request
+        // format problem. Bumped its timeout since 10s wasn't enough, and
+        // added a pinned fallback below so the market cap cell never gets
+        // stuck on "Loading..." forever if the explorer just doesn't
+        // respond - total supply moves slowly enough that a static
+        // approximate figure is a reasonable last resort, not just a raw
+        // guess.
+        const PLS_TOTAL_SUPPLY_FALLBACK = 14814814814815; // approx, as of writing - update periodically
+        let plsTotalSupply = null;
+        // Cached from the most recent successful on-chain reserves read, so that
+        // whenever plsTotalSupply finishes loading (which races the very first
+        // fetchOnChainData() call - see below) we can render core-pls-mcap right
+        // away instead of waiting for the next 60s on-chain poll to come around.
+        let lastPlsUsdPrice = null;
+        // Renders core-pls-mcap immediately from whatever we currently have
+        // (plsTotalSupply x lastPlsUsdPrice), rather than waiting for the next
+        // scheduled fetchOnChainData() poll. Called both from fetchOnChainData
+        // itself and from fetchPlsTotalSupply once total supply resolves -
+        // whichever of the two finishes second is what actually paints the
+        // cell, instead of the two racing and one silently losing.
+        function renderPlsMarketCap() {
+            if (plsTotalSupply && lastPlsUsdPrice) {
+                setCoreCellText('core-pls-mcap', `$${Math.round(plsTotalSupply * lastPlsUsdPrice).toLocaleString()}`);
+                coreFieldLoaded['core-pls-mcap'] = true;
+            }
+        }
+        async function fetchPlsTotalSupply() {
+            try {
+                const data = await fetchJsonWithRetry(
+                    'https://api.scan.pulsechain.com/api/v2/stats',
+                    {
+                        retries: 1, baseDelayMs: 900, timeoutMs: 15000,
+                        validate: d => !!(Number(d?.market_cap) > 0 && Number(d?.coin_price) > 0)
+                    }
+                );
+                plsTotalSupply = Number(data.market_cap) / Number(data.coin_price);
+                renderPlsMarketCap();
+                return;
+            } catch (e) {
+                console.error("PLS total supply fetch error (v2/stats):", e);
+            }
+            try {
+                const data = await fetchJsonWithRetry(
+                    'https://api.scan.pulsechain.com/api?module=stats&action=ethsupply',
+                    { retries: 1, baseDelayMs: 900, validate: d => !!d?.result }
+                );
+                if (data?.result) {
+                    plsTotalSupply = Number(ethers.utils.formatEther(data.result));
+                    renderPlsMarketCap();
+                    return;
+                }
+            } catch (e) {
+                console.error("PLS total supply fetch error (legacy):", e);
+            }
+            // Both live sources failed. If we've never successfully loaded a
+            // real value (i.e. this isn't just a transient blip on top of a
+            // last-known-good number), fall back to the pinned estimate
+            // rather than leaving market cap on "Loading..." indefinitely.
+            if (plsTotalSupply === null) {
+                plsTotalSupply = PLS_TOTAL_SUPPLY_FALLBACK;
+            }
+            renderPlsMarketCap();
         }
 
         let btcPriceLoaded = false; // becomes true after the first successful BTC price fetch
@@ -2300,6 +2628,7 @@
             await Promise.allSettled([
                 fetchPrimaryMarketData(),
                 fetchBtcEthPrices(),
+                fetchCoreTokensChange(),
             ]);
         }
 
@@ -2424,6 +2753,69 @@
             el.title = `${formatFullTokenAmount(pool.shd)} SHD / ${formatFullTokenAmount(pool.pls)} PLS`;
         }
 
+        function setCoreCellText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        // Computes price/market cap/liquidity for each PulseChain Core token
+        // from its pair reserves + on-chain totalSupply, the same way
+        // shd-price/shd-market-cap are derived above - generalized to handle
+        // each token's own decimals (HEX is 8, not 18) and whichever token
+        // sits on the other side of the pair. Most of these pairs are quoted
+        // in WPLS (converted to USD via plsUsdPrice); PRVX's pair is quoted
+        // in USDC instead, which is treated as ~$1, same assumption already
+        // used for the WPLS/DAI reference pool above.
+        function renderCoreTokens(coreRawData, plsUsdPrice) {
+            CORE_TOKENS.forEach(t => {
+                const meta = coreTokenMeta[t.id];
+                const data = coreRawData[t.id];
+                if (!data || !data.reserves || meta.isToken0 === null || meta.decimals === null || !meta.quoteAddress || meta.quoteDecimals === null) return;
+
+                const isQuoteWpls = meta.quoteAddress.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase();
+                const quoteUsdPrice = isQuoteWpls ? plsUsdPrice : 1;
+                if (!quoteUsdPrice) return;
+
+                const tokenReserveRaw = meta.isToken0 ? data.reserves.reserve0 : data.reserves.reserve1;
+                const quoteReserveRaw = meta.isToken0 ? data.reserves.reserve1 : data.reserves.reserve0;
+                const tokenAmount = Number(ethers.utils.formatUnits(tokenReserveRaw, meta.decimals));
+                const quoteAmount = Number(ethers.utils.formatUnits(quoteReserveRaw, meta.quoteDecimals));
+                if (!tokenAmount) return;
+
+                const priceUsd = (quoteAmount / tokenAmount) * quoteUsdPrice;
+                renderTickerPrice(`core-${t.id}-price`, priceUsd);
+                coreFieldLoaded[`core-${t.id}-price`] = true;
+
+                const liquidityUsd = 2 * quoteAmount * quoteUsdPrice;
+                setCoreCellText(`core-${t.id}-liquidity`, `$${Math.round(liquidityUsd).toLocaleString()}`);
+                coreFieldLoaded[`core-${t.id}-liquidity`] = true;
+
+                if (data.totalSupply) {
+                    const supply = Number(ethers.utils.formatUnits(data.totalSupply[0], meta.decimals));
+                    setCoreCellText(`core-${t.id}-mcap`, `$${Math.round(supply * priceUsd).toLocaleString()}`);
+                    coreFieldLoaded[`core-${t.id}-mcap`] = true;
+                }
+            });
+
+            // Only sweep the fields THIS function is responsible for (the
+            // HEX/PLSX/INC/PRVX rows). core-pls-* and core-shd-* live in
+            // coreFieldLoaded too (for the "has this ever loaded" bookkeeping
+            // used elsewhere), but they're rendered separately above in
+            // fetchOnChainData - sweeping them here as well was overwriting a
+            // legitimately still-loading PLS market cap (waiting on
+            // fetchPlsTotalSupply, which resolves slightly later than this
+            // first on-chain round) with "Unavailable" every single call.
+            CORE_TOKENS.forEach(t => {
+                ['price', 'mcap', 'liquidity'].forEach(suffix => {
+                    const id = `core-${t.id}-${suffix}`;
+                    if (!coreFieldLoaded[id]) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = 'Unavailable';
+                    }
+                });
+            });
+        }
+
         const MULTICALL3_ADDRESS = "0xcA11bde05977b3631167028862bE2a173976CA11";
         const MULTICALL3_ABI = [
             "function aggregate3(tuple(address target, bool allowFailure, bytes callData)[] calls) returns (tuple(bool success, bytes returnData)[] returnData)"
@@ -2438,10 +2830,12 @@
                 "function getFaucetBalance() view returns (uint256)",
                 "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
                 "function token0() view returns (address)",
+                "function token1() view returns (address)",
                 "function totalMinted() view returns (uint256)",
                 "function getEthBalance(address addr) view returns (uint256 balance)",
                 "function ownerOf(uint256 tokenId) view returns (address)",
-                "function totalSupply() view returns (uint256)"
+                "function totalSupply() view returns (uint256)",
+                "function decimals() view returns (uint8)"
             ]);
         } catch (err) {
             console.error("ethers.js failed to load — on-chain stats will show as unavailable:", err);
@@ -2454,6 +2848,44 @@
         let shdPriceLoaded = false;
 
         const poolToken0Cache = { v1: null, v2: null, pls: null };
+
+        // --- PulseChain Core (HEX / PLSX / INC / PRVX) ---
+        // Prices/market cap/liquidity are derived on-chain from each token's
+        // WPLS pair reserves (same approach as SHD above), converted to USD
+        // via the already-computed plsUsdPrice. DexScreener is only used for
+        // the 24h % change, which isn't derivable from a single reserves
+        // snapshot (see fetchCoreTokensChange near fetchPrimaryMarketData).
+        const CORE_TOKENS = [
+            { id: 'hex',  address: '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39', pair: '0xf1F4ee610b2bAbB05C635F726eF8B0C568c8dc65' },
+            { id: 'plsx', address: '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab', pair: '0x1b45b9148791d3a104184Cd5DFE5CE57193a3ee9' },
+            { id: 'inc',  address: '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d', pair: '0xf808Bb6265e9Ca27002c0A04562Bf50d4FE37EAA' },
+            { id: 'prvx', address: '0xF6f8Db0aBa00007681F8fAF16A0FDa1c9B030b11', pair: '0x7f681a5aD615238357bA148C281E2EAEfd2dE55A' }
+        ];
+
+        // Which side of each pair the core token sits on, its own decimals,
+        // and the quote-side (other) token's address/decimals - fetched once
+        // each and cached, same pattern as poolToken0Cache. Kept fully
+        // generic rather than assuming every pair is quoted in WPLS: HEX
+        // uses 8 decimals instead of 18, and PRVX's pair is quoted in USDC
+        // rather than WPLS, so both the core token's and the quote token's
+        // decimals are read on-chain instead of assumed.
+        const coreTokenMeta = {};
+        CORE_TOKENS.forEach(t => { coreTokenMeta[t.id] = { pairToken0: null, pairToken1: null, isToken0: null, decimals: null, quoteAddress: null, quoteDecimals: null }; });
+
+        // Tracks whether each core-token field has ever loaded a real value,
+        // so a later transient failure leaves the last-known-good value on
+        // screen instead of blanking it.
+        const coreFieldLoaded = {
+            'core-pls-price': false, 'core-pls-mcap': false, 'core-pls-liquidity': false,
+            'core-shd-price': false, 'core-shd-mcap': false, 'core-shd-liquidity': false
+        };
+        const coreChangeLoaded = { pls: false, shd: false };
+        CORE_TOKENS.forEach(t => {
+            coreFieldLoaded[`core-${t.id}-price`] = false;
+            coreFieldLoaded[`core-${t.id}-mcap`] = false;
+            coreFieldLoaded[`core-${t.id}-liquidity`] = false;
+            coreChangeLoaded[t.id] = false;
+        });
 
         function buildOnChainCalls() {
             const calls = [
@@ -2473,6 +2905,37 @@
             if (!poolToken0Cache.v1) calls.push({ target: LIQUIDITY_PAIRS.v1, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
             if (!poolToken0Cache.v2) calls.push({ target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
             if (!poolToken0Cache.pls) calls.push({ target: PLS_PAIR_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
+
+            // --- PulseChain Core tokens ---
+            // Fixed calls (reserves + totalSupply) always run; the one-time
+            // pair-token/decimals lookups are only appended until each is
+            // cached. Decoding in fetchOnChainData walks the results in this
+            // exact same order (fixed loop, then the two conditional loops -
+            // quote decimals depends on quoteAddress being resolved, so it's
+            // a separate pass).
+            //
+            // We fetch BOTH token0() and token1() for each pair rather than
+            // assuming the core token is always token0 and the quote is
+            // always token1: pair contracts sort their two tokens by
+            // ascending address, and for PRVX/USDC specifically PRVX's own
+            // address sorts *after* USDC's, making PRVX token1 in its own
+            // pair. Assuming "quote = token1()" there would return PRVX's
+            // own address as the quote, not USDC's.
+            CORE_TOKENS.forEach(t => {
+                calls.push({ target: t.pair, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") });
+                calls.push({ target: t.address, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalSupply") });
+            });
+            CORE_TOKENS.forEach(t => {
+                const meta = coreTokenMeta[t.id];
+                if (meta.pairToken0 === null) calls.push({ target: t.pair, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token0") });
+                if (meta.pairToken1 === null) calls.push({ target: t.pair, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("token1") });
+                if (meta.decimals === null) calls.push({ target: t.address, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("decimals") });
+            });
+            CORE_TOKENS.forEach(t => {
+                const meta = coreTokenMeta[t.id];
+                if (meta.quoteAddress && meta.quoteDecimals === null) calls.push({ target: meta.quoteAddress, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("decimals") });
+            });
+
             return calls;
         }
 
@@ -2524,6 +2987,20 @@
 
         async function fetchOnChainData() {
             try {
+                // Snapshot which core tokens already had a resolved quoteAddress
+                // BEFORE this round's calls are built. buildOnChainCalls() only
+                // queues a decimals(quoteAddress) call when quoteAddress was
+                // already known at that moment. Decoding later mutates
+                // meta.quoteAddress (once token1() comes back), so if we re-read
+                // the live value during decode instead of this snapshot, the
+                // round that first resolves quoteAddress will think a decimals
+                // result is waiting in `results` when none was ever requested -
+                // misaligning every read after it.
+                const quoteAddressKnownBeforeBuild = {};
+                CORE_TOKENS.forEach(t => {
+                    quoteAddressKnownBeforeBuild[t.id] = coreTokenMeta[t.id].quoteAddress !== null;
+                });
+
                 const calls = buildOnChainCalls();
                 const results = await withRpcFallback((provider) => {
                     const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
@@ -2554,6 +3031,95 @@
                     if (token0) poolToken0Cache.pls = token0[0];
                 }
 
+                // --- PulseChain Core tokens: decode raw reserves/supply now,
+                // render once plsUsdPrice is computed further down.
+                const coreRawData = {};
+                CORE_TOKENS.forEach(t => {
+                    coreRawData[t.id] = {
+                        reserves: decodeResult("getReserves", results[i++]),
+                        totalSupply: decodeResult("totalSupply", results[i++])
+                    };
+                });
+                CORE_TOKENS.forEach(t => {
+                    const meta = coreTokenMeta[t.id];
+                    if (meta.pairToken0 === null) {
+                        const r = decodeResult("token0", results[i++]);
+                        if (r) meta.pairToken0 = r[0];
+                    }
+                    if (meta.pairToken1 === null) {
+                        const r = decodeResult("token1", results[i++]);
+                        if (r) meta.pairToken1 = r[0];
+                    }
+                    if (meta.decimals === null) {
+                        const dec = decodeResult("decimals", results[i++]);
+                        if (dec) meta.decimals = dec[0];
+                    }
+                    // Derive which side is the core token and which is the
+                    // quote from the actual pair-token addresses, rather than
+                    // assuming the core token is always token0 - PRVX sorts
+                    // as token1 in its own USDC pair, so "quote = token1()"
+                    // would otherwise resolve to PRVX itself.
+                    if (meta.isToken0 === null && meta.pairToken0) {
+                        meta.isToken0 = meta.pairToken0.toLowerCase() === t.address.toLowerCase();
+                    }
+                    if (meta.quoteAddress === null && meta.pairToken0 && meta.pairToken1) {
+                        meta.quoteAddress = meta.isToken0 ? meta.pairToken1 : meta.pairToken0;
+                        // WPLS's decimals are already known (18, same as
+                        // every other token on this page) so skip the
+                        // extra on-chain lookup in that common case -
+                        // only a non-WPLS quote (e.g. PRVX's USDC pair)
+                        // needs its own decimals() call below.
+                        if (meta.quoteAddress.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase()) {
+                            meta.quoteDecimals = 18;
+                        }
+                    }
+                });
+                CORE_TOKENS.forEach(t => {
+                    const meta = coreTokenMeta[t.id];
+                    if (quoteAddressKnownBeforeBuild[t.id] && meta.quoteDecimals === null) {
+                        const dec = decodeResult("decimals", results[i++]);
+                        if (dec) meta.quoteDecimals = dec[0];
+                    }
+                });
+
+                // A quote address that resolves for the very first time this round
+                // (e.g. PRVX's USDC pair, discovered from the token0()/token1() calls
+                // above) can't have had its decimals() call queued in buildOnChainCalls()
+                // - that function only queues it once quoteAddress was ALREADY known,
+                // i.e. one round earlier. Without this, a newly-discovered non-WPLS
+                // quote token sits with quoteDecimals === null for a full extra polling
+                // interval (60s), during which renderCoreTokens() below skips that
+                // token entirely and shows "Unavailable" for its price/mcap/liquidity.
+                // Fetch any such missing decimals() right now, in the same round, so
+                // the token can render immediately instead of waiting for round 2.
+                const pendingQuoteDecimalsCalls = [];
+                const pendingQuoteDecimalsTokenIds = [];
+                CORE_TOKENS.forEach(t => {
+                    const meta = coreTokenMeta[t.id];
+                    if (meta.quoteAddress && meta.quoteDecimals === null) {
+                        pendingQuoteDecimalsCalls.push({
+                            target: meta.quoteAddress,
+                            allowFailure: true,
+                            callData: ON_CHAIN_ABI.encodeFunctionData("decimals")
+                        });
+                        pendingQuoteDecimalsTokenIds.push(t.id);
+                    }
+                });
+                if (pendingQuoteDecimalsCalls.length) {
+                    try {
+                        const quoteDecResults = await withRpcFallback((provider) => {
+                            const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+                            return multicall.callStatic.aggregate3(pendingQuoteDecimalsCalls);
+                        });
+                        pendingQuoteDecimalsTokenIds.forEach((id, idx) => {
+                            const dec = decodeResult("decimals", quoteDecResults[idx]);
+                            if (dec) coreTokenMeta[id].quoteDecimals = dec[0];
+                        });
+                    } catch (e) {
+                        console.error("Quote decimals fetch error:", e);
+                    }
+                }
+
                 if (totalMined) { document.getElementById('total-mined').textContent = formatTokenAmount(Number(ethers.utils.formatEther(totalMined[0]))) + " SHD"; onChainFieldLoaded['total-mined'] = true; }
                 if (contractBalance) { document.getElementById('contract-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(contractBalance[0]))) + " SHD"; onChainFieldLoaded['contract-balance'] = true; }
                 if (rewardReserve) { document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD"; onChainFieldLoaded['reward-reserve'] = true; }
@@ -2567,13 +3133,38 @@
                 if (poolToken0Cache.pls) {
                     plsUsdPrice = reservesToPlsUsdPrice(plsReserves, poolToken0Cache.pls);
                 }
+                if (plsUsdPrice) lastPlsUsdPrice = plsUsdPrice;
                 if (plsUsdPrice) {
                     renderTickerPrice('pls-price', plsUsdPrice);
+                    renderTickerPrice('core-pls-price', plsUsdPrice);
+                    coreFieldLoaded['core-pls-price'] = true;
                     plsPriceLoaded = true;
+
+                    // PLS liquidity, shown in the Core row - reuses the same
+                    // WPLS/DAI reference pool reserves already decoded above
+                    // for plsUsdPrice, so no extra RPC call is needed.
+                    if (poolToken0Cache.pls && plsReserves) {
+                        const isPlsToken0 = poolToken0Cache.pls.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase();
+                        const plsReserveAmt = Number(ethers.utils.formatEther(isPlsToken0 ? plsReserves.reserve0 : plsReserves.reserve1));
+                        setCoreCellText('core-pls-liquidity', `$${Math.round(2 * plsReserveAmt * plsUsdPrice).toLocaleString()}`);
+                        coreFieldLoaded['core-pls-liquidity'] = true;
+                    }
+
+                    // PLS market cap, via PulseChain's explorer stats API -
+                    // there's no ERC20 totalSupply() to call since PLS is the
+                    // native coin, not a contract. plsTotalSupply may still be
+                    // null here on the very first call (it resolves slightly
+                    // later, over in fetchPlsTotalSupply) - renderPlsMarketCap()
+                    // no-ops in that case and fetchPlsTotalSupply paints the
+                    // cell itself as soon as it finishes, instead of this cell
+                    // being stuck until the next 60s on-chain poll.
+                    renderPlsMarketCap();
                 } else if (!plsPriceLoaded) {
                     const plsEl = document.getElementById('pls-price');
                     if (plsEl) plsEl.textContent = 'Unavailable';
                 }
+
+                renderCoreTokens(coreRawData, plsUsdPrice);
 
                 let v1LiquidityUsd = null;
                 let v2LiquidityUsd = null;
@@ -2588,6 +3179,8 @@
                             const shdUsdPrice = (pool.pls / pool.shd) * plsUsdPrice;
                             document.getElementById('shd-price').textContent = `$${shdUsdPrice.toFixed(8)}`;
                             renderTickerPrice('shd-ticker-price', shdUsdPrice);
+                            renderTickerPrice('core-shd-price', shdUsdPrice);
+                            coreFieldLoaded['core-shd-price'] = true;
                             shdPriceLoaded = true;
 
                             // --- Market cap: on-chain totalSupply x on-chain SHD price ---
@@ -2595,6 +3188,8 @@
                                 const supply = Number(ethers.utils.formatEther(totalSupply[0]));
                                 document.getElementById('shd-market-cap').textContent = `$${Math.round(supply * shdUsdPrice).toLocaleString()}`;
                                 onChainFieldLoaded['shd-market-cap'] = true;
+                                setCoreCellText('core-shd-mcap', `$${Math.round(supply * shdUsdPrice).toLocaleString()}`);
+                                coreFieldLoaded['core-shd-mcap'] = true;
                             }
                         }
 
@@ -2628,6 +3223,8 @@
                     const totalLiquidity = (v1LiquidityUsd || 0) + (v2LiquidityUsd || 0);
                     document.getElementById('shd-liquidity').textContent = `$${Math.round(totalLiquidity).toLocaleString()}`;
                     onChainFieldLoaded['shd-liquidity'] = true;
+                    setCoreCellText('core-shd-liquidity', `$${Math.round(totalLiquidity).toLocaleString()}`);
+                    coreFieldLoaded['core-shd-liquidity'] = true;
                 } else if (!onChainFieldLoaded['shd-liquidity']) {
                     const liqEl = document.getElementById('shd-liquidity');
                     if (liqEl) liqEl.textContent = 'Unavailable';
@@ -2643,6 +3240,12 @@
                 // already show a real value keep it instead of flashing "Error".
                 Object.keys(onChainFieldLoaded).forEach((id) => {
                     if (!onChainFieldLoaded[id]) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = "Error";
+                    }
+                });
+                Object.keys(coreFieldLoaded).forEach((id) => {
+                    if (!coreFieldLoaded[id]) {
                         const el = document.getElementById(id);
                         if (el) el.textContent = "Error";
                     }
@@ -2695,10 +3298,20 @@
             // before the retry logic could catch up).
             fetchPrices();
             fetchOnChainData();
+            // fetchPlsTotalSupply hits PulseChain's explorer API, a different
+            // host from DexScreener/CoinGecko, so it doesn't contend with the
+            // rate-limit concern the other calls above are staggered for -
+            // starting it immediately (instead of after a delay) lets it race
+            // fetchOnChainData rather than lose to it by default. Whichever of
+            // the two finishes second now paints core-pls-mcap via
+            // renderPlsMarketCap(), so this no longer sits on "Loading..." /
+            // "Unavailable" for a full extra 60s poll cycle.
+            fetchPlsTotalSupply();
             setTimeout(fetchShdHolderCount, 500);
             priceInterval = setInterval(fetchPrices, 45000);
             onChainInterval = setInterval(fetchOnChainData, 60000);
             holderInterval = setInterval(fetchShdHolderCount, 90000);
+            plsSupplyInterval = setInterval(fetchPlsTotalSupply, 300000);
         }
 
         document.addEventListener('visibilitychange', () => {
@@ -2706,6 +3319,7 @@
                 if (priceInterval) clearInterval(priceInterval);
                 if (onChainInterval) clearInterval(onChainInterval);
                 if (holderInterval) clearInterval(holderInterval);
+                if (plsSupplyInterval) clearInterval(plsSupplyInterval);
             } else {
                 startPolling();
             }
