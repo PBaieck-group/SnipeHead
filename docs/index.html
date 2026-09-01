@@ -6,7 +6,7 @@
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.gigatheminter.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -1242,6 +1242,211 @@
             margin: 0 1px;
         }
 
+        /* ---------- Recent Transactions ---------- */
+        .tx-list {
+            overflow: hidden;
+        }
+
+        .tx-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tx-header .section-title {
+            margin-bottom: 0;
+        }
+
+        .tx-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        #tx-status.tx-status-error {
+            color: var(--red);
+        }
+
+        .tx-table-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 13.5rem; /* ~header + 4 rows visible; scroll for the rest */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .tx-table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .tx-table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 3px;
+        }
+
+        .tx-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+            min-width: 720px;
+        }
+
+        .tx-table thead th {
+            text-align: left;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0.7rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 1;
+        }
+
+        .tx-table tbody td {
+            padding: 0.75rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .tx-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tx-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tx-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+        }
+
+        .tx-type.buy {
+            color: var(--green);
+            background: var(--green-soft);
+        }
+
+        .tx-type.sell {
+            color: var(--red);
+            background: var(--red-soft);
+        }
+
+        .tx-pool {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.15rem 0.45rem;
+            border-radius: 5px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .tx-pool.v1 { color: var(--violet); border-color: rgba(167, 139, 250, 0.3); }
+        .tx-pool.v2 { color: var(--accent); border-color: var(--accent-border); }
+
+        .tx-addr {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .tx-addr a {
+            color: var(--text-secondary);
+            transition: color 0.15s;
+        }
+        .tx-addr a:hover { color: var(--accent); }
+
+        .tx-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .tx-empty, .tx-loading {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .tx-amount {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .tx-usd {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            /* Header row is hidden below, so each stacked card needs to be tall
+               enough to show a handful of rows before scrolling internally. */
+            .tx-table-wrap {
+                max-height: 26rem;
+            }
+            .tx-table {
+                min-width: 0;
+                display: block;
+            }
+            .tx-table thead { display: none; }
+            .tx-table tbody { display: block; }
+            .tx-table tr {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem 0.75rem;
+                padding: 0.9rem 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .tx-table td {
+                border: none !important;
+                padding: 0 !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere;
+            }
+            /* Column headers are hidden on mobile, so each value gets its own
+               small inline label (set via data-label in JS) instead. */
+            .tx-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: var(--text-muted);
+                margin-bottom: 0.15rem;
+            }
+            .tx-table td:nth-child(1) { grid-column: 1; }
+            .tx-table td:nth-child(2) { grid-column: 2; text-align: right; }
+            .tx-table td:nth-child(2)::before { text-align: right; }
+            .tx-table td:nth-child(3) { grid-column: 1; }
+            .tx-table td:nth-child(4) { grid-column: 2; text-align: right; }
+            .tx-table td:nth-child(4)::before { text-align: right; }
+            .tx-table td:nth-child(5) { grid-column: 1; }
+            .tx-table td:nth-child(6) { grid-column: 2; text-align: right; }
+            .tx-table td:nth-child(6)::before { text-align: right; }
+            .tx-table td:nth-child(7) { grid-column: 1 / -1; }
+            .tx-table td:nth-child(8) { grid-column: 1 / -1; }
+            .tx-table td[colspan] { grid-column: 1 / -1; }
+        }
+
         /* Footer */
         footer {
             border-top: 1px solid var(--border);
@@ -1477,6 +1682,10 @@
                     <a href="#chart" class="side-link">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                         Chart &amp; Swap
+                    </a>
+                    <a href="#transactions" class="side-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"/></svg>
+                        Transactions
                     </a>
                     <a href="#core" class="side-link">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m-4-5v5m8-8v8M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -1725,6 +1934,41 @@
                     </div>
                 </section>
 
+                <!-- Recent Transactions -->
+                <section class="section" id="transactions">
+                    <div class="tx-header">
+                        <h3 class="section-title">Recent Transactions</h3>
+                        <div class="tx-meta">
+                            <span id="tx-status">Loading swaps…</span>
+                            <button type="button" class="dexscreener-reload-btn" id="tx-reload-btn" onclick="manualReloadTransactions(this)" aria-label="Reload transactions">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                Reload
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card tx-list card-static">
+                        <div class="tx-table-wrap">
+                            <table class="tx-table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>USD</th>
+                                        <th>SHD</th>
+                                        <th>WPLS</th>
+                                        <th>Price</th>
+                                        <th>Pool</th>
+                                        <th>Trader</th>
+                                        <th>Block</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tx-tbody">
+                                    <tr><td colspan="8" class="tx-loading">Fetching latest swaps from V1 &amp; V2 pools…</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- PulseChain Core -->
                 <section class="section" id="core">
                     <h3 class="section-title">PulseChain Core</h3>
@@ -1968,7 +2212,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.3.1</p>
+                    <p class="footer-version">v4.4.0</p>
                 </div>
             </footer>
         </div>
@@ -2509,7 +2753,7 @@
         // respond - total supply moves slowly enough that a static
         // approximate figure is a reasonable last resort, not just a raw
         // guess.
-        const PLS_TOTAL_SUPPLY_FALLBACK = 14814814814815; // approx, as of writing - update periodically
+        const PLS_TOTAL_SUPPLY_FALLBACK = 135085881560694; // approx, per CoinGecko as of writing - update periodically
         let plsTotalSupply = null;
         // Cached from the most recent successful on-chain reserves read, so that
         // whenever plsTotalSupply finishes loading (which races the very first
@@ -2556,7 +2800,26 @@
             } catch (e) {
                 console.error("PLS total supply fetch error (legacy):", e);
             }
-            // Both live sources failed. If we've never successfully loaded a
+            // Both PulseChain-explorer sources failed (in practice they fail every
+            // time - the v2/stats endpoint doesn't populate market_cap/coin_price
+            // for the native coin on this instance, and the legacy module is
+            // deprecated). Before giving up, try CoinGecko's coin endpoint, which
+            // does reliably report total_supply for PulseChain.
+            try {
+                const cgData = await fetchJsonWithRetry(
+                    'https://api.coingecko.com/api/v3/coins/pulsechain?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false',
+                    {
+                        retries: 1, baseDelayMs: 900,
+                        validate: d => Number(d?.market_data?.total_supply) > 0
+                    }
+                );
+                plsTotalSupply = Number(cgData.market_data.total_supply);
+                renderPlsMarketCap();
+                return;
+            } catch (e) {
+                console.error("PLS total supply fetch error (coingecko):", e);
+            }
+            // All live sources failed. If we've never successfully loaded a
             // real value (i.e. this isn't just a transient blip on top of a
             // last-known-good number), fall back to the pinned estimate
             // rather than leaving market cap on "Loading..." indefinitely.
@@ -2657,14 +2920,12 @@
             "https://rpc.pulsechain.com",
             "https://rpc-pulsechain.g4mm4.io",
             "https://pulsechain-rpc.publicnode.com",
-            "https://rpc.gigatheminter.com",
             "https://rpc.pulsechainstats.com"
         ];
         const RPC_LABELS = {
             "https://rpc.pulsechain.com": "rpc.pulsechain.com",
             "https://rpc-pulsechain.g4mm4.io": "g4mm4.io",
             "https://pulsechain-rpc.publicnode.com": "publicnode.com",
-            "https://rpc.gigatheminter.com": "gigatheminter.com",
             "https://rpc.pulsechainstats.com": "pulsechainstats.com",
         };
         const RPC_HEALTHCHECK_TIMEOUT_MS = 5000;
@@ -2741,6 +3002,23 @@
             v1: "0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8",
             v2: "0x6d8a9F5726A5e67aC1Cd7F558Fe5B289e95ba232"
         };
+
+        // PulseX routers (used to identify maker vs router in Swap events)
+        const PULSEX_ROUTERS = {
+            v1: "0x98bf93ebf5c380C0e6Ae8e192A7e2AE08edAcc02".toLowerCase(),
+            v2: "0x165C3410fC91EF562C50559f7d2289fEbed552d9".toLowerCase()
+        };
+        const SWAP_TOPIC0 = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
+        const TX_LOOKBACK_BLOCKS = 3000; // max lookback ~8h; usually stops earlier once we have enough swaps
+        const TX_DISPLAY_LIMIT = 20;
+        let txInterval = null;
+        let lastKnownPlsUsdForTx = null;
+        let txLoadedOnce = false;
+        // Which side SHD sits on in each pool (cached after first successful decode path)
+        const txPoolShdIsToken0 = { v1: null, v2: null };
+        // Incrementing token so a slow, stale fetch (e.g. one that had to scan more
+        // chunks on a quiet pool) can never overwrite a newer, already-rendered result.
+        let txFetchToken = 0;
 
         function formatFullTokenAmount(value) {
             return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -3291,6 +3569,282 @@
             }
         }
 
+        function topicToAddress(topic) {
+            if (!topic || topic.length < 42) return null;
+            return ('0x' + topic.slice(-40)).toLowerCase();
+        }
+
+        function formatTxAmount(n) {
+            if (typeof n !== 'number' || !isFinite(n)) return '—';
+            if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+            if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
+            if (n >= 1) return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            if (n >= 0.01) return n.toFixed(4);
+            return n.toFixed(6);
+        }
+
+        function formatTxUsd(n) {
+            if (typeof n !== 'number' || !isFinite(n) || n <= 0) return '—';
+            if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+            if (n >= 1) return '$' + n.toFixed(2);
+            if (n >= 0.01) return '$' + n.toFixed(4);
+            return '$' + n.toFixed(6);
+        }
+
+        function formatTxPrice(n) {
+            if (typeof n !== 'number' || !isFinite(n) || n <= 0) return '—';
+            if (n >= 1) return '$' + n.toFixed(4);
+            if (n >= 0.0001) return '$' + n.toFixed(6);
+            return '$' + n.toFixed(8);
+        }
+
+        function decodeSwapLog(log, poolKey, shdIsToken0) {
+            // data = amount0In, amount1In, amount0Out, amount1Out (4 x uint256)
+            const data = log.data;
+            if (!data || data.length < 2 + 64 * 4) return null;
+            const hex = data.slice(2);
+            const amount0In = BigInt('0x' + hex.slice(0, 64));
+            const amount1In = BigInt('0x' + hex.slice(64, 128));
+            const amount0Out = BigInt('0x' + hex.slice(128, 192));
+            const amount1Out = BigInt('0x' + hex.slice(192, 256));
+
+            const sender = topicToAddress(log.topics[1]);
+            const to = topicToAddress(log.topics[2]);
+
+            let shdIn, shdOut, wplsIn, wplsOut;
+            if (shdIsToken0) {
+                shdIn = amount0In; shdOut = amount0Out;
+                wplsIn = amount1In; wplsOut = amount1Out;
+            } else {
+                shdIn = amount1In; shdOut = amount1Out;
+                wplsIn = amount0In; wplsOut = amount0Out;
+            }
+
+            // Buy SHD = SHD leaves the pool (amountOut > 0 for SHD)
+            // Sell SHD = SHD enters the pool (amountIn > 0 for SHD)
+            const isBuy = shdOut > 0n && shdIn === 0n;
+            const isSell = shdIn > 0n && shdOut === 0n;
+            if (!isBuy && !isSell) return null; // skip weird / dual-sided
+
+            const shdRaw = isBuy ? shdOut : shdIn;
+            const wplsRaw = isBuy ? wplsIn : wplsOut;
+            const shdAmt = Number(ethers.utils.formatEther(shdRaw));
+            const wplsAmt = Number(ethers.utils.formatEther(wplsRaw));
+            if (!shdAmt || !wplsAmt) return null;
+
+            const priceInPls = wplsAmt / shdAmt;
+            const plsUsd = lastKnownPlsUsdForTx || lastPlsUsdPrice;
+            const priceUsd = plsUsd ? priceInPls * plsUsd : null;
+            const usdValue = plsUsd ? wplsAmt * plsUsd : null;
+
+            // Prefer the non-router side as the trader (DexScreener-style maker)
+            const routers = new Set([PULSEX_ROUTERS.v1, PULSEX_ROUTERS.v2]);
+            let trader = to;
+            if (!trader || routers.has(trader) || trader === LIQUIDITY_PAIRS[poolKey].toLowerCase()) {
+                trader = sender;
+            }
+            if (trader && routers.has(trader)) {
+                // still a router — keep `to` as fallback
+                trader = to || sender;
+            }
+
+            return {
+                type: isBuy ? 'buy' : 'sell',
+                shd: shdAmt,
+                wpls: wplsAmt,
+                priceUsd,
+                usdValue,
+                pool: poolKey,
+                trader,
+                txHash: log.transactionHash,
+                blockNumber: parseInt(log.blockNumber, 16),
+                logIndex: parseInt(log.logIndex, 16)
+            };
+        }
+
+        async function resolvePoolToken0(provider, pairAddress) {
+            const iface = new ethers.utils.Interface(['function token0() view returns (address)']);
+            const data = iface.encodeFunctionData('token0');
+            const result = await provider.call({ to: pairAddress, data });
+            const decoded = iface.decodeFunctionResult('token0', result);
+            return decoded[0].toLowerCase();
+        }
+
+        // Fetch a log range, automatically splitting into smaller windows only if the
+        // RPC actually rejects the range (some public endpoints cap eth_getLogs width).
+        // This keeps the common case at one round trip instead of always assuming
+        // the provider needs small requests.
+        async function getLogsResilient(provider, pairAddress, fromBlock, toBlock, depth = 0) {
+            try {
+                return await provider.getLogs({
+                    address: pairAddress,
+                    fromBlock,
+                    toBlock,
+                    topics: [SWAP_TOPIC0]
+                });
+            } catch (e) {
+                if (depth >= 4 || toBlock - fromBlock < 100) {
+                    console.warn(`getLogs ${pairAddress} ${fromBlock}-${toBlock} failed, giving up on this slice:`, e.message);
+                    return [];
+                }
+                const mid = fromBlock + Math.floor((toBlock - fromBlock) / 2);
+                const [a, b] = await Promise.all([
+                    getLogsResilient(provider, pairAddress, fromBlock, mid, depth + 1),
+                    getLogsResilient(provider, pairAddress, mid + 1, toBlock, depth + 1)
+                ]);
+                return [...a, ...b];
+            }
+        }
+
+        // Most pools have enough recent activity that a single call over a modest,
+        // recent window already covers the target count — try that first (one round
+        // trip) instead of always crawling backward in small fixed-size chunks, which
+        // cost one round trip each even when a chunk turns up nothing.
+        async function fetchRecentSwapLogs(provider, pairAddress, fromBlock, toBlock, limit) {
+            const FAST_WINDOW = 600; // ~30-40 min of PulseChain blocks; covers most cases in one call
+            const fastStart = Math.max(fromBlock, toBlock - FAST_WINDOW + 1);
+
+            let logs = await getLogsResilient(provider, pairAddress, fastStart, toBlock);
+
+            if (logs.length < limit && fastStart > fromBlock) {
+                // Fast window wasn't enough (quiet pool) — pull the rest of the
+                // lookback in one more call rather than many small chunks.
+                const rest = await getLogsResilient(provider, pairAddress, fromBlock, fastStart - 1);
+                logs = logs.concat(rest);
+            }
+
+            return logs;
+        }
+
+        async function fetchRecentTransactions() {
+            if (document.hidden) return;
+            const statusEl = document.getElementById('tx-status');
+            const tbody = document.getElementById('tx-tbody');
+            if (!tbody) return;
+
+            // Claim this call's slot. If a newer call finishes first and bumps the
+            // token again, this call's result is stale and must not render.
+            const myToken = ++txFetchToken;
+
+            try {
+                if (lastPlsUsdPrice) lastKnownPlsUsdForTx = lastPlsUsdPrice;
+
+                const provider = await getWorkingProvider();
+                const latest = await provider.getBlockNumber();
+                const fromBlock = Math.max(0, latest - TX_LOOKBACK_BLOCKS);
+
+                // Resolve which side SHD is on for each pool (once), in parallel —
+                // these two calls are independent so no reason to wait on one before
+                // starting the other.
+                await Promise.all(['v1', 'v2'].map(async (key) => {
+                    if (txPoolShdIsToken0[key] !== null) return;
+                    // Prefer already-cached poolToken0Cache from on-chain multicall
+                    const cached = poolToken0Cache[key];
+                    if (cached) {
+                        txPoolShdIsToken0[key] = cached.toLowerCase() === SHD_TOKEN_ADDRESS.toLowerCase();
+                    } else {
+                        const token0 = await resolvePoolToken0(provider, LIQUIDITY_PAIRS[key]);
+                        txPoolShdIsToken0[key] = token0 === SHD_TOKEN_ADDRESS.toLowerCase();
+                        poolToken0Cache[key] = token0;
+                    }
+                }));
+
+                // Newest-first chunks; stop once we have enough logs per pool
+                const perPoolTarget = TX_DISPLAY_LIMIT;
+                const [logsV1, logsV2] = await Promise.all([
+                    fetchRecentSwapLogs(provider, LIQUIDITY_PAIRS.v1, fromBlock, latest, perPoolTarget),
+                    fetchRecentSwapLogs(provider, LIQUIDITY_PAIRS.v2, fromBlock, latest, perPoolTarget)
+                ]);
+
+                const decoded = [];
+                for (const log of logsV1) {
+                    const d = decodeSwapLog(log, 'v1', txPoolShdIsToken0.v1);
+                    if (d) decoded.push(d);
+                }
+                for (const log of logsV2) {
+                    const d = decodeSwapLog(log, 'v2', txPoolShdIsToken0.v2);
+                    if (d) decoded.push(d);
+                }
+
+                // Newest first
+                decoded.sort((a, b) => {
+                    if (b.blockNumber !== a.blockNumber) return b.blockNumber - a.blockNumber;
+                    return b.logIndex - a.logIndex;
+                });
+
+                const top = decoded.slice(0, TX_DISPLAY_LIMIT);
+
+                // Bail out if a newer fetch has already started (and possibly already
+                // rendered) while we were awaiting the calls above.
+                if (myToken !== txFetchToken) return;
+
+                renderTransactions(top);
+                txLoadedOnce = true;
+                if (statusEl) {
+                    statusEl.classList.remove('tx-status-error');
+                    statusEl.textContent = top.length
+                        ? `${top.length} recent swaps · V1 & V2`
+                        : 'No recent swaps in lookback window';
+                }
+            } catch (err) {
+                console.error('Recent transactions fetch error:', err);
+                if (myToken !== txFetchToken) return; // superseded — don't stomp a newer result
+                if (!txLoadedOnce && tbody) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">Unable to load swaps. Check RPC connection.</td></tr>`;
+                }
+                if (statusEl) {
+                    statusEl.classList.add('tx-status-error');
+                    statusEl.textContent = txLoadedOnce
+                        ? 'Live updates paused — retrying…'
+                        : 'Error loading swaps';
+                }
+            }
+        }
+
+        function renderTransactions(txs) {
+            const tbody = document.getElementById('tx-tbody');
+            if (!tbody) return;
+            if (!txs.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">No swaps found in the recent block range.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = txs.map(tx => {
+                const typeClass = tx.type === 'buy' ? 'buy' : 'sell';
+                const typeLabel = tx.type === 'buy' ? 'Buy' : 'Sell';
+                const explorerTx = `https://ipfs.scan.pulsechain.com/tx/${tx.txHash}`;
+                const explorerAddr = tx.trader
+                    ? `https://ipfs.scan.pulsechain.com/address/${tx.trader}`
+                    : '#';
+                const timeLabel = `#${tx.blockNumber.toLocaleString()}`;
+                return `<tr>
+                    <td data-label="Type"><span class="tx-type ${typeClass}">${typeLabel}</span></td>
+                    <td data-label="USD"><span class="tx-amount">${formatTxUsd(tx.usdValue)}</span></td>
+                    <td data-label="SHD"><span class="tx-amount">${formatTxAmount(tx.shd)}</span></td>
+                    <td data-label="WPLS"><span class="tx-amount">${formatTxAmount(tx.wpls)}</span></td>
+                    <td data-label="Price"><span class="tx-amount">${formatTxPrice(tx.priceUsd)}</span></td>
+                    <td data-label="Pool"><span class="tx-pool ${tx.pool}">${tx.pool.toUpperCase()}</span></td>
+                    <td class="tx-addr" data-label="Trader"><a href="${explorerAddr}" target="_blank" rel="noopener noreferrer" title="${tx.trader || ''}">${truncateAddress(tx.trader)}</a></td>
+                    <td class="tx-time" data-label="Block"><a href="${explorerTx}" target="_blank" rel="noopener noreferrer" style="color:inherit">${timeLabel}</a></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function manualReloadTransactions(btn) {
+            if (btn) {
+                btn.classList.add('reloading');
+                btn.disabled = true;
+            }
+            fetchRecentTransactions().finally(() => {
+                if (btn) {
+                    setTimeout(() => {
+                        btn.classList.remove('reloading');
+                        btn.disabled = false;
+                    }, 800);
+                }
+            });
+        }
+
         function startPolling() {
             // Stagger the initial calls slightly instead of firing them all in the same
             // instant, to avoid a burst of simultaneous requests on first load
@@ -3308,10 +3862,20 @@
             // "Unavailable" for a full extra 60s poll cycle.
             fetchPlsTotalSupply();
             setTimeout(fetchShdHolderCount, 500);
+            // Transactions hit the blockchain RPC (a different host from the price
+            // APIs above), so there's no rate-limit reason to stagger it — starting
+            // immediately lets its multiple round trips (get block number, resolve
+            // pool token order, fetch logs) run in parallel with the price fetch
+            // instead of queued behind it. USD/price columns just show "—" for the
+            // rare case the price isn't ready yet on this exact first paint; the
+            // next 45s poll fills them in.
+            fetchRecentTransactions();
             priceInterval = setInterval(fetchPrices, 45000);
             onChainInterval = setInterval(fetchOnChainData, 60000);
             holderInterval = setInterval(fetchShdHolderCount, 90000);
             plsSupplyInterval = setInterval(fetchPlsTotalSupply, 300000);
+            if (txInterval) clearInterval(txInterval);
+            txInterval = setInterval(fetchRecentTransactions, 45000);
         }
 
         document.addEventListener('visibilitychange', () => {
@@ -3320,6 +3884,7 @@
                 if (onChainInterval) clearInterval(onChainInterval);
                 if (holderInterval) clearInterval(holderInterval);
                 if (plsSupplyInterval) clearInterval(plsSupplyInterval);
+                if (txInterval) clearInterval(txInterval);
             } else {
                 startPolling();
             }
