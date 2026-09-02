@@ -2212,7 +2212,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.4.0</p>
+                    <p class="footer-version">v4.4.1</p>
                 </div>
             </footer>
         </div>
@@ -3658,8 +3658,8 @@
                 pool: poolKey,
                 trader,
                 txHash: log.transactionHash,
-                blockNumber: parseInt(log.blockNumber, 16),
-                logIndex: parseInt(log.logIndex, 16)
+                blockNumber: log.blockNumber,
+                logIndex: log.logIndex
             };
         }
 
