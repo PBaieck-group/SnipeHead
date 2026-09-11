@@ -1,0 +1,57 @@
+{
+  "name": "Angel SH",
+  "description": "SnipeHead NFT (SNFT) — Divine aim. Golden SH, golden target, halo, white wings, and a gold cross. Heaven has crosshairs too.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/007.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Celestial / Angelic"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Gold Dots + Small Cross"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Gold Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Peaceful"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Halo + Wings + Gold Cross Necklace"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White with Stars"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 92,
+      "display_type": "number"
+    }
+  ]
+}

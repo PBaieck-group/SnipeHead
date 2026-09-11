@@ -1,0 +1,57 @@
+{
+  "name": "Old Blood",
+  "description": "SnipeHead NFT (SNFT) — The wise elder. Years of experience, zero patience for nonsense. White sparse hair, long white beard, eyes closed in quiet judgment.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/016.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Elder / Traditional"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "White Sparse"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "Long White Beard"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Stoic"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "None"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Aged Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 74,
+      "display_type": "number"
+    }
+  ]
+}

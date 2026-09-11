@@ -1,0 +1,57 @@
+{
+  "name": "Fat Pig",
+  "description": "SnipeHead NFT (SNFT) — Heavyset face flanked by two clown masks — one laughing, one crying. The target sits between comedy and tragedy.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/033.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Clown / Duality"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Clown Masks + Ink"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Ambiguous"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Spike + Cross Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 77,
+      "display_type": "number"
+    }
+  ]
+}

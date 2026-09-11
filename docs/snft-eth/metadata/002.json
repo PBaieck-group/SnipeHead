@@ -1,0 +1,57 @@
+{
+  "name": "Man Bladder",
+  "description": "SnipeHead NFT (SNFT) — Ink rains down the face. Open eyes, dripping chaos, spiked and cross earrings. The target never blinks.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/002.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Dark / Grunge"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Paint Splatter"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Spike + Cross Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale with Black Ink"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 58,
+      "display_type": "number"
+    }
+  ]
+}

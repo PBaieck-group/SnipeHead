@@ -1,0 +1,57 @@
+{
+  "name": "Alien Head",
+  "description": "SnipeHead NFT (SNFT) — Deep-set eyes, heavy brow ridges, wrinkled alien skin. The target found something that was never meant to be found.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/024.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Alien / Extraterrestrial"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Stern"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "None"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Alien Grey"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 87,
+      "display_type": "number"
+    }
+  ]
+}

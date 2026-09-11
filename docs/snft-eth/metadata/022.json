@@ -1,0 +1,57 @@
+{
+  "name": "Face Thief",
+  "description": "SnipeHead NFT (SNFT) — The face that wears many masks. Multiple expressions inked into the skin. Every face is temporary.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/022.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Psychological / Mask"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Multiple Masks + Ink"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Ambiguous"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Spike + Cross Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 84,
+      "display_type": "number"
+    }
+  ]
+}

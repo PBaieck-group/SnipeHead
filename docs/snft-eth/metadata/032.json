@@ -1,0 +1,57 @@
+{
+  "name": "Chain Chin",
+  "description": "SnipeHead NFT (SNFT) — User: SH_17. Location: hidden. Status: invisible. Circuit board skin, Tor lock, barcode, and the all-seeing triangle.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/032.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Cyber / Dark Web"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Binary + Circuits + Text"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "All-Seeing Eye Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Anonymous"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Tor Lock + Chain"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale with Digital Decay"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 97,
+      "display_type": "number"
+    }
+  ]
+}

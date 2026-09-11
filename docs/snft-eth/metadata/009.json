@@ -1,0 +1,57 @@
+{
+  "name": "Nothing",
+  "description": "SnipeHead NFT (SNFT) — One red eye, a slow smirk, blood running down the cheek. The target that stares back.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/009.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Dark / Intense"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Blood + Ink"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Menacing"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Spike + Cross Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 62,
+      "display_type": "number"
+    }
+  ]
+}

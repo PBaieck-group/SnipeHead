@@ -1,0 +1,57 @@
+{
+  "name": "Happy Guy",
+  "description": "SnipeHead NFT (SNFT) — The rare genuine smile under the target. Clean, simple, almost disarming.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/023.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Minimal / Friendly"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Happy"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "None"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 38,
+      "display_type": "number"
+    }
+  ]
+}

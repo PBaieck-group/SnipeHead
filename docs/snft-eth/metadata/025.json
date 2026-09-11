@@ -1,0 +1,57 @@
+{
+  "name": "Warm Target",
+  "description": "SnipeHead NFT (SNFT) — Warm freckles, soft smile, heart and star earrings. The most approachable crosshair in the collection.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/025.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Soft / Natural"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Freckles"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Friendly"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Heart + Star Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Fair with Freckles"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 54,
+      "display_type": "number"
+    }
+  ]
+}

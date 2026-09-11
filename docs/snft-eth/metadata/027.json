@@ -1,0 +1,57 @@
+{
+  "name": "Big Back",
+  "description": "SnipeHead NFT (SNFT) — Round face, diamond studs, gold SH pendant. All Eyes On Me written on the cheek like a declaration.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/027.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Flashy / Ego"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Text + Dollar"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Self-Assured"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Diamond Studs + Gold SH Chain"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 76,
+      "display_type": "number"
+    }
+  ]
+}

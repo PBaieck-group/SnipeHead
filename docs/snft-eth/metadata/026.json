@@ -1,0 +1,57 @@
+{
+  "name": "88 Million",
+  "description": "SnipeHead NFT (SNFT) — Wallet balance $88,888,888.88. Lamborghini shades, BTC earrings, solid gold Cuban. The calm of someone who already won.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/026.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Crypto / Whale"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Satisfied"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Lambo Shades + BTC Earrings + Gold Chain"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 94,
+      "display_type": "number"
+    }
+  ]
+}

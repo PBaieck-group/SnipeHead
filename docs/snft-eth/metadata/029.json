@@ -1,0 +1,57 @@
+{
+  "name": "Demon Eye",
+  "description": "SnipeHead NFT (SNFT) — Om and Trishul. White forehead markings, ruby tilak, rudraksha earrings. The third eye sits directly under the target.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/029.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Hindu / Shaivite"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Tilak + Tripundra"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Ruby Lotus Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Meditative"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Rudraksha Earrings + Om + Trishul"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 89,
+      "display_type": "number"
+    }
+  ]
+}

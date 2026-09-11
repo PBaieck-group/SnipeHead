@@ -1,0 +1,57 @@
+{
+  "name": "Truth Is Unity",
+  "description": "SnipeHead NFT (SNFT) — Power Belongs To The People. Protest silhouettes, red star, barcode, raised fist, and the refusal to obey.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/035.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Political / Activist"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Protest Art + Barcode"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Star Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Defiant"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "None"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 82,
+      "display_type": "number"
+    }
+  ]
+}

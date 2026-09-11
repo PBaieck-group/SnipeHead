@@ -1,0 +1,57 @@
+{
+  "name": "Slay Girl",
+  "description": "SnipeHead NFT (SNFT) — Attention is the oxygen. Pink everything, glowing heart target, LOOK AT ME choker, and the energy of someone the algorithm already loves.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/004.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Y2K / Attention Core"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Pink Makeup"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Pink Heart Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Confident"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Choker + Multi Earrings + Bandaid"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale with Pink Accents"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 78,
+      "display_type": "number"
+    }
+  ]
+}

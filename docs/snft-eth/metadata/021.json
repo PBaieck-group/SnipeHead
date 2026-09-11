@@ -1,0 +1,57 @@
+{
+  "name": "Heartlocked",
+  "description": "SnipeHead NFT (SNFT) — Soft pink everything. Heart target, heart earrings, blush, and the gentle closed-eye smile of pure affection.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/021.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Cute / Soft"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Pink Dots + Heart Cheeks"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Pink Heart Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Loving"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Heart Earrings"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale with Blush"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 60,
+      "display_type": "number"
+    }
+  ]
+}

@@ -1,0 +1,3384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SnipeHead (SHD) is a community-powered token on Ethereum. Mine and trade SHD in a decentralized ecosystem.">
+    <meta name="keywords" content="Ethereum, SHD, SnipeHead, DeFi, Mining, Crypto, DEX, Uniswap">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.binance.com https://api.kraken.com https://api.coinbase.com https://api.etherscan.io https://ethereum-rpc.publicnode.com https://rpc.mevblocker.io https://0xrpc.io https://public.1rpc.io https://rpc.nodeflare.app https://rpc.fullsend.to; frame-src https://dexscreener.com https://app.uniswap.org https://thirdweb.com https://*.thirdweb.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <meta property="og:title" content="SnipeHead - Built on Ethereum">
+    <meta property="og:description" content="Mine and trade SHD on Ethereum. Decentralized and unstoppable.">
+    <meta property="og:url" content="https://snipehead.xyz/">
+    <meta property="og:image" content="https://snipehead.xyz/Logo_200.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://snipehead.xyz/Logo_200.png">
+    <meta name="twitter:title" content="SnipeHead - Built on Ethereum">
+    <meta name="twitter:description" content="Mine and trade SHD on Ethereum. Decentralized and unstoppable.">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <title>SnipeHead - Ethereum</title>
+    <link rel="canonical" href="https://snipehead.xyz/">
+    <script
+  src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"
+  integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J"
+  crossorigin="anonymous">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Ethereum-inspired dark theme — primary accent = ETH logo blue */
+            --bg: #0b0c12;
+            --bg-sidebar: #0f111a;
+            --bg-card: #13151f;
+            --bg-card-hover: #191c28;
+            --bg-elevated: #161925;
+            --border: rgba(98, 126, 234, 0.12);
+            --border-hover: rgba(98, 126, 234, 0.28);
+            --text: #f0f2f8;
+            --text-secondary: #9aa3b8;
+            --text-muted: #6b728a;
+            --accent: #627eea;
+            --accent-soft: rgba(98, 126, 234, 0.14);
+            --accent-border: rgba(98, 126, 234, 0.35);
+            --violet: #8b7cf6;
+            --violet-soft: rgba(139, 124, 246, 0.14);
+            --rose: #f472b6;
+            --rose-soft: rgba(244, 114, 182, 0.12);
+            --btc-yellow: #f2a900;
+            --eth-blue: #627eea;
+            --green: #4ade80;
+            --green-soft: rgba(74, 222, 128, 0.1);
+            --red: #f87171;
+            --red-soft: rgba(248, 113, 113, 0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-pill: 999px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+            --shadow-md: 0 12px 36px rgba(8, 12, 28, 0.55);
+            --sidebar-w: 264px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .no-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 2rem;
+            }
+        }
+
+        /* ---------- App shell ---------- */
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            z-index: 200;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: none;
+            }
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 12, 20, 0.45);
+            z-index: 190;
+        }
+
+        #mobile-menu.active ~ .sidebar-overlay {
+            display: block;
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Allow the sidebar to be manually closed on desktop too */
+        @media (min-width: 1024px) {
+            body.desktop-sidebar-closed .sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+            body.desktop-sidebar-closed .content-area {
+                margin-left: 0;
+            }
+            body.desktop-sidebar-closed .hamburger {
+                display: flex;
+            }
+        }
+
+        .sidebar-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 1.35rem 1.1rem 1.25rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+            padding: 0 0.35rem;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .logo-img {
+            height: 32px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        .sidebar-dismiss {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+        }
+        .sidebar-dismiss:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+        /* Close button stays visible on desktop so the sidebar can be dismissed there too */
+
+        .side-group-label {
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 0 0.6rem;
+            margin: 1.15rem 0 0.5rem;
+        }
+
+        .side-group-label:first-of-type {
+            margin-top: 0;
+        }
+
+        .side-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.55rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .side-link:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .side-link.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .side-link svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+        }
+
+        .side-link .ext-icon {
+            width: 12px;
+            height: 12px;
+            margin-left: auto;
+            opacity: 0.5;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .sidebar-status {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.65rem 0.75rem;
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+        }
+
+        .sidebar-socials {
+            display: flex;
+            gap: 0.4rem;
+            padding: 0 0.1rem;
+        }
+
+        .sidebar-socials a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .sidebar-socials a:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+        }
+        .sidebar-socials svg { width: 14px; height: 14px; }
+
+        /* ---------- Content area ---------- */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 1024px) {
+            .content-area {
+                margin-left: var(--sidebar-w);
+                transition: margin-left 0.25s ease;
+            }
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 12, 18, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            height: 66px;
+            padding: 0 1.1rem;
+            min-width: 0;
+        }
+
+        @media (min-width: 768px) {
+            .topbar-inner {
+                padding: 0 2rem;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .topbar-inner {
+                gap: 0.5rem;
+                padding: 0 0.85rem;
+            }
+        }
+
+        .topbar-title {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            flex-shrink: 0;
+            display: none;
+        }
+        @media (min-width: 640px) {
+            .topbar-title { display: block; }
+        }
+
+        .topbar-ticker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0.4rem 0.85rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        /* Below 900px there isn't room for AGE + PLS price together,
+           so keep the ticker pill visible but only show the PLS price. */
+        @media (max-width: 899px) {
+            .topbar-ticker #shd-countdown,
+            .topbar-ticker .ticker-sep {
+                display: none;
+            }
+            .topbar-ticker {
+                gap: 0;
+            }
+        }
+
+        /* BTC/ETH prices are only shown once there's room (desktop);
+           mobile and tablet keep showing just PLS, unchanged. */
+        @media (max-width: 1023px) {
+            .topbar-ticker .ticker-extra {
+                display: none;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .topbar-ticker {
+                font-size: 0.72rem;
+                padding: 0.35rem 0.65rem;
+                gap: 0.4rem;
+            }
+        }
+
+        /* Very narrow phones: trim further so the Buy button never
+           gets pushed off screen. */
+        @media (max-width: 380px) {
+            .topbar-inner {
+                gap: 0.35rem;
+            }
+            .topbar-ticker {
+                font-size: 0.66rem;
+                padding: 0.3rem 0.5rem;
+            }
+            .topbar-ticker .dot {
+                display: none;
+            }
+            .topbar-actions .btn {
+                padding: 0.45rem 0.65rem;
+                font-size: 0.72rem;
+            }
+        }
+
+        .topbar-ticker .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent);
+            flex-shrink: 0;
+        }
+
+        .topbar-spacer {
+            flex: 1;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 479px) {
+            .topbar-actions .btn-secondary {
+                display: none;
+            }
+            .topbar-actions .btn {
+                padding: 0.5rem 0.85rem;
+                font-size: 0.78rem;
+            }
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 1024px) {
+            .hamburger {
+                display: none;
+            }
+        }
+
+        .hamburger span {
+            display: block;
+            height: 2px;
+            width: 18px;
+            background: var(--text-secondary);
+            border-radius: 1px;
+            transition: all 0.2s ease;
+            margin: 0 auto;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .main {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 1.5rem 1.1rem 3.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .main {
+                padding: 2rem 2rem 4rem;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 550;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--text);
+            color: #0a0a0b;
+        }
+
+        .btn-primary:hover {
+            background: #e4e4e7;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border-hover);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-accent {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid var(--accent-border);
+        }
+
+        .btn-accent:hover {
+            background: rgba(98, 126, 234, 0.22);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-static:hover {
+            border-color: var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Hero banner */
+        .hero-banner {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse 60% 90% at 100% 0%, rgba(98, 126, 234, 0.18), transparent 60%),
+                radial-gradient(ellipse 45% 70% at 0% 100%, rgba(139, 124, 246, 0.12), transparent 60%),
+                var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem 1.75rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-pill);
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .hero-banner h1 {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: clamp(1.6rem, 3.6vw, 2.35rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            margin-bottom: 0.85rem;
+        }
+
+        .hero-banner h1 span {
+            color: var(--accent);
+        }
+
+        .hero-sub {
+            font-size: 1.0625rem;
+            color: var(--text-secondary);
+            max-width: 32rem;
+            margin-bottom: 1.75rem;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .stat-card {
+            padding: 1.35rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .stat-sub {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .stat-change {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-top: 0.35rem;
+        }
+
+        .stat-meta {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+        }
+
+        .stat-row-label {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .stat-row-value {
+            font-weight: 600;
+            color: var(--text);
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stat-footer {
+            margin-top: auto;
+            padding-top: 0.85rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .stat-footer a {
+            color: var(--text-muted);
+            transition: color 0.15s;
+        }
+        .stat-footer a:hover {
+            color: var(--text-secondary);
+        }
+
+        .rpc-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            flex-shrink: 0;
+        }
+        .rpc-dot.fallback { background: #d97706; }
+        .rpc-dot.offline { background: var(--red); }
+
+        /* Section */
+        .section {
+            margin-bottom: 2.75rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 1.25rem;
+            color: var(--text);
+        }
+
+        /* Chart & Swap */
+        .chart-swap {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+            .chart-swap {
+                flex-direction: row;
+            }
+            .chart-swap > .chart-col {
+                flex: 2;
+                min-width: 0;
+            }
+            .chart-swap > .swap-col {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        #dexscreener-embed {
+            height: 560px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .dexscreener-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .live-label {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse-soft 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .dexscreener-reload-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.65rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+
+        .dexscreener-reload-btn:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+        }
+
+        .dexscreener-reload-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .dexscreener-reload-btn svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .dexscreener-reload-btn.reloading svg {
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .dexscreener-chart-body {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .dexscreener-chart-body iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        #pulsex-embed {
+            position: relative;
+            height: 560px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            overflow: hidden;
+        }
+
+        #pulsex-embed iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        #uniswap-embed {
+            position: relative;
+            height: 560px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            overflow: hidden;
+        }
+
+        #uniswap-embed iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .widget-fallback {
+            display: none;
+            color: var(--red);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        #pulsex-embed.fallback .widget-fallback {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            #dexscreener-embed { height: 400px; }
+            #pulsex-embed { height: 560px; }
+            #uniswap-embed { height: 560px; }
+        }
+
+        /* PulseChain Core */
+        .core-list {
+            padding: 0.25rem 0;
+            overflow: hidden;
+        }
+
+        .core-row {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 1fr 1fr;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.35rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .core-row:last-child {
+            border-bottom: none;
+        }
+
+        .core-row-head {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding-top: 0.9rem;
+            padding-bottom: 0.7rem;
+        }
+
+        .core-asset {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .core-icon {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .core-symbol {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .core-col {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .core-price-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .core-change {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .core-col[data-label]::before {
+            content: attr(data-label);
+            display: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .core-row {
+                grid-template-columns: 1fr 1fr;
+                row-gap: 0.9rem;
+            }
+            .core-row-head {
+                display: none;
+            }
+            .core-asset {
+                grid-column: 1 / -1;
+            }
+            .core-col[data-label]::before {
+                display: block;
+            }
+            /* Price is the figure people actually scan for, so make it the
+               visually dominant one on mobile - Market Cap and Liquidity
+               were previously sharing identical .core-col sizing, which
+               made a big-digit mcap number read as "bigger" than price
+               purely by digit count, not by design. */
+            .core-col[data-label="Price"] {
+                font-size: 1.15rem;
+                font-weight: 700;
+            }
+            .core-col[data-label="Market Cap"],
+            .core-col[data-label="Liquidity"] {
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: var(--text-secondary);
+            }
+        }
+
+        /* Network details */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .detail-card {
+            padding: 1.5rem;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .detail-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .detail-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+            text-align: right;
+            word-break: break-all;
+        }
+
+        .contract-bar {
+            padding: 1.25rem 1.5rem;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .contract-bar {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .contract-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+        }
+
+        .contract-addr {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.875rem;
+            color: var(--accent);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .contract-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Tools */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .tools-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .tool-card {
+            padding: 1.15rem;
+            display: block;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .tool-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tool-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+        }
+
+        .tool-desc {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* CTA band */
+        .cta-band {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .cta-band h2 {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 1.875rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+        }
+
+        .cta-band h2 span {
+            color: var(--accent);
+        }
+
+        .cta-band p {
+            color: var(--text-secondary);
+            max-width: 28rem;
+            margin: 0 auto 1.5rem;
+            font-size: 0.975rem;
+        }
+
+        .cta-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.65rem;
+        }
+
+        /* Sub-zero-count styling for tiny ticker prices (e.g. $0.0000123) */
+        .core-price-zeros {
+            font-size: 0.65em;
+            font-weight: 600;
+            color: var(--accent);
+            vertical-align: baseline;
+            margin: 0 1px;
+        }
+
+        /* ---------- Recent Transactions ---------- */
+        .tx-list {
+            overflow: hidden;
+        }
+
+        .tx-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tx-header .section-title {
+            margin-bottom: 0;
+        }
+
+        .tx-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        #tx-status.tx-status-error {
+            color: var(--red);
+        }
+
+        .tx-table-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 13.5rem; /* ~header + 4 rows visible; scroll for the rest */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .tx-table-wrap::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .tx-table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 3px;
+        }
+
+        .tx-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+            min-width: 720px;
+        }
+
+        .tx-table thead th {
+            text-align: left;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0.7rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 1;
+        }
+
+        .tx-table tbody td {
+            padding: 0.75rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .tx-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tx-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tx-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+        }
+
+        .tx-type.buy {
+            color: var(--green);
+            background: var(--green-soft);
+        }
+
+        .tx-type.sell {
+            color: var(--red);
+            background: var(--red-soft);
+        }
+
+        .tx-pool {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.15rem 0.45rem;
+            border-radius: 5px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .tx-pool.v1 { color: var(--violet); border-color: rgba(167, 139, 250, 0.3); }
+        .tx-pool.v2 { color: var(--accent); border-color: var(--accent-border); }
+
+        .tx-addr {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .tx-addr a {
+            color: var(--text-secondary);
+            transition: color 0.15s;
+        }
+        .tx-addr a:hover { color: var(--accent); }
+
+        .tx-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .tx-empty, .tx-loading {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .tx-amount {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .tx-usd {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            /* Header row is hidden below, so each stacked card needs to be tall
+               enough to show a handful of rows before scrolling internally. */
+            .tx-table-wrap {
+                max-height: 26rem;
+            }
+            .tx-table {
+                min-width: 0;
+                display: block;
+            }
+            .tx-table thead { display: none; }
+            .tx-table tbody { display: block; }
+            .tx-table tr {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem 0.75rem;
+                padding: 0.9rem 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .tx-table td {
+                border: none !important;
+                padding: 0 !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere;
+            }
+            /* Column headers are hidden on mobile, so each value gets its own
+               small inline label (set via data-label in JS) instead. */
+            .tx-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: var(--text-muted);
+                margin-bottom: 0.15rem;
+            }
+            .tx-table td:nth-child(1) { grid-column: 1; }
+            .tx-table td:nth-child(2) { grid-column: 2; text-align: right; }
+            .tx-table td:nth-child(2)::before { text-align: right; }
+            .tx-table td:nth-child(3) { grid-column: 1; }
+            .tx-table td:nth-child(4) { grid-column: 2; text-align: right; }
+            .tx-table td:nth-child(4)::before { text-align: right; }
+            .tx-table td:nth-child(5) { grid-column: 1; }
+            .tx-table td:nth-child(6) { grid-column: 2; text-align: right; }
+            .tx-table td:nth-child(6)::before { text-align: right; }
+            .tx-table td:nth-child(7) { grid-column: 1 / -1; }
+            .tx-table td:nth-child(8) { grid-column: 1 / -1; }
+            .tx-table td[colspan] { grid-column: 1 / -1; }
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: 0.5rem;
+        }
+
+        .footer-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: center;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-version {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
+        /* Toast */
+        #toast-container {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            max-width: 22rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            padding: 0.9rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            animation: slide-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            position: relative;
+        }
+
+        .toast.success { border-color: rgba(98, 126, 234, 0.35); }
+        .toast.error { border-color: rgba(220, 38, 38, 0.3); }
+
+        @keyframes slide-in {
+            from { transform: translateX(110%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast p {
+            font-size: 0.875rem;
+            color: var(--text);
+            line-height: 1.45;
+            padding-right: 1.25rem;
+        }
+
+        .toast-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.65rem;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            line-height: 1;
+        }
+
+        .toast-close:hover {
+            color: var(--text);
+        }
+
+        /* Terms modal */
+        #terms-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 12, 20, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #terms-content {
+            max-width: 720px;
+            max-height: 88vh;
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+        }
+
+        #terms-header {
+            padding: 1.15rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #terms-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        #terms-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        #terms-body h2 {
+            color: var(--text);
+            font-size: 1rem;
+            margin: 1.35rem 0 0.5rem;
+        }
+
+        #terms-body strong {
+            color: var(--text);
+        }
+
+        #terms-footer {
+            padding: 1.15rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .terms-checkbox input {
+            margin-top: 0.2rem;
+            accent-color: var(--accent);
+        }
+
+        .terms-actions {
+            display: flex;
+            gap: 0.65rem;
+        }
+
+        .terms-actions .btn {
+            flex: 1;
+        }
+
+        /* Utility */
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        ::selection {
+            background: rgba(98, 126, 234, 0.35);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="mobile-menu">
+            <div class="sidebar-inner">
+                <div class="sidebar-top">
+                    <div class="logo-group">
+                        <img src="Logo_200.png" alt="SnipeHead" class="logo-img">
+                        <span class="logo-text">SnipeHead Pro</span>
+                    </div>
+                    <button class="sidebar-dismiss" onclick="toggleMenu()" aria-label="Close menu">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9l-3 3 3 3"/></svg>
+                    </button>
+                </div>
+
+                <nav class="side-nav">
+                    <p class="side-group-label">Dashboard</p>
+                    <a href="#overview" class="side-link active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Dashboard
+                    </a>
+                    <a href="#markets" class="side-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        Markets
+                    </a>
+                    <a href="#chart" class="side-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        Chart &amp; Swap
+                    </a>
+                    <a href="#network" class="side-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                        Network
+                    </a>
+                    <a href="#tools" class="side-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Tools
+                    </a>
+                    <p class="side-group-label">External</p>
+                    <a href="https://app.uniswap.org/swap?outputCurrency=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&chain=mainnet" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c1.11 0 2.08.402 2.599 1M12 8V6m0 14v-2m0-10c-1.11 0-2.08.402-2.599 1"/></svg>
+                        Buy SHD
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <a href="https://dexscreener.com/ethereum/0xcc3af3770d808f47caabcd84ca773bc2198c69162eef3e77c57a64063986cefa" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm6 0V9a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        DexScreener
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <a href="https://snipehead.xyz/mine-eth/" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+                        Mining
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <a href="https://snipehead.xyz/snft-eth/" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        SNFT
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <a href="https://snipehead.xyz/pls/" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"/></svg>
+                        PulseChain
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-status" id="rpc-status">
+                        <span class="rpc-dot" id="rpc-status-dot"></span>
+                        <span id="rpc-status-text">Connecting to network...</span>
+                    </div>
+                    <div class="sidebar-socials">
+                        <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer" aria-label="X">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="https://substack.com/@snipehead" target="_blank" rel="noopener noreferrer" aria-label="Substack">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.539 24V10.812H1.46zM22.539 0H1.46v2.836h21.08V0z"/></svg>
+                        </a>
+                        <a href="https://github.com/PBaieck-group/SnipeHead-eth" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 015.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .3.2.66.79.55A10.52 10.52 0 0023.5 12c0-6.27-5.23-11.5-11.5-11.5z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="toggleMenu()"></div>
+
+        <!-- Content -->
+        <div class="content-area">
+            <header class="topbar">
+                <div class="topbar-inner">
+                    <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu" aria-expanded="false">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <span class="topbar-title">Dashboard</span>
+                    <div class="topbar-ticker">
+                        <span class="dot"></span>
+                        <span id="shd-countdown">AGE: Calculating...</span>
+                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
+                        <span class="ticker-extra">BTC <span id="btc-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="btc-change" style="font-weight:600;"></span></span>
+                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
+                        <span class="ticker-extra">ETH <span id="eth-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="eth-change" style="font-weight:600;"></span></span>
+                        <span class="ticker-sep" style="opacity:0.4">&middot;</span>
+                        <span>SHD <span id="shd-ticker-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="shd-ticker-change" style="font-weight:600;"></span></span>
+                    </div>
+                    <div class="topbar-spacer"></div>
+                </div>
+            </header>
+
+            <main class="main">
+                <!-- Hero banner -->
+                <section class="hero-banner" id="overview">
+                    <div class="hero-badge">
+                        <span class="dot"></span>
+                        <span>Community-powered &middot; Built For Ethereum</span>
+                    </div>
+                    <h1>Welcome to <span>SnipeHead</span></h1>
+                    <p class="hero-sub">
+                        Flow free from corp systems. Mine SHD, decentralized and unstoppable on Ethereum.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="https://app.uniswap.org/swap?outputCurrency=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&chain=mainnet" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
+                        <a href="https://snipehead.xyz/mine-eth/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Start Mining</a>
+                        <a href="https://snipehead.xyz/snft-eth/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Mint SNFT</a>
+                    </div>
+                </section>
+
+                <!-- Stats -->
+                <section class="stats-grid" id="markets">
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: var(--accent-soft); color: var(--accent);">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <span class="stat-label">SHD Price &amp; SNFT</span>
+                        </div>
+                        <p class="stat-value" id="shd-price">Loading...</p>
+                        <p class="stat-change" id="shd-change">&nbsp;</p>
+                        <div style="display:flex; gap:0.75rem; margin-top:0.35rem; font-size:0.75rem;">
+                            <span class="text-green" id="shd-buys">&nbsp;</span>
+                            <span class="text-red" id="shd-sells">&nbsp;</span>
+                        </div>
+                        <div class="stat-meta">
+                            <div class="stat-row">
+                                <span class="stat-row-label">SNFT Minted</span>
+                                <span class="stat-row-value" id="snft-minted">Loading...</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">SNFT ETH Raised</span>
+                                <span class="stat-row-value" id="snft-pls">Loading...</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">SNFT Holders</span>
+                                <span class="stat-row-value" id="snft-holders">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <a href="https://etherscan.io/token/0xa1e1a6cB1F694e41a5C270542dF233673665FCd5#balances" target="_blank" rel="noopener noreferrer">SHD Holders</a>
+                            <span>&middot;</span>
+                            <a href="https://snipehead.xyz/snft-eth/" target="_blank" rel="noopener noreferrer">View SNFT</a>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: var(--violet-soft); color: var(--violet);">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            </div>
+                            <span class="stat-label">Market Cap</span>
+                        </div>
+                        <p class="stat-value" id="shd-market-cap">Loading...</p>
+                        <div class="stat-meta">
+                            <div class="stat-row">
+                                <span class="stat-row-label">Pool</span>
+                                <span class="stat-row-value">Uniswap V4 · SHD/WBTC</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Quote</span>
+                                <span class="stat-row-value">WBTC</span>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <span>Marketcap via DexScreener</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: var(--rose-soft); color: var(--rose);">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                            </div>
+                            <span class="stat-label">Mining</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                            <div>
+                                <p class="stat-value" style="font-size:1.25rem;" id="total-mined">Loading...</p>
+                                <p class="stat-sub">Mining Power</p>
+                            </div>
+                            <div style="border-left:1px solid var(--border); padding-left:0.75rem;">
+                                <p class="stat-value" style="font-size:1.25rem;" id="contract-balance">Loading...</p>
+                                <p class="stat-sub">Mining Balance</p>
+                            </div>
+                        </div>
+                        <div class="stat-meta">
+                            <div class="stat-row">
+                                <span class="stat-row-label">Reward Reserve</span>
+                                <span class="stat-row-value" id="reward-reserve">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <a href="https://snipehead.xyz/mine-eth/" target="_blank" rel="noopener noreferrer">Mine SHD</a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chart & Swap -->
+                <section class="section" id="chart">
+                    <h3 class="section-title">Price Chart &amp; Swap</h3>
+                    <div class="chart-swap">
+                        <div class="chart-col">
+                            <div id="dexscreener-embed">
+                                <div class="dexscreener-header">
+                                    <span class="live-label"><span class="live-dot"></span> Live Chart</span>
+                                    <button type="button" id="dexscreener-reload-btn" class="dexscreener-reload-btn" onclick="manualReloadDexscreenerEmbed(this)" aria-label="Reload chart">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                                        Reload
+                                    </button>
+                                </div>
+                                <div class="dexscreener-chart-body">
+                                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/ethereum/0xcc3af3770d808f47caabcd84ca773bc2198c69162eef3e77c57a64063986cefa?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swap-col">
+                            <div id="uniswap-embed">
+                                <iframe
+                                    src="https://thirdweb.com/bridge/swap-widget?theme=dark&buyChain=1&buyTokenAddress=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&sellChain=1"
+                                    title="Swap SHD"
+                                    allow="clipboard-write; clipboard-read; ethereum"
+                                    loading="lazy"
+                                ></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Network Details -->
+                <section class="section" id="network">
+                    <h3 class="section-title">Network Details</h3>
+                    <div class="details-grid">
+                        <div class="card card-static detail-card">
+                            <div class="detail-header">
+                                <div class="detail-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                                </div>
+                                <h4 class="detail-title">Ethereum Network</h4>
+                            </div>
+                            <div>
+                                <div class="info-row">
+                                    <span class="info-label">Network Name</span>
+                                    <span class="info-value">Ethereum Mainnet</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">RPC URL</span>
+                                    <span class="info-value">https://ethereum-rpc.publicnode.com</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Chain ID</span>
+                                    <span class="info-value" style="font-family:ui-monospace,monospace">1</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Currency</span>
+                                    <span class="info-value">ETH</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Explorer</span>
+                                    <span class="info-value">https://etherscan.io</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.25rem;">
+                                <button onclick="addEthereumToWallet()" class="btn btn-primary">Add Ethereum to Wallet</button>
+                            </div>
+                        </div>
+
+                        <div class="card card-static detail-card">
+                            <div class="detail-header">
+                                <div class="detail-icon" style="background:var(--rose-soft); color:var(--rose);">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                </div>
+                                <h4 class="detail-title">SHD Token</h4>
+                            </div>
+                            <div>
+                                <div class="info-row">
+                                    <span class="info-label">Name</span>
+                                    <span class="info-value">SnipeHead</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Symbol</span>
+                                    <span class="info-value">SHD</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Total Supply</span>
+                                    <span class="info-value">1,000,000,000</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Decimals</span>
+                                    <span class="info-value" style="font-family:ui-monospace,monospace">18</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Type</span>
+                                    <span class="info-value">ERC20</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.25rem;">
+                                <button onclick="addSHDToWallet()" class="btn btn-primary">Add SHD to Wallet</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-static contract-bar">
+                        <div style="min-width:0;">
+                            <p class="contract-label">SnipeHead Contract Address</p>
+                            <p id="contract-address" class="contract-addr no-scrollbar" data-full-address="0xa1e1a6cB1F694e41a5C270542dF233673665FCd5" title="0xa1e1a6cB1F694e41a5C270542dF233673665FCd5">0xa1e1a6cB1F694e41a5C270542dF233673665FCd5</p>
+                        </div>
+                        <div class="contract-actions">
+                            <button onclick="copyContract(this)" class="btn btn-primary" style="font-size:0.8125rem; padding:0.5rem 1rem;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                Copy
+                            </button>
+                            <a href="https://etherscan.io/address/0xa1e1a6cB1F694e41a5C270542dF233673665FCd5#code" class="btn btn-secondary" style="font-size:0.8125rem; padding:0.5rem 1rem;" target="_blank" rel="noopener noreferrer">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                View
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tools -->
+                <section class="section" id="tools">
+                    <div class="card card-static" style="padding:1.5rem;">
+                        <h4 style="font-size:1rem; font-weight:600; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+                            <svg width="20" height="20" style="color:var(--accent)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Helpful Community Tools
+                        </h4>
+                        <div class="tools-grid">
+                            <a href="https://app.uniswap.org/swap?outputCurrency=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&chain=mainnet/" target="_blank" rel="noopener noreferrer" class="card tool-card">
+                                <div class="tool-title">Uniswap</div>
+                                <p class="tool-desc">Trade SHD on Ethereum’s leading decentralized exchange.</p>
+                            </a>
+                            <a href="https://www.railgun.org/" target="_blank" rel="noopener noreferrer" class="card tool-card">
+                                <div class="tool-title">Railgun</div>
+                                <p class="tool-desc">Private DeFi on Ethereum — shield balances and transact with zero-knowledge privacy.</p>
+                            </a>
+                            <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer" class="card tool-card">
+                                <div class="tool-title">MetaMask</div>
+                                <p class="tool-desc">The most popular Ethereum wallet — connect, store assets, and interact with dApps.</p>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA -->
+                <section class="section">
+                    <div class="card cta-band card-static">
+                        <h2>Join the <span>SnipeHead</span> Ecosystem</h2>
+                        <p>Mine SHD for exclusive rewards and trade on Uniswap V4 — fully on Ethereum.</p>
+                        <div class="cta-actions">
+                            <a href="https://app.uniswap.org/swap?outputCurrency=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&chain=mainnet" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
+                            <a href="https://snipehead.xyz/mine-eth/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Start Mining</a>
+                            <a href="https://snipehead.xyz/snft-eth/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Mint SNFT</a>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <footer>
+                <div class="container footer-inner">
+                    <p>© 2025–<span id="copyright-year">2026</span> SnipeHead. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="https://ethereum.org/" target="_blank" rel="noopener noreferrer">Ethereum</a>
+                        <a href="https://github.com/PBaieck-group/SnipeHead-eth" target="_blank" rel="noopener noreferrer">GitHub</a>
+                        <a href="https://gitlab.com/pbaieck-group/SnipeHead-eth" target="_blank" rel="noopener noreferrer">GitLab</a>
+                        <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
+                    </div>
+                    <p class="footer-version">v1.0.0</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Terms of Use Modal -->
+    <div id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+        <div id="terms-content">
+            <div id="terms-header">
+                <h2 id="terms-modal-title">Terms of Use</h2>
+                <button onclick="declineTerms()" style="color:var(--text-muted); font-size:1.5rem; line-height:1;" aria-label="Close">&times;</button>
+            </div>
+            <div id="terms-body">
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Last Updated: June 10, 2026</p>
+                <p><strong>IMPORTANT NOTICE:</strong> READ CAREFULLY – SnipeHead IS NOT A TRADING PLATFORM. EXTREME RISK OF LOSS.</p>
+                <h2>1. Introduction</h2>
+                <p>Welcome to SnipeHead. This is a community interface providing tools and information for the SnipeHead (SHD) token on Ethereum. We do not custody assets, execute trades, or provide financial advice.</p>
+                <p>By using this Site you agree to these Terms. If you do not agree, do not use the Site.</p>
+                <h2>2. No Custody / Non-Custodial</h2>
+                <p>We never hold your keys or assets. All transactions are executed solely by you via your own wallet.</p>
+                <h2>3. Assumption of Risk</h2>
+                <p>Digital assets like SHD are highly volatile and speculative. You may lose all funds. You are solely responsible for your own research and decisions.</p>
+                <h2>4. User Conduct</h2>
+                <p>You agree to use the Site only for lawful purposes and not for fraud, manipulation, or illegal activity.</p>
+                <h2>5. No Warranties</h2>
+                <p>The Site is provided "AS IS". We disclaim all liability to the fullest extent permitted by law.</p>
+                <p style="margin-top:1.25rem; font-size:0.75rem; color:var(--text-muted);">Full legal terms adapted from Pump.tires for SnipeHead. By accepting you acknowledge the risks and agree to all terms.</p>
+            </div>
+            <div id="terms-footer">
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="terms-agree">
+                    <label for="terms-agree">I have read and agree to the Terms of Use and understand the risks involved.</label>
+                </div>
+                <div class="terms-actions">
+                    <button onclick="declineTerms()" class="btn btn-secondary">Decline</button>
+                    <button onclick="acceptTerms()" id="accept-btn" class="btn btn-primary" disabled>Accept &amp; Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const hamburger = document.querySelector('.hamburger');
+
+            if (window.innerWidth >= 1024) {
+                // Desktop: the sidebar is normally always visible here, but the
+                // user can now dismiss it (via the same close button) and bring
+                // it back with the hamburger button that appears in its place.
+                const isClosed = document.body.classList.toggle('desktop-sidebar-closed');
+                hamburger.setAttribute('aria-expanded', String(!isClosed));
+                try {
+                    localStorage.setItem('sidebarClosedDesktop', isClosed ? '1' : '0');
+                } catch (e) { /* localStorage unavailable, ignore */ }
+                return;
+            }
+
+            const isActive = menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', isActive);
+        }
+
+        // Remember the user's desktop sidebar preference between visits.
+        (function restoreDesktopSidebarState() {
+            try {
+                if (window.innerWidth >= 1024 && localStorage.getItem('sidebarClosedDesktop') === '1') {
+                    document.body.classList.add('desktop-sidebar-closed');
+                }
+            } catch (e) { /* localStorage unavailable, ignore */ }
+        })();
+
+        // Close the mobile menu when a same-page section link (Dashboard,
+        // Markets, Chart & Swap, Network, Tools) is tapped.
+        // External links (Bridge, Pump.Tires, Faucet, etc.) open in a new
+        // tab already, so they're left alone.
+        document.querySelectorAll('#mobile-menu .side-link[href^="#"]').forEach(link => {
+            link.addEventListener('click', () => {
+                const menu = document.getElementById('mobile-menu');
+                if (menu.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
+
+
+
+        function showTermsModal() {
+            const modal = document.getElementById('terms-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                const firstFocusable = modal.querySelector('button, input, a');
+                if (firstFocusable) firstFocusable.focus();
+            }, 100);
+        }
+
+        function declineTerms() {
+            window.location.href = "https://dexscreener.com/ethereum/0xcc3af3770d808f47caabcd84ca773bc2198c69162eef3e77c57a64063986cefa";
+        }
+
+        function acceptTerms() {
+            const checkbox = document.getElementById('terms-agree');
+            if (!checkbox.checked) return;
+            localStorage.setItem('termsAcceptedSnipehead', 'true');
+            document.getElementById('terms-modal').style.display = 'none';
+            showToast("Thank you for accepting the Terms of Use.", "success");
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('terms-modal');
+            if (modal.style.display !== 'flex') return;
+            if (e.key === "Escape") {
+                declineTerms();
+                return;
+            }
+            if (e.key === "Tab") {
+                const focusables = modal.querySelectorAll('button, input, [tabindex="0"]');
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        });
+
+        // --- DexScreener embed loader ---
+        function loadDexscreenerEmbed() {
+            const iframe = document.getElementById('dexscreener-iframe');
+            if (!iframe || iframe.dataset.loaded) return;
+            const chartUrl = iframe.dataset.src;
+            if (!chartUrl) return;
+            iframe.dataset.loaded = 'true';
+            iframe.src = chartUrl;
+        }
+
+        const DEXSCREENER_STALL_MS = 3 * 60 * 1000;
+        const DEXSCREENER_HIDDEN_DEBOUNCE_MS = 1500;
+        let dexscreenerHiddenSince = null;
+        let dexscreenerHiddenTimer = null;
+
+        function reloadDexscreenerEmbed() {
+            const iframe = document.getElementById('dexscreener-iframe');
+            const chartUrl = iframe && iframe.dataset.src;
+            if (!iframe || !chartUrl) return;
+            iframe.src = 'about:blank';
+            requestAnimationFrame(() => { iframe.src = chartUrl; });
+        }
+
+        function manualReloadDexscreenerEmbed(btn) {
+            if (btn) {
+                btn.classList.add('reloading');
+                btn.disabled = true;
+            }
+            reloadDexscreenerEmbed();
+            dexscreenerHiddenSince = null;
+            if (btn) {
+                setTimeout(() => {
+                    btn.classList.remove('reloading');
+                    btn.disabled = false;
+                }, 1200);
+            }
+        }
+
+        function markDexscreenerVisible() {
+            clearTimeout(dexscreenerHiddenTimer);
+            const iframe = document.getElementById('dexscreener-iframe');
+            if (!iframe) return;
+            if (!iframe.dataset.loaded) {
+                loadDexscreenerEmbed();
+            } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
+                reloadDexscreenerEmbed();
+            }
+            dexscreenerHiddenSince = null;
+        }
+
+        function markDexscreenerHidden() {
+            clearTimeout(dexscreenerHiddenTimer);
+            dexscreenerHiddenTimer = setTimeout(() => {
+                if (dexscreenerHiddenSince === null) dexscreenerHiddenSince = Date.now();
+            }, DEXSCREENER_HIDDEN_DEBOUNCE_MS);
+        }
+
+        const dexscreenerContainer = document.getElementById('dexscreener-embed');
+        if (dexscreenerContainer && 'IntersectionObserver' in window) {
+            const dexscreenerObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        markDexscreenerVisible();
+                    } else {
+                        markDexscreenerHidden();
+                    }
+                });
+            }, { threshold: 0.1 });
+            dexscreenerObserver.observe(dexscreenerContainer);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    markDexscreenerHidden();
+                } else {
+                    markDexscreenerVisible();
+                }
+            });
+        } else {
+            if (document.readyState === 'complete') {
+                loadDexscreenerEmbed();
+            } else {
+                window.addEventListener('load', loadDexscreenerEmbed);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const agreeCheckbox = document.getElementById('terms-agree');
+            const acceptBtn = document.getElementById('accept-btn');
+            if (agreeCheckbox && acceptBtn) {
+                agreeCheckbox.addEventListener('change', () => {
+                    acceptBtn.disabled = !agreeCheckbox.checked;
+                });
+            }
+
+            try {
+                if (!localStorage.getItem('termsAcceptedSnipehead')) {
+                    setTimeout(showTermsModal, 600);
+                }
+            } catch(e) {
+                setTimeout(showTermsModal, 600);
+            }
+
+            updateCountdown();
+            const currentYear = new Date().getFullYear();
+            document.getElementById('copyright-year').textContent = currentYear;
+        });
+
+        const TICKER_PRICE_DECIMALS = {
+            inc: 2,
+            hex: 6,
+            ehex: 6
+        };
+
+        // Shared USD price formatter used by the top ticker (PLS/SHD/BTC/ETH etc).
+        function formatTickerPrice(price, key) {
+            if (typeof price !== 'number' || isNaN(price)) return { text: '—' };
+            if (Object.prototype.hasOwnProperty.call(TICKER_PRICE_DECIMALS, key)) {
+                return { text: `$${price.toFixed(TICKER_PRICE_DECIMALS[key])}` };
+            }
+            if (price >= 1000) return { text: `$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}` };
+            if (price >= 1) return { text: `$${price.toFixed(2)}` };
+            if (price >= 0.01) return { text: `$${price.toFixed(4)}` };
+            if (price >= 0.0001) return { text: `$${price.toFixed(6)}` };
+
+            const fixed = price.toFixed(14);
+            const match = fixed.match(/^0\.(0+)(\d+)/);
+            if (!match) return { text: `$${price.toFixed(8)}` };
+            return { zeroCount: match[1].length, sig: match[2].slice(0, 4) };
+        }
+
+        function updateCountdown() {
+            const creation = new Date('2026-03-26T10:03:55-04:00');
+            function tick() {
+                const diff = Date.now() - creation;
+                if (diff < 0) {
+                    document.getElementById('shd-countdown').textContent = 'AGE: Launching Soon...';
+                    return;
+                }
+                const d = Math.floor(diff / 86400000);
+                document.getElementById('shd-countdown').textContent = `AGE: ${d}d`;
+            }
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        let priceInterval, onChainInterval;
+
+        function renderTickerPrice(elId, price, subColor) {
+            const el = document.getElementById(elId);
+            if (!el || typeof price !== 'number' || isNaN(price)) return;
+            const formatted = formatTickerPrice(price, null);
+            if (formatted.zeroCount) {
+                el.textContent = '';
+                el.append('$0.');
+                const sub = document.createElement('sub');
+                sub.className = 'core-price-zeros';
+                if (subColor) sub.style.color = subColor;
+                sub.textContent = String(formatted.zeroCount);
+                el.append(sub, formatted.sig);
+            } else {
+                el.textContent = formatted.text;
+            }
+        }
+
+        function renderTickerChange(elId, change24h) {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            if (typeof change24h === 'number') {
+                const isUp = change24h >= 0;
+                el.textContent = `${isUp ? '▲' : '▼'}${Math.abs(change24h).toFixed(1)}%`;
+                el.classList.toggle('text-green', isUp);
+                el.classList.toggle('text-red', !isUp);
+            } else {
+                el.textContent = '';
+                el.classList.remove('text-green', 'text-red');
+            }
+        }
+
+        // --- Retry-with-backoff fetch helper ---
+        // Retries transient failures (timeouts, network errors, non-2xx, rate limits)
+        // with short exponential backoff before giving up. Each caller decides what
+        // "success" means via an optional validate() check on the parsed JSON, so we
+        // don't retry forever on a response that came back 200 but had no usable data.
+        async function fetchJsonWithRetry(url, { retries = 2, baseDelayMs = 800, timeoutMs = 10000, validate = null } = {}) {
+            let lastErr;
+            let lastParsedData; // last successfully-parsed JSON, even if it failed validate() --
+                                 // lets a caller render a partial result instead of nothing
+                                 // when every retry comes back incomplete.
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    lastParsedData = data;
+                    if (validate && !validate(data)) throw new Error('Response failed validation (empty/unexpected payload)');
+                    return data;
+                } catch (e) {
+                    lastErr = e;
+                    if (attempt < retries) {
+                        // Jitter (+/-30%) so requests that failed together (e.g. a burst of
+                        // calls fired at page load) don't all retry at the exact same
+                        // millisecond and re-trigger the same rate limit again.
+                        const base = baseDelayMs * Math.pow(2, attempt); // 800ms, 1600ms, ...
+                        const jitter = base * 0.3 * (Math.random() * 2 - 1);
+                        await new Promise(r => setTimeout(r, base + jitter));
+                    }
+                }
+            }
+            if (lastErr && lastParsedData !== undefined) lastErr.partialData = lastParsedData;
+            throw lastErr;
+        }
+
+        // pls-price and shd-price are now computed straight from on-chain pool
+        // reserves in fetchOnChainData() (see reservesToPlsUsdPrice / the SHD
+        // price block there) instead of DexScreener, so they're no longer at the
+        // mercy of DexScreener's rate limits. Market cap and liquidity are also
+        // computed on-chain there now (totalSupply x price, and 2x each pool's
+        // PLS-side value). DexScreener is only used here for numbers that
+        // genuinely require an indexer/history and can't come from a single
+        // reserves snapshot: 24h % change and buy/sell counts.
+        let plsChangeLoaded = false;
+        let shdExtrasLoaded = false;
+
+        const PLS_PAIR_ADDRESS = '0xE56043671df55dE5CDf8459710433C10324DE0aE';
+
+        // LIQUIDITY_PAIRS.v1 (the primary SHD pool) is the only pair required here -
+        // it's the one used for the SHD 24h change/buys-sells numbers.
+        // Computed lazily (not as a top-level const) because LIQUIDITY_PAIRS isn't
+        // declared until later in this script block - evaluating this eagerly at
+        // parse time would throw a temporal-dead-zone ReferenceError and halt the
+        // whole script. This function is only ever called at runtime, by which point
+        // LIQUIDITY_PAIRS has long since been initialized.
+        function essentialPairsPresent(pairs) {
+            return Array.isArray(pairs) && pairs.some(p => p && p.priceUsd);
+        }
+
+        async function fetchPrimaryMarketData() {
+            // Ethereum: pull SHD pair data from DexScreener by token address.
+            // V4 pool ID is not a pair contract; the token endpoint returns the
+            // best matching pools (including V4 when DexScreener indexes them).
+            try {
+                const data = await fetchJsonWithRetry(
+                    `https://api.dexscreener.com/latest/dex/tokens/${SHD_TOKEN_ADDRESS}`,
+                    {
+                        retries: 3,
+                        baseDelayMs: 900,
+                        validate: d => essentialPairsPresent(d?.pairs || [])
+                    }
+                );
+                renderPrimaryMarketDataFromPayload(data.pairs || []);
+                return;
+            } catch (e) {
+                console.error("Primary market data fetch error (after retries):", e);
+                if (e?.partialData) {
+                    renderPrimaryMarketDataFromPayload(e.partialData.pairs || []);
+                }
+            }
+        }
+
+        function renderPrimaryMarketDataFromPayload(pairs) {
+            // Prefer ethereum pairs, then any pair with a USD price.
+            const ethPairs = pairs.filter(p => (p?.chainId || '').toLowerCase() === 'ethereum');
+            const pool = (ethPairs.length ? ethPairs : pairs).find(p => p && p.priceUsd);
+            if (!pool || !pool.priceUsd) return;
+
+            shdExtrasLoaded = true;
+            const price = Number(pool.priceUsd);
+            if (price > 0) {
+                const priceEl = document.getElementById('shd-price');
+                if (priceEl) priceEl.textContent = `$${price.toFixed(8)}`;
+                renderTickerPrice('shd-ticker-price', price);
+                renderTickerPrice('core-shd-price', price);
+                shdPriceLoaded = true;
+                coreFieldLoaded['core-shd-price'] = true;
+            }
+
+            renderTickerChange('shd-ticker-change', pool.priceChange?.h24);
+            renderTickerChange('core-shd-change', pool.priceChange?.h24);
+            coreChangeLoaded.shd = true;
+
+            const changeEl = document.getElementById('shd-change');
+            const change24h = pool.priceChange?.h24;
+            if (changeEl && typeof change24h === 'number') {
+                const isUp = change24h >= 0;
+                changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}% (24h)`;
+                changeEl.classList.toggle('text-green', isUp);
+                changeEl.classList.toggle('text-red', !isUp);
+            }
+
+            const buysEl = document.getElementById('shd-buys');
+            const sellsEl = document.getElementById('shd-sells');
+            const txns24h = pool.txns?.h24;
+            if (buysEl && sellsEl && txns24h) {
+                buysEl.textContent = `${txns24h.buys ?? 0} buys`;
+                sellsEl.textContent = `${txns24h.sells ?? 0} sells`;
+            }
+
+            const liq = pool.liquidity?.usd;
+            if (typeof liq === 'number' && liq > 0) {
+                const liqEl = document.getElementById('shd-liquidity');
+                if (liqEl) { liqEl.textContent = `$${Math.round(liq).toLocaleString()}`; onChainFieldLoaded['shd-liquidity'] = true; }
+                setCoreCellText('core-shd-liquidity', `$${Math.round(liq).toLocaleString()}`);
+                coreFieldLoaded['core-shd-liquidity'] = true;
+            }
+            const mcap = pool.marketCap || pool.fdv;
+            if (typeof mcap === 'number' && mcap > 0) {
+                const mcapEl = document.getElementById('shd-market-cap');
+                if (mcapEl) { mcapEl.textContent = `$${Math.round(mcap).toLocaleString()}`; onChainFieldLoaded['shd-market-cap'] = true; }
+                setCoreCellText('core-shd-mcap', `$${Math.round(mcap).toLocaleString()}`);
+                coreFieldLoaded['core-shd-mcap'] = true;
+            }
+        }
+
+        // 24h % change for the PulseChain Core tokens - the only thing about
+        // them that still comes from DexScreener rather than raw reserves,
+        // since % change needs price history, not just a snapshot.
+        async function fetchCoreTokensChange() {
+            const addrs = CORE_TOKENS.map(t => t.pair).join(',');
+            try {
+                const data = await fetchJsonWithRetry(
+                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${addrs}`,
+                    {
+                        retries: 2,
+                        baseDelayMs: 900,
+                        validate: d => Array.isArray(d?.pairs) && d.pairs.length > 0
+                    }
+                );
+                const pairs = data.pairs || [];
+                CORE_TOKENS.forEach(t => {
+                    const pair = pairs.find(p => p?.pairAddress?.toLowerCase() === t.pair.toLowerCase());
+                    if (pair) {
+                        renderTickerChange(`core-${t.id}-change`, pair.priceChange?.h24);
+                        coreChangeLoaded[t.id] = true;
+                    } else if (!coreChangeLoaded[t.id]) {
+                        const el = document.getElementById(`core-${t.id}-change`);
+                        if (el) el.textContent = '';
+                    }
+                });
+            } catch (e) {
+                console.error("PulseChain Core 24h change fetch error:", e);
+            }
+        }
+
+        // PLS total supply, for the Core row's market cap - there's no
+        // ERC20 totalSupply() to call on-chain since PLS is the native coin,
+        // not a contract, so this comes from the explorer's stats API
+        // instead. Refreshed infrequently since total supply changes slowly;
+        // a failure here just leaves market cap on its last-known value (or
+        // "Loading...") rather than blanking the rest of the row.
+        //
+        // Both of the explorer's own endpoints have proven unreliable in
+        // practice - the legacy `?module=stats&action=X` API is being
+        // deprecated and reliably fails validation, and /api/v2/stats has
+        // been timing out outright rather than erroring, which points to
+        // the instance itself being slow/overloaded rather than a request
+        // format problem. Bumped its timeout since 10s wasn't enough, and
+        // added a pinned fallback below so the market cap cell never gets
+        // stuck on "Loading..." forever if the explorer just doesn't
+        // respond - total supply moves slowly enough that a static
+        // approximate figure is a reasonable last resort, not just a raw
+        // guess.
+        const PLS_TOTAL_SUPPLY_FALLBACK = 135085881560694; // approx, per CoinGecko as of writing - update periodically
+        let plsTotalSupply = null;
+        // Cached from the most recent successful on-chain reserves read, so that
+        // whenever plsTotalSupply finishes loading (which races the very first
+        // fetchOnChainData() call - see below) we can render core-pls-mcap right
+        // away instead of waiting for the next 60s on-chain poll to come around.
+        let lastPlsUsdPrice = null;
+        // Renders core-pls-mcap immediately from whatever we currently have
+        // (plsTotalSupply x lastPlsUsdPrice), rather than waiting for the next
+        // scheduled fetchOnChainData() poll. Called both from fetchOnChainData
+        // itself and from fetchPlsTotalSupply once total supply resolves -
+        // whichever of the two finishes second is what actually paints the
+        // cell, instead of the two racing and one silently losing.
+        function renderPlsMarketCap() {
+            if (plsTotalSupply && lastPlsUsdPrice) {
+                setCoreCellText('core-pls-mcap', `$${Math.round(plsTotalSupply * lastPlsUsdPrice).toLocaleString()}`);
+                coreFieldLoaded['core-pls-mcap'] = true;
+            }
+        }
+        async function fetchPlsTotalSupply() {
+            // No-op on Ethereum — PLS total supply was only needed for the
+            // PulseChain core market-cap row, which has been removed.
+        }
+
+        let btcPriceLoaded = false; // becomes true after the first successful BTC price fetch
+        let ethPriceLoaded = false; // becomes true after the first successful ETH price fetch
+
+        async function fetchBtcEthPrices() {
+            // BTC and ETH via Kraken public ticker (Binance is geo-restricted in many regions).
+            try {
+                const data = await fetchJsonWithRetry(
+                    'https://api.kraken.com/0/public/Ticker?pair=XBTUSD,ETHUSD',
+                    {
+                        validate: d => d?.result && (d.result.XXBTZUSD || d.result.XBTUSD) && (d.result.XETHZUSD || d.result.ETHUSD)
+                    }
+                );
+                const result = data.result || {};
+                const btcTicker = result.XXBTZUSD || result.XBTUSD;
+                const ethTicker = result.XETHZUSD || result.ETHUSD;
+
+                if (btcTicker) {
+                    const btcPrice = Number(btcTicker.c?.[0]);
+                    if (btcPrice > 0) {
+                        document.getElementById('btc-price').textContent =
+                            `$${Math.round(btcPrice).toLocaleString()}`;
+                        const open = Number(btcTicker.o);
+                        const change = open > 0 ? ((btcPrice - open) / open) * 100 : null;
+                        renderTickerChange('btc-change', Number.isFinite(change) ? change : null);
+                        btcPriceLoaded = true;
+                    } else if (!btcPriceLoaded) {
+                        const btcEl = document.getElementById('btc-price');
+                        if (btcEl) btcEl.textContent = 'Unavailable';
+                    }
+                } else if (!btcPriceLoaded) {
+                    const btcEl = document.getElementById('btc-price');
+                    if (btcEl) btcEl.textContent = 'Unavailable';
+                }
+
+                if (ethTicker) {
+                    const ethPrice = Number(ethTicker.c?.[0]);
+                    if (ethPrice > 0) {
+                        document.getElementById('eth-price').textContent =
+                            `$${Math.round(ethPrice).toLocaleString()}`;
+                        const open = Number(ethTicker.o);
+                        const change = open > 0 ? ((ethPrice - open) / open) * 100 : null;
+                        renderTickerChange('eth-change', Number.isFinite(change) ? change : null);
+                        ethPriceLoaded = true;
+                    } else if (!ethPriceLoaded) {
+                        const ethEl = document.getElementById('eth-price');
+                        if (ethEl) ethEl.textContent = 'Unavailable';
+                    }
+                } else if (!ethPriceLoaded) {
+                    const ethEl = document.getElementById('eth-price');
+                    if (ethEl) ethEl.textContent = 'Unavailable';
+                }
+            } catch (e) {
+                console.error("BTC/ETH price fetch error (after retries):", e);
+                if (!btcPriceLoaded) {
+                    const btcEl = document.getElementById('btc-price');
+                    if (btcEl) btcEl.textContent = 'Unavailable';
+                }
+                if (!ethPriceLoaded) {
+                    const ethEl = document.getElementById('eth-price');
+                    if (ethEl) ethEl.textContent = 'Unavailable';
+                }
+            }
+        }
+
+        async function fetchPrices() {
+            if (document.hidden) return;
+            // SHD/market-cap from DexScreener; BTC/ETH from Kraken (independent host).
+            await Promise.allSettled([
+                fetchPrimaryMarketData(),
+                fetchBtcEthPrices(),
+            ]);
+        }
+
+        const MINING_CONTRACT = "0x0AF20FaC296a4f19C68acC64FB850b699D6869e3";
+        const SNFT_CONTRACT = "0xE85eB0a14E185968B2a947d98feA023F8e80AB3a";
+        const SNFT_MAX_SUPPLY = 35;
+
+        function formatTokenAmount(formatted) {
+            if (formatted >= 1000000000) {
+                return (Math.floor(formatted / 10000000) / 100) + 'B';
+            }
+            if (formatted >= 1000000) {
+                return (Math.floor(formatted / 10000) / 100) + 'M';
+            }
+            if (formatted >= 10000) {
+                return (formatted / 1000).toFixed(3) + 'K';
+            }
+            if (formatted >= 1000) {
+                return (formatted / 1000).toFixed(3) + 'K';
+            }
+            return (Math.floor(formatted * 1000000) / 1000000)
+                   .toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 6 });
+        }
+
+        const RPC_ENDPOINTS = [
+            "https://ethereum-rpc.publicnode.com",
+            "https://rpc.mevblocker.io",
+            "https://0xrpc.io/eth",
+            "https://public.1rpc.io/eth",
+            "https://rpc.nodeflare.app/eth/public",
+            "https://rpc.fullsend.to"
+        ];
+        const RPC_LABELS = {
+            "https://ethereum-rpc.publicnode.com": "publicnode.com",
+            "https://rpc.mevblocker.io": "mevblocker.io",
+            "https://0xrpc.io/eth": "0xrpc.io",
+            "https://public.1rpc.io/eth": "1rpc.io",
+            "https://rpc.nodeflare.app/eth/public": "nodeflare.app",
+            "https://rpc.fullsend.to": "fullsend.to",
+        };
+        const RPC_HEALTHCHECK_TIMEOUT_MS = 5000;
+
+        function updateRpcStatusUI(url) {
+            const dot = document.getElementById('rpc-status-dot');
+            const text = document.getElementById('rpc-status-text');
+            if (!dot || !text) return;
+
+            if (!url) {
+                dot.className = 'rpc-dot offline';
+                text.textContent = 'All RPC endpoints unreachable';
+                return;
+            }
+
+            const isPrimary = url === RPC_ENDPOINTS[0];
+            dot.className = isPrimary ? 'rpc-dot' : 'rpc-dot fallback';
+            text.textContent = isPrimary
+                ? `Connected via ${RPC_LABELS[url] || url}`
+                : `Connected via ${RPC_LABELS[url] || url} (backup)`;
+        }
+
+        let cachedProvider = null;
+        let cachedRpcUrl = null;
+        let providerPromise = null;
+
+        async function getWorkingProvider(forceRefresh = false) {
+            if (cachedProvider && !forceRefresh) return cachedProvider;
+            if (providerPromise) return providerPromise;
+
+            providerPromise = (async () => {
+                for (const url of RPC_ENDPOINTS) {
+                    try {
+                        const provider = new ethers.providers.JsonRpcProvider(url);
+                        await Promise.race([
+                            provider.getBlockNumber(),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error("RPC timeout")), RPC_HEALTHCHECK_TIMEOUT_MS))
+                        ]);
+                        cachedProvider = provider;
+                        cachedRpcUrl = url;
+                        console.log(`Using Ethereum RPC: ${url}`);
+                        updateRpcStatusUI(url);
+                        return provider;
+                    } catch (err) {
+                        console.warn(`RPC unavailable (${url}):`, err.message);
+                    }
+                }
+                updateRpcStatusUI(null);
+                throw new Error("All Ethereum RPC endpoints are unavailable");
+            })();
+
+            try {
+                return await providerPromise;
+            } finally {
+                providerPromise = null;
+            }
+        }
+
+        async function withRpcFallback(fn) {
+            try {
+                const provider = await getWorkingProvider();
+                return await fn(provider);
+            } catch (err) {
+                console.warn("RPC call failed, switching endpoint:", err.message);
+                const provider = await getWorkingProvider(true);
+                return await fn(provider);
+            }
+        }
+
+        const SHD_TOKEN_ADDRESS = "0xa1e1a6cB1F694e41a5C270542dF233673665FCd5";
+        // Uniswap V4 SHD/WBTC pool ID (32-byte hash, not a contract address).
+        // V4 uses PoolManager + StateView; V2-style getReserves() does not apply.
+        // On-chain price/liquidity from this pool will be wired in a follow-up.
+        const UNISWAP_V4_POOL_ID = "0xcc3af3770d808f47caabcd84ca773bc2198c69162eef3e77c57a64063986cefa";
+        const WBTC_TOKEN_ADDRESS = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
+        // Stubs so leftover Pulse-era helpers do not throw ReferenceError if called
+        const WPLS_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
+        const PULSEX_ROUTERS = { v1: "0x0000000000000000000000000000000000000000", v2: "0x0000000000000000000000000000000000000000" };
+        // Legacy V2-style pair map kept empty so old pool UI paths no-op cleanly.
+        const LIQUIDITY_PAIRS = { v1: null, v2: null };
+
+        // Uniswap routers (placeholder — V4 swap decoding uses PoolManager events; follow-up)
+        const UNISWAP_ROUTERS = {
+            v2: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D".toLowerCase(),
+            v3: "0xE592427A0AEce92De3Edee1F18E0157C05861564".toLowerCase()
+        };
+        const SWAP_TOPIC0 = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
+        const TX_LOOKBACK_BLOCKS = 3000; // max lookback ~8h; usually stops earlier once we have enough swaps
+        const TX_DISPLAY_LIMIT = 20;
+        let txInterval = null;
+        let lastKnownPlsUsdForTx = null;
+        let txLoadedOnce = false;
+        // Which side SHD sits on in each pool (cached after first successful decode path)
+        const txPoolShdIsToken0 = { v1: null, v2: null };
+        // Incrementing token so a slow, stale fetch (e.g. one that had to scan more
+        // chunks on a quiet pool) can never overwrite a newer, already-rendered result.
+        let txFetchToken = 0;
+
+        function formatFullTokenAmount(value) {
+            return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function renderPoolLiquidity(elementId, pool) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = `${formatTokenAmount(pool.shd)} SHD / ${formatTokenAmount(pool.pls)} PLS`;
+            el.title = `${formatFullTokenAmount(pool.shd)} SHD / ${formatFullTokenAmount(pool.pls)} PLS`;
+        }
+
+        function setCoreCellText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        // Computes price/market cap/liquidity for each PulseChain Core token
+        // from its pair reserves + on-chain totalSupply, the same way
+        // shd-price/shd-market-cap are derived above - generalized to handle
+        // each token's own decimals (HEX is 8, not 18) and whichever token
+        // sits on the other side of the pair. Most of these pairs are quoted
+        // in WPLS (converted to USD via plsUsdPrice); PRVX's pair is quoted
+        // in USDC instead, which is treated as ~$1, same assumption already
+        // used for the WPLS/DAI reference pool above.
+        function renderCoreTokens(coreRawData, plsUsdPrice) {
+            CORE_TOKENS.forEach(t => {
+                const meta = coreTokenMeta[t.id];
+                const data = coreRawData[t.id];
+                if (!data || !data.reserves || meta.isToken0 === null || meta.decimals === null || !meta.quoteAddress || meta.quoteDecimals === null) return;
+
+                const isQuoteWpls = meta.quoteAddress.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase();
+                const quoteUsdPrice = isQuoteWpls ? plsUsdPrice : 1;
+                if (!quoteUsdPrice) return;
+
+                const tokenReserveRaw = meta.isToken0 ? data.reserves.reserve0 : data.reserves.reserve1;
+                const quoteReserveRaw = meta.isToken0 ? data.reserves.reserve1 : data.reserves.reserve0;
+                const tokenAmount = Number(ethers.utils.formatUnits(tokenReserveRaw, meta.decimals));
+                const quoteAmount = Number(ethers.utils.formatUnits(quoteReserveRaw, meta.quoteDecimals));
+                if (!tokenAmount) return;
+
+                const priceUsd = (quoteAmount / tokenAmount) * quoteUsdPrice;
+                renderTickerPrice(`core-${t.id}-price`, priceUsd);
+                coreFieldLoaded[`core-${t.id}-price`] = true;
+
+                const liquidityUsd = 2 * quoteAmount * quoteUsdPrice;
+                setCoreCellText(`core-${t.id}-liquidity`, `$${Math.round(liquidityUsd).toLocaleString()}`);
+                coreFieldLoaded[`core-${t.id}-liquidity`] = true;
+
+                if (data.totalSupply) {
+                    const supply = Number(ethers.utils.formatUnits(data.totalSupply[0], meta.decimals));
+                    setCoreCellText(`core-${t.id}-mcap`, `$${Math.round(supply * priceUsd).toLocaleString()}`);
+                    coreFieldLoaded[`core-${t.id}-mcap`] = true;
+                }
+            });
+
+            // Only sweep the fields THIS function is responsible for (the
+            // HEX/PLSX/INC/PRVX rows). core-pls-* and core-shd-* live in
+            // coreFieldLoaded too (for the "has this ever loaded" bookkeeping
+            // used elsewhere), but they're rendered separately above in
+            // fetchOnChainData - sweeping them here as well was overwriting a
+            // legitimately still-loading PLS market cap (waiting on
+            // fetchPlsTotalSupply, which resolves slightly later than this
+            // first on-chain round) with "Unavailable" every single call.
+            CORE_TOKENS.forEach(t => {
+                ['price', 'mcap', 'liquidity'].forEach(suffix => {
+                    const id = `core-${t.id}-${suffix}`;
+                    if (!coreFieldLoaded[id]) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = 'Unavailable';
+                    }
+                });
+            });
+        }
+
+        const MULTICALL3_ADDRESS = "0xcA11bde05977b3631167028862bE2a173976CA11";
+        const MULTICALL3_ABI = [
+            "function aggregate3(tuple(address target, bool allowFailure, bytes callData)[] calls) returns (tuple(bool success, bytes returnData)[] returnData)"
+        ];
+
+        let ON_CHAIN_ABI = null;
+        try {
+            ON_CHAIN_ABI = new ethers.utils.Interface([
+                "function totalMined() view returns (uint256)",
+                "function getContractSHDBalance() view returns (uint256)",
+                "function getRewardReserve() view returns (uint256)",
+                "function getFaucetBalance() view returns (uint256)",
+                "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+                "function token0() view returns (address)",
+                "function token1() view returns (address)",
+                "function totalMinted() view returns (uint256)",
+                "function getEthBalance(address addr) view returns (uint256 balance)",
+                "function ownerOf(uint256 tokenId) view returns (address)",
+                "function totalSupply() view returns (uint256)",
+                "function decimals() view returns (uint8)"
+            ]);
+        } catch (err) {
+            console.error("ethers.js failed to load — on-chain stats will show as unavailable:", err);
+        }
+
+        // Track whether PLS/SHD have ever loaded a real on-chain price. Once true,
+        // a later transient RPC failure just leaves the last-known-good value on
+        // screen instead of flashing "Unavailable".
+        let plsPriceLoaded = false;
+        let shdPriceLoaded = false;
+
+        const poolToken0Cache = { v1: null, v2: null, pls: null };
+
+        // --- PulseChain Core (HEX / PLSX / INC / PRVX) ---
+        // Prices/market cap/liquidity are derived on-chain from each token's
+        // WPLS pair reserves (same approach as SHD above), converted to USD
+        // via the already-computed plsUsdPrice. DexScreener is only used for
+        // the 24h % change, which isn't derivable from a single reserves
+        // snapshot (see fetchCoreTokensChange near fetchPrimaryMarketData).
+        const CORE_TOKENS = [
+            { id: 'hex',  address: '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39', pair: '0xf1F4ee610b2bAbB05C635F726eF8B0C568c8dc65' },
+            { id: 'plsx', address: '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab', pair: '0x1b45b9148791d3a104184Cd5DFE5CE57193a3ee9' },
+            { id: 'inc',  address: '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d', pair: '0xf808Bb6265e9Ca27002c0A04562Bf50d4FE37EAA' },
+            { id: 'prvx', address: '0xF6f8Db0aBa00007681F8fAF16A0FDa1c9B030b11', pair: '0x7f681a5aD615238357bA148C281E2EAEfd2dE55A' }
+        ];
+
+        // Which side of each pair the core token sits on, its own decimals,
+        // and the quote-side (other) token's address/decimals - fetched once
+        // each and cached, same pattern as poolToken0Cache. Kept fully
+        // generic rather than assuming every pair is quoted in WPLS: HEX
+        // uses 8 decimals instead of 18, and PRVX's pair is quoted in USDC
+        // rather than WPLS, so both the core token's and the quote token's
+        // decimals are read on-chain instead of assumed.
+        const coreTokenMeta = {};
+        CORE_TOKENS.forEach(t => { coreTokenMeta[t.id] = { pairToken0: null, pairToken1: null, isToken0: null, decimals: null, quoteAddress: null, quoteDecimals: null }; });
+
+        // Tracks whether each core-token field has ever loaded a real value,
+        // so a later transient failure leaves the last-known-good value on
+        // screen instead of blanking it.
+        const coreFieldLoaded = {
+            'core-pls-price': false, 'core-pls-mcap': false, 'core-pls-liquidity': false,
+            'core-shd-price': false, 'core-shd-mcap': false, 'core-shd-liquidity': false
+        };
+        const coreChangeLoaded = { pls: false, shd: false };
+        CORE_TOKENS.forEach(t => {
+            coreFieldLoaded[`core-${t.id}-price`] = false;
+            coreFieldLoaded[`core-${t.id}-mcap`] = false;
+            coreFieldLoaded[`core-${t.id}-liquidity`] = false;
+            coreChangeLoaded[t.id] = false;
+        });
+
+        function buildOnChainCalls() {
+            // Ethereum cutover: mining + SNFT + SHD totalSupply only.
+            // Uniswap V4 pool state and core-token rows come in a follow-up.
+            return [
+                { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalMined") },
+                { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getContractSHDBalance") },
+                { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getRewardReserve") },
+                { target: SNFT_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalMinted") },
+                { target: MULTICALL3_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getEthBalance", [SNFT_CONTRACT]) },
+                { target: SHD_TOKEN_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalSupply") }
+            ];
+        }
+
+        function decodeResult(name, result) {
+            if (!result.success) return null;
+            try {
+                return ON_CHAIN_ABI.decodeFunctionResult(name, result.returnData);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function reservesToPool(reservesResult, token0Address) {
+            if (!reservesResult) return null;
+            const isShdToken0 = token0Address.toLowerCase() === SHD_TOKEN_ADDRESS.toLowerCase();
+            const shdReserve = isShdToken0 ? reservesResult.reserve0 : reservesResult.reserve1;
+            const plsReserve = isShdToken0 ? reservesResult.reserve1 : reservesResult.reserve0;
+            return {
+                shd: Number(ethers.utils.formatEther(shdReserve)),
+                pls: Number(ethers.utils.formatEther(plsReserve))
+            };
+        }
+
+        // Derives PLS's USD price straight from the WPLS/DAI pool's reserves
+        // (both 18-decimal tokens, same math as reservesToPool above), treating
+        // bridged DAI as ~$1. This is what lets pls-price and, in turn,
+        // shd-price be computed without ever calling DexScreener.
+        function reservesToPlsUsdPrice(reservesResult, token0Address) {
+            if (!reservesResult) return null;
+            const isPlsToken0 = token0Address.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase();
+            const plsReserve = isPlsToken0 ? reservesResult.reserve0 : reservesResult.reserve1;
+            const daiReserve = isPlsToken0 ? reservesResult.reserve1 : reservesResult.reserve0;
+            const pls = Number(ethers.utils.formatEther(plsReserve));
+            const dai = Number(ethers.utils.formatEther(daiReserve));
+            if (!pls) return null;
+            return dai / pls;
+        }
+
+        // Tracks whether each on-chain stat field has ever loaded a real value.
+        // Once a field has shown real data, a later fetch failure (RPC hiccup,
+        // multicall revert, etc.) leaves that last-known-good value on screen
+        // instead of blanking it to "Error".
+        const onChainFieldLoaded = {
+            'total-mined': false, 'contract-balance': false, 'reward-reserve': false,
+            'faucet-balance': false, 'liquidity-v1': false, 'liquidity-v2': false,
+            'snft-minted': false, 'snft-pls': false, 'snft-holders': false,
+            'shd-market-cap': false, 'shd-liquidity': false
+        };
+
+        async function fetchOnChainData() {
+            try {
+                const calls = buildOnChainCalls();
+                const results = await withRpcFallback((provider) => {
+                    const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+                    return multicall.callStatic.aggregate3(calls);
+                });
+
+                let i = 0;
+                const totalMined = decodeResult("totalMined", results[i++]);
+                const contractBalance = decodeResult("getContractSHDBalance", results[i++]);
+                const rewardReserve = decodeResult("getRewardReserve", results[i++]);
+                const snftMinted = decodeResult("totalMinted", results[i++]);
+                const snftPlsBalance = decodeResult("getEthBalance", results[i++]);
+                const totalSupply = decodeResult("totalSupply", results[i++]);
+
+                if (totalMined) { document.getElementById('total-mined').textContent = formatTokenAmount(Number(ethers.utils.formatEther(totalMined[0]))) + " SHD"; onChainFieldLoaded['total-mined'] = true; }
+                if (contractBalance) { document.getElementById('contract-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(contractBalance[0]))) + " SHD"; onChainFieldLoaded['contract-balance'] = true; }
+                if (rewardReserve) { document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD"; onChainFieldLoaded['reward-reserve'] = true; }
+
+                // Price / mcap / liquidity for SHD will come from DexScreener or
+                // Uniswap V4 StateView in a follow-up. Leave existing cells as-is
+                // so we don't flash "Unavailable" over last-known values.
+                if (totalSupply) {
+                    // Keep totalSupply available for a future on-chain mcap path
+                    window.__shdTotalSupply = Number(ethers.utils.formatEther(totalSupply[0]));
+                }
+
+                if (snftMinted) { document.getElementById('snft-minted').textContent = `${snftMinted[0].toString()}/${SNFT_MAX_SUPPLY}`; onChainFieldLoaded['snft-minted'] = true; }
+                if (snftPlsBalance) { document.getElementById('snft-pls').textContent = formatTokenAmount(Number(ethers.utils.formatEther(snftPlsBalance[0]))) + " ETH"; onChainFieldLoaded['snft-pls'] = true; }
+
+                if (snftMinted) await fetchSnftHolders(Number(snftMinted[0]));
+            } catch (err) {
+                console.error("Failed to load on-chain data:", err);
+                // Only blank fields that have never successfully loaded; fields that
+                // already show a real value keep it instead of flashing "Error".
+                Object.keys(onChainFieldLoaded).forEach((id) => {
+                    if (!onChainFieldLoaded[id]) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = "Error";
+                    }
+                });
+                Object.keys(coreFieldLoaded).forEach((id) => {
+                    if (!coreFieldLoaded[id]) {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = "Error";
+                    }
+                });
+            }
+        }
+
+        async function fetchSnftHolders(totalMintedCount) {
+            const el = document.getElementById('snft-holders');
+            if (!el) return;
+            if (!totalMintedCount || totalMintedCount <= 0) {
+                el.textContent = "0";
+                onChainFieldLoaded['snft-holders'] = true;
+                return;
+            }
+            try {
+                const ownerCalls = [];
+                for (let tokenId = 1; tokenId <= totalMintedCount; tokenId++) {
+                    ownerCalls.push({
+                        target: SNFT_CONTRACT,
+                        allowFailure: true,
+                        callData: ON_CHAIN_ABI.encodeFunctionData("ownerOf", [tokenId])
+                    });
+                }
+                const ownerResults = await withRpcFallback((provider) => {
+                    const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+                    return multicall.callStatic.aggregate3(ownerCalls);
+                });
+
+                const holders = new Set();
+                ownerResults.forEach((result) => {
+                    const decoded = decodeResult("ownerOf", result);
+                    if (decoded) holders.add(decoded[0].toLowerCase());
+                });
+
+                el.textContent = holders.size.toString();
+                onChainFieldLoaded['snft-holders'] = true;
+            } catch (err) {
+                console.error("Failed to load SNFT holders:", err);
+                // Only show an error state if we've never loaded a real count yet;
+                // otherwise leave the last-known-good value on screen.
+                if (!onChainFieldLoaded['snft-holders']) el.textContent = "Error";
+            }
+        }
+
+        function topicToAddress(topic) {
+            if (!topic || topic.length < 42) return null;
+            return ('0x' + topic.slice(-40)).toLowerCase();
+        }
+
+        function formatTxAmount(n) {
+            if (typeof n !== 'number' || !isFinite(n)) return '—';
+            if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+            if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
+            if (n >= 1) return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            if (n >= 0.01) return n.toFixed(4);
+            return n.toFixed(6);
+        }
+
+        function formatTxUsd(n) {
+            if (typeof n !== 'number' || !isFinite(n) || n <= 0) return '—';
+            if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+            if (n >= 1) return '$' + n.toFixed(2);
+            if (n >= 0.01) return '$' + n.toFixed(4);
+            return '$' + n.toFixed(6);
+        }
+
+        function formatTxPrice(n) {
+            if (typeof n !== 'number' || !isFinite(n) || n <= 0) return '—';
+            if (n >= 1) return '$' + n.toFixed(4);
+            if (n >= 0.0001) return '$' + n.toFixed(6);
+            return '$' + n.toFixed(8);
+        }
+
+        function decodeSwapLog(log, poolKey, shdIsToken0) {
+            // data = amount0In, amount1In, amount0Out, amount1Out (4 x uint256)
+            const data = log.data;
+            if (!data || data.length < 2 + 64 * 4) return null;
+            const hex = data.slice(2);
+            const amount0In = BigInt('0x' + hex.slice(0, 64));
+            const amount1In = BigInt('0x' + hex.slice(64, 128));
+            const amount0Out = BigInt('0x' + hex.slice(128, 192));
+            const amount1Out = BigInt('0x' + hex.slice(192, 256));
+
+            const sender = topicToAddress(log.topics[1]);
+            const to = topicToAddress(log.topics[2]);
+
+            let shdIn, shdOut, wplsIn, wplsOut;
+            if (shdIsToken0) {
+                shdIn = amount0In; shdOut = amount0Out;
+                wplsIn = amount1In; wplsOut = amount1Out;
+            } else {
+                shdIn = amount1In; shdOut = amount1Out;
+                wplsIn = amount0In; wplsOut = amount0Out;
+            }
+
+            // Buy SHD = SHD leaves the pool (amountOut > 0 for SHD)
+            // Sell SHD = SHD enters the pool (amountIn > 0 for SHD)
+            const isBuy = shdOut > 0n && shdIn === 0n;
+            const isSell = shdIn > 0n && shdOut === 0n;
+            if (!isBuy && !isSell) return null; // skip weird / dual-sided
+
+            const shdRaw = isBuy ? shdOut : shdIn;
+            const wplsRaw = isBuy ? wplsIn : wplsOut;
+            const shdAmt = Number(ethers.utils.formatEther(shdRaw));
+            const wplsAmt = Number(ethers.utils.formatEther(wplsRaw));
+            if (!shdAmt || !wplsAmt) return null;
+
+            const priceInPls = wplsAmt / shdAmt;
+            const plsUsd = lastKnownPlsUsdForTx || lastPlsUsdPrice;
+            const priceUsd = plsUsd ? priceInPls * plsUsd : null;
+            const usdValue = plsUsd ? wplsAmt * plsUsd : null;
+
+            // Prefer the non-router side as the trader (DexScreener-style maker)
+            const routers = new Set([PULSEX_ROUTERS.v1, PULSEX_ROUTERS.v2]);
+            let trader = to;
+            if (!trader || routers.has(trader) || trader === LIQUIDITY_PAIRS[poolKey].toLowerCase()) {
+                trader = sender;
+            }
+            if (trader && routers.has(trader)) {
+                // still a router — keep `to` as fallback
+                trader = to || sender;
+            }
+
+            return {
+                type: isBuy ? 'buy' : 'sell',
+                shd: shdAmt,
+                wpls: wplsAmt,
+                priceUsd,
+                usdValue,
+                pool: poolKey,
+                trader,
+                txHash: log.transactionHash,
+                blockNumber: log.blockNumber,
+                logIndex: log.logIndex
+            };
+        }
+
+        async function resolvePoolToken0(provider, pairAddress) {
+            const iface = new ethers.utils.Interface(['function token0() view returns (address)']);
+            const data = iface.encodeFunctionData('token0');
+            const result = await provider.call({ to: pairAddress, data });
+            const decoded = iface.decodeFunctionResult('token0', result);
+            return decoded[0].toLowerCase();
+        }
+
+        // Fetch a log range, automatically splitting into smaller windows only if the
+        // RPC actually rejects the range (some public endpoints cap eth_getLogs width).
+        // This keeps the common case at one round trip instead of always assuming
+        // the provider needs small requests.
+        async function getLogsResilient(provider, pairAddress, fromBlock, toBlock, depth = 0) {
+            try {
+                return await provider.getLogs({
+                    address: pairAddress,
+                    fromBlock,
+                    toBlock,
+                    topics: [SWAP_TOPIC0]
+                });
+            } catch (e) {
+                if (depth >= 4 || toBlock - fromBlock < 100) {
+                    console.warn(`getLogs ${pairAddress} ${fromBlock}-${toBlock} failed, giving up on this slice:`, e.message);
+                    return [];
+                }
+                const mid = fromBlock + Math.floor((toBlock - fromBlock) / 2);
+                const [a, b] = await Promise.all([
+                    getLogsResilient(provider, pairAddress, fromBlock, mid, depth + 1),
+                    getLogsResilient(provider, pairAddress, mid + 1, toBlock, depth + 1)
+                ]);
+                return [...a, ...b];
+            }
+        }
+
+        // Most pools have enough recent activity that a single call over a modest,
+        // recent window already covers the target count — try that first (one round
+        // trip) instead of always crawling backward in small fixed-size chunks, which
+        // cost one round trip each even when a chunk turns up nothing.
+        async function fetchRecentSwapLogs(provider, pairAddress, fromBlock, toBlock, limit) {
+            const FAST_WINDOW = 600; // ~30-40 min of PulseChain blocks; covers most cases in one call
+            const fastStart = Math.max(fromBlock, toBlock - FAST_WINDOW + 1);
+
+            let logs = await getLogsResilient(provider, pairAddress, fastStart, toBlock);
+
+            if (logs.length < limit && fastStart > fromBlock) {
+                // Fast window wasn't enough (quiet pool) — pull the rest of the
+                // lookback in one more call rather than many small chunks.
+                const rest = await getLogsResilient(provider, pairAddress, fromBlock, fastStart - 1);
+                logs = logs.concat(rest);
+            }
+
+            return logs;
+        }
+
+        async function fetchRecentTransactions() {
+            // V4 swaps are emitted by PoolManager (not V2 pair contracts).
+            // Transaction feed will be reconnected in a follow-up.
+            if (document.hidden) return;
+            const statusEl = document.getElementById('tx-status');
+            const tbody = document.getElementById('tx-tbody');
+            if (!tbody) return;
+            if (statusEl) {
+                statusEl.classList.remove('tx-status-error');
+                statusEl.textContent = 'V4 swap feed coming soon';
+            }
+            if (!txLoadedOnce) {
+                tbody.innerHTML = '<tr><td colspan="8" class="tx-empty">Uniswap V4 transaction feed will be wired next. Chart remains live via DexScreener.</td></tr>';
+                txLoadedOnce = true;
+            }
+        }
+
+        function renderTransactions(txs) {
+            const tbody = document.getElementById('tx-tbody');
+            if (!tbody) return;
+            if (!txs.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">No swaps found in the recent block range.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = txs.map(tx => {
+                const typeClass = tx.type === 'buy' ? 'buy' : 'sell';
+                const typeLabel = tx.type === 'buy' ? 'Buy' : 'Sell';
+                const explorerTx = `https://ipfs.scan.pulsechain.com/tx/${tx.txHash}`;
+                const explorerAddr = tx.trader
+                    ? `https://ipfs.scan.pulsechain.com/address/${tx.trader}`
+                    : '#';
+                const timeLabel = `#${tx.blockNumber.toLocaleString()}`;
+                return `<tr>
+                    <td data-label="Type"><span class="tx-type ${typeClass}">${typeLabel}</span></td>
+                    <td data-label="USD"><span class="tx-amount">${formatTxUsd(tx.usdValue)}</span></td>
+                    <td data-label="SHD"><span class="tx-amount">${formatTxAmount(tx.shd)}</span></td>
+                    <td data-label="WPLS"><span class="tx-amount">${formatTxAmount(tx.wpls)}</span></td>
+                    <td data-label="Price"><span class="tx-amount">${formatTxPrice(tx.priceUsd)}</span></td>
+                    <td data-label="Pool"><span class="tx-pool ${tx.pool}">${tx.pool.toUpperCase()}</span></td>
+                    <td class="tx-addr" data-label="Trader"><a href="${explorerAddr}" target="_blank" rel="noopener noreferrer" title="${tx.trader || ''}">${truncateAddress(tx.trader)}</a></td>
+                    <td class="tx-time" data-label="Block"><a href="${explorerTx}" target="_blank" rel="noopener noreferrer" style="color:inherit">${timeLabel}</a></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function manualReloadTransactions(btn) {
+            if (btn) {
+                btn.classList.add('reloading');
+                btn.disabled = true;
+            }
+            fetchRecentTransactions().finally(() => {
+                if (btn) {
+                    setTimeout(() => {
+                        btn.classList.remove('reloading');
+                        btn.disabled = false;
+                    }, 800);
+                }
+            });
+        }
+
+        function startPolling() {
+            // Stagger the initial calls slightly instead of firing them all in the same
+            // instant, to avoid a burst of simultaneous requests on first load
+            // (which was tripping DexScreener's rate limiting and showing N/A/Unavailable
+            // before the retry logic could catch up).
+            fetchPrices();
+            fetchOnChainData();
+            priceInterval = setInterval(fetchPrices, 45000);
+            onChainInterval = setInterval(fetchOnChainData, 60000);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (priceInterval) clearInterval(priceInterval);
+                if (onChainInterval) clearInterval(onChainInterval);
+            } else {
+                startPolling();
+            }
+        });
+
+        startPolling();
+
+        function truncateAddress(addr, front = 6, back = 6) {
+            if (!addr || addr.length <= front + back + 1) return addr;
+            return `${addr.slice(0, front)}…${addr.slice(-back)}`;
+        }
+
+        function updateContractAddressDisplay() {
+            const el = document.getElementById('contract-address');
+            if (!el) return;
+            const full = el.dataset.fullAddress;
+            el.textContent = window.innerWidth < 480 ? truncateAddress(full) : full;
+        }
+
+        updateContractAddressDisplay();
+        let addressResizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(addressResizeTimer);
+            addressResizeTimer = setTimeout(updateContractAddressDisplay, 150);
+        });
+
+        function copyContract(btn) {
+            navigator.clipboard.writeText('0xa1e1a6cB1F694e41a5C270542dF233673665FCd5').then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = 'Copied!';
+                setTimeout(() => btn.innerHTML = orig, 2000);
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <svg width="20" height="20" style="flex-shrink:0; margin-top:1px; color:${type === 'error' ? 'var(--red)' : 'var(--accent)'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${type === 'error'
+                        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'}
+                </svg>
+                <p></p>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            toast.querySelector('p').textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        async function addEthereumToWallet() {
+            if (typeof window.ethereum === 'undefined') return showToast("No Ethereum-compatible wallet detected.", 'error');
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{ chainId: '0x1', chainName: 'Ethereum Mainnet', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://ethereum-rpc.publicnode.com'], blockExplorerUrls: ['https://etherscan.io'] }]
+                });
+                showToast("Ethereum network added successfully!");
+            } catch (error) {
+                // Most wallets already have mainnet; treat user cancel / already-added as soft success
+                if (error.code === 4001) return;
+                if (error.code === -32602 || (error.message && /already/i.test(error.message))) {
+                    showToast("Ethereum Mainnet is already available in your wallet.");
+                    return;
+                }
+                showToast("Failed to add Ethereum network.", 'error');
+            }
+        }
+
+        async function addSHDToWallet() {
+            if (typeof window.ethereum === 'undefined') return showToast("No Ethereum-compatible wallet detected.", 'error');
+            try {
+                const wasAdded = await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: { type: 'ERC20', options: { address: '0xa1e1a6cB1F694e41a5C270542dF233673665FCd5', symbol: 'SHD', decimals: 18, image: 'https://raw.githubusercontent.com/PBaieck-group/SnipeHead/main/docs/Logo_200.png' } }
+                });
+                showToast(wasAdded ? "SHD token added to your wallet!" : "Token addition cancelled.");
+            } catch (error) {
+                if (error.code !== 4001) showToast("Failed to add SHD token.", 'error');
+            }
+        }
+    </script>
+</body>
+</html>

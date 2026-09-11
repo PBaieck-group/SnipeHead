@@ -1,0 +1,57 @@
+{
+  "name": "67",
+  "description": "SnipeHead NFT (SNFT) — A single streak of blood and a black scarf. Cross earrings, closed eyes, target locked in silence.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/005.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Dark / Minimal"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Blood Streak"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Stoic"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Black Scarf + Cross Earrings + Necklace"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 55,
+      "display_type": "number"
+    }
+  ]
+}

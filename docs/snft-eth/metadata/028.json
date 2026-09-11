@@ -1,0 +1,57 @@
+{
+  "name": "Cracked Cosmos",
+  "description": "SnipeHead NFT (SNFT) — Cosmic alignment. Cracked stone head, six glowing gemstones in chakra positions, lightning from another dimension.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/028.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Cosmic / Mystical"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Cracks + Gems"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Ruby Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Transcendent"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Gemstone Chakras"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Stone with Cracks"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cosmic Space"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 96,
+      "display_type": "number"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "S Girl",
+  "description": "SnipeHead NFT (SNFT) — Cracked porcelain elegance. Ornate silver jewelry, black lace choker, gemstone drops, and a single tear of ink.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/015.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Gothic / Elegant"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots + Cracks + Ink"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Melancholic"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "Ornate Jewelry + Lace Choker"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale Cracked"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 86,
+      "display_type": "number"
+    }
+  ]
+}

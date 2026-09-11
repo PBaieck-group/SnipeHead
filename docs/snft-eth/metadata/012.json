@@ -1,0 +1,57 @@
+{
+  "name": "No Aura",
+  "description": "SnipeHead NFT (SNFT) — Pure aggression in graphite. Narrowed eyes, furrowed brow. The simplest expression of don't test me.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/012.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Sketch / Aggressive"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Bald"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Angry"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "None"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 40,
+      "display_type": "number"
+    }
+  ]
+}

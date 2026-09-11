@@ -1,0 +1,57 @@
+{
+  "name": "Death of SH",
+  "description": "SnipeHead NFT (SNFT) — Quiet devotion under the white shroud. Closed eyes, pure silence, a prayer locked in the crosshairs.",
+  "image": "ipfs://bafybeibjoncyfsdv32fwfk2damq32jgtktpspkayurt52rvd4lqz6shsuy/001.png",
+  "external_url": "https://snipehead.xyz",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Genesis"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Religious / Contemplative"
+    },
+    {
+      "trait_type": "Hair",
+      "value": "Covered (White Veil)"
+    },
+    {
+      "trait_type": "Facial Hair",
+      "value": "None"
+    },
+    {
+      "trait_type": "Markings",
+      "value": "Three Black Dots"
+    },
+    {
+      "trait_type": "Center Symbol",
+      "value": "Red Target"
+    },
+    {
+      "trait_type": "Mood",
+      "value": "Serene"
+    },
+    {
+      "trait_type": "Accessories",
+      "value": "White Veil"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pale"
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Rarity Score",
+      "value": 72,
+      "display_type": "number"
+    }
+  ]
+}
