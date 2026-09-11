@@ -17,22 +17,26 @@
     <meta name="twitter:image" content="https://snipehead.xyz/Logo_500.png">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
-    <title>SnipeHead — Choose Your Chain</title>
+    <title>SnipeHead</title>
     <link rel="canonical" href="https://snipehead.xyz/">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #05060a;
-            --bg-elevated: #0b0d14;
-            --text: #f0f2f8;
-            --text-secondary: #9aa3b8;
-            --text-muted: #6b728a;
-            --eth: #627eea;
-            --eth-glow: rgba(98, 126, 234, 0.45);
-            --pls: #c026d3;
-            --pls-glow: rgba(192, 38, 211, 0.4);
+            --bg: #090a0d;
+            --bg-elevated: #12141a;
+            --text: #f3f4f8;
+            --text-secondary: #9da3b4;
+            --text-muted: #5f6575;
+            --gold: #c9962c;
+            --gold-glow: rgba(201, 150, 44, 0.35);
+            --eth: #6a7fd9;
+            --eth-deep: #4c5cad;
+            --eth-glow: rgba(106, 127, 217, 0.28);
+            --pls: #b855d6;
+            --pls-deep: #93409f;
+            --pls-glow: rgba(184, 85, 214, 0.28);
             --border: rgba(255, 255, 255, 0.08);
-            --radius: 20px;
+            --radius: 16px;
         }
 
         * {
@@ -77,56 +81,20 @@
                 linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             background-size: 64px 64px;
-            mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
-            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 15%, transparent 72%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 15%, transparent 72%);
         }
 
-        .orb {
+        .bg-glow {
             position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.55;
-            animation: drift 18s ease-in-out infinite alternate;
-        }
-
-        .orb-eth {
-            width: 420px;
-            height: 420px;
-            background: var(--eth);
-            top: -8%;
-            right: 5%;
-            animation-delay: -4s;
-        }
-
-        .orb-pls {
-            width: 380px;
-            height: 380px;
-            background: var(--pls);
-            bottom: -5%;
-            left: 0%;
-            animation-delay: -9s;
-        }
-
-        .orb-center {
-            width: 280px;
-            height: 280px;
-            background: #1e293b;
-            top: 35%;
+            width: 640px;
+            height: 640px;
+            top: -18%;
             left: 50%;
             transform: translateX(-50%);
+            background: radial-gradient(circle, var(--gold-glow), transparent 68%);
             opacity: 0.35;
-            animation-duration: 22s;
-            animation-name: drift-center;
-        }
-
-        @keyframes drift {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, -40px) scale(1.08); }
-        }
-
-        @keyframes drift-center {
-            0% { transform: translateX(-50%) translate(0, 0) scale(1); }
-            100% { transform: translateX(-50%) translate(-20px, 25px) scale(1.12); }
+            filter: blur(10px);
         }
 
         .page {
@@ -143,7 +111,7 @@
 
         @media (min-width: 768px) {
             .page {
-                padding: 2rem 2rem 3rem;
+                padding: 2.25rem 2rem 3rem;
             }
         }
 
@@ -151,7 +119,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2.75rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease-out 0s forwards;
         }
 
         .brand {
@@ -164,24 +134,25 @@
             width: 40px;
             height: 40px;
             border-radius: 10px;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
         }
 
         .brand-name {
             font-family: 'Space Grotesk', 'Inter', sans-serif;
             font-size: 1.15rem;
             font-weight: 600;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.01em;
         }
 
         .header-badge {
             display: none;
             align-items: center;
-            gap: 0.45rem;
-            padding: 0.35rem 0.85rem;
-            font-size: 0.75rem;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.78rem;
             font-weight: 500;
             color: var(--text-secondary);
-            background: rgba(255,255,255,0.04);
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 999px;
         }
@@ -194,9 +165,9 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #4ade80;
-            box-shadow: 0 0 8px #4ade80;
-            animation: pulse 2s ease-in-out infinite;
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--gold-glow);
+            animation: pulse 2.2s ease-in-out infinite;
         }
 
         @keyframes pulse {
@@ -206,58 +177,49 @@
 
         .hero {
             text-align: center;
-            margin-bottom: 2.75rem;
-            animation: fadeUp 0.7s ease-out both;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 0.65s ease-out 0.08s forwards;
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(18px); }
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero-logo {
-            width: 88px;
-            height: 88px;
-            margin: 0 auto 1.35rem;
-            border-radius: 22px;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.1),
-                0 12px 40px rgba(0,0,0,0.45),
-                0 0 60px rgba(98, 126, 234, 0.15);
-            object-fit: cover;
-            background: #0a0a0c;
+        .hero-kicker {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gold);
+            margin-bottom: 1rem;
         }
 
         .hero h1 {
             font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-size: clamp(1.85rem, 5vw, 2.85rem);
+            font-size: clamp(2.1rem, 5.4vw, 3.25rem);
             font-weight: 600;
             letter-spacing: -0.03em;
-            line-height: 1.15;
-            margin-bottom: 0.85rem;
-        }
-
-        .hero h1 span {
-            background: linear-gradient(135deg, #a5b4fc 0%, var(--eth) 45%, #c084fc 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            line-height: 1.12;
+            margin-bottom: 1rem;
+            color: var(--text);
         }
 
         .hero p {
-            font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+            font-size: clamp(0.98rem, 2.1vw, 1.1rem);
             color: var(--text-secondary);
-            max-width: 28rem;
+            max-width: 29rem;
             margin: 0 auto;
-            line-height: 1.6;
+            line-height: 1.65;
         }
 
         .chains {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.15rem;
-            margin-bottom: 2.5rem;
-            animation: fadeUp 0.7s ease-out 0.12s both;
+            margin-bottom: 2.75rem;
+            opacity: 0;
+            animation: fadeUp 0.65s ease-out 0.18s forwards;
         }
 
         @media (min-width: 700px) {
@@ -273,88 +235,79 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 2rem 1.5rem 1.75rem;
-            background: linear-gradient(165deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            padding: 2.25rem 1.5rem 2rem;
+            background: linear-gradient(165deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition:
-                transform 0.25s ease,
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
             overflow: hidden;
             cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
         .chain-card::before {
             content: '';
             position: absolute;
             inset: 0;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            opacity: 0.55;
             pointer-events: none;
             border-radius: inherit;
-        }
-
-        .chain-card.eth::before {
-            background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--eth-glow), transparent 70%);
+            transition: opacity 0.3s ease;
         }
 
         .chain-card.pls::before {
-            background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--pls-glow), transparent 70%);
+            background: radial-gradient(ellipse 75% 55% at 50% -5%, var(--pls-glow), transparent 70%);
+        }
+
+        .chain-card.eth::before {
+            background: radial-gradient(ellipse 75% 55% at 50% -5%, var(--eth-glow), transparent 70%);
         }
 
         .chain-card:hover {
-            transform: translateY(-6px);
-        }
-
-        .chain-card.eth:hover {
-            border-color: rgba(98, 126, 234, 0.45);
-            box-shadow:
-                0 20px 50px rgba(0,0,0,0.4),
-                0 0 40px rgba(98, 126, 234, 0.18);
-        }
-
-        .chain-card.pls:hover {
-            border-color: rgba(192, 38, 211, 0.45);
-            box-shadow:
-                0 20px 50px rgba(0,0,0,0.4),
-                0 0 40px rgba(192, 38, 211, 0.18);
+            transform: translateY(-4px);
         }
 
         .chain-card:hover::before {
             opacity: 1;
         }
 
+        .chain-card.pls:hover {
+            border-color: rgba(184, 85, 214, 0.5);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.45), 0 0 34px var(--pls-glow);
+        }
+
+        .chain-card.eth:hover {
+            border-color: rgba(106, 127, 217, 0.5);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.45), 0 0 34px var(--eth-glow);
+        }
+
         .chain-token {
-            width: min(180px, 55vw);
+            width: min(170px, 52vw);
             height: auto;
-            margin-bottom: 1.35rem;
-            filter: drop-shadow(0 12px 28px rgba(0,0,0,0.5));
-            transition: transform 0.35s ease;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 14px 26px rgba(0,0,0,0.55));
             position: relative;
             z-index: 1;
+            transition: transform 0.3s ease;
         }
 
         .chain-card:hover .chain-token {
-            transform: scale(1.06) translateY(-4px);
+            transform: scale(1.05) translateY(-3px);
         }
 
         .chain-label {
             font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-size: 1.35rem;
+            font-size: 1.3rem;
             font-weight: 600;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.35rem;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.4rem;
             position: relative;
             z-index: 1;
         }
 
         .chain-sub {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 1.35rem;
+            margin-bottom: 1.6rem;
             position: relative;
             z-index: 1;
         }
@@ -363,27 +316,34 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.7rem 1.35rem;
+            padding: 0.7rem 1.4rem;
             font-size: 0.875rem;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: 10px;
+            color: #0a0a0c;
             position: relative;
             z-index: 1;
-            transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        .chain-card.eth .chain-cta {
-            background: var(--eth);
-            color: #0a0a0c;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .chain-card.pls .chain-cta {
-            background: linear-gradient(135deg, #e879f9, #c026d3);
-            color: #0a0a0c;
+            background: linear-gradient(135deg, var(--pls), var(--pls-deep));
+        }
+
+        .chain-card.eth .chain-cta {
+            background: linear-gradient(135deg, var(--eth), var(--eth-deep));
         }
 
         .chain-card:hover .chain-cta {
-            transform: scale(1.03);
+            transform: scale(1.04);
+        }
+
+        .chain-card.pls:hover .chain-cta {
+            box-shadow: 0 8px 22px var(--pls-glow);
+        }
+
+        .chain-card.eth:hover .chain-cta {
+            box-shadow: 0 8px 22px var(--eth-glow);
         }
 
         .chain-cta svg {
@@ -399,7 +359,8 @@
         .meta {
             margin-top: auto;
             text-align: center;
-            animation: fadeUp 0.7s ease-out 0.22s both;
+            opacity: 0;
+            animation: fadeUp 0.65s ease-out 0.28s forwards;
         }
 
         .meta-line {
@@ -409,7 +370,7 @@
             gap: 0.5rem 1.25rem;
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
         }
 
         .meta-line a {
@@ -418,13 +379,17 @@
         }
 
         .meta-line a:hover {
-            color: var(--text);
+            color: var(--gold);
         }
 
         .footer-copy {
             font-size: 0.75rem;
             color: var(--text-muted);
-            opacity: 0.85;
+        }
+
+        .footer-version {
+            color: var(--text-muted);
+            opacity: 0.6;
         }
 
         .chain-card:focus-visible {
@@ -435,14 +400,19 @@
         .chain-card.pls:focus-visible {
             outline-color: var(--pls);
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            header, .hero, .chains, .meta {
+                animation: none;
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="bg-layer" aria-hidden="true">
         <div class="bg-grid"></div>
-        <div class="orb orb-eth"></div>
-        <div class="orb orb-pls"></div>
-        <div class="orb orb-center"></div>
+        <div class="bg-glow"></div>
     </div>
 
     <div class="page">
@@ -458,13 +428,14 @@
         </header>
 
         <section class="hero">
-            <h1>Choose your <span>chain</span></h1>
-            <p>Mine SHD, trade, and join the ecosystem, fully decentralized on PulseChain or Ethereum.</p>
+            <span class="hero-kicker">Decentralized. Non-custodial. Unstoppable.</span>
+            <h1>Choose your chain</h1>
+            <p>Mine SHD, trade, and join the ecosystem on PulseChain or Ethereum.</p>
         </section>
 
         <section class="chains" aria-label="Select blockchain">
             <a class="chain-card pls" href="https://snipehead.xyz/pls" aria-label="Enter SnipeHead on PulseChain">
-                <img class="chain-token" src="pls-3d-token-v1.png" alt="PulseChain" width="180" height="180">
+                <img class="chain-token" src="pls-3d-token-v1.png" alt="PulseChain" width="170" height="170">
                 <h2 class="chain-label">PulseChain</h2>
                 <p class="chain-sub">PulseX · Low fees · Community native</p>
                 <span class="chain-cta">
@@ -474,7 +445,7 @@
             </a>
 
             <a class="chain-card eth" href="https://snipehead.xyz/eth" aria-label="Enter SnipeHead on Ethereum">
-                <img class="chain-token" src="eth-3d-token-v1.png" alt="Ethereum" width="180" height="180">
+                <img class="chain-token" src="eth-3d-token-v1.png" alt="Ethereum" width="170" height="170">
                 <h2 class="chain-label">Ethereum</h2>
                 <p class="chain-sub">OG · V4 · SHD/WBTC</p>
                 <span class="chain-cta">
@@ -488,7 +459,7 @@
             <div class="meta-line">
                 <a href="https://github.com/PBaieck-group" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>
-            <p class="footer-copy">&copy; 2025–2026 SnipeHead. Community-powered. Non-custodial.</p>
+            <p class="footer-copy">&copy; 2025–2026 SnipeHead. Community-powered. Non-custodial. <span class="footer-version">v1.0.0</span></p>
         </footer>
     </div>
 </body>
