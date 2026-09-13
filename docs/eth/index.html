@@ -1910,7 +1910,7 @@
                         <div class="swap-col">
                             <div id="uniswap-embed">
                                 <iframe
-                                    src="https://thirdweb.com/bridge/swap-widget?theme=dark&buyChain=1&buyTokenAddress=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&sellChain=1"
+                                    src="https://thirdweb.com/bridge/swap-widget?theme=dark&buyChain=1&buyTokenAddress=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&sellChain=1&sellAmount=0.0001"
                                     title="Swap SHD"
                                     allow="clipboard-write; clipboard-read; ethereum"
                                     loading="lazy"
@@ -2039,7 +2039,7 @@
                 <section class="section">
                     <div class="card cta-band card-static">
                         <h2>Join the <span>SnipeHead</span> Ecosystem</h2>
-                        <p>Mine SHD for exclusive rewards and trade on Uniswap V4 — fully on Ethereum.</p>
+                        <p>Buy SHD then mine for exclusive rewards.</p>
                         <div class="cta-actions">
                             <a href="https://app.uniswap.org/swap?outputCurrency=0xa1e1a6cB1F694e41a5C270542dF233673665FCd5&chain=mainnet" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
                             <a href="https://snipehead.xyz/mine-eth/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Start Mining</a>
@@ -2059,7 +2059,7 @@
                         <a href="https://gitlab.com/pbaieck-group/SnipeHead-eth" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v1.0.1</p>
+                    <p class="footer-version">v1.0.2</p>
                 </div>
             </footer>
         </div>
@@ -2458,7 +2458,7 @@
             const price = Number(pool.priceUsd);
             if (price > 0) {
                 const priceEl = document.getElementById('shd-price');
-                if (priceEl) priceEl.textContent = `$${price.toFixed(8)}`;
+                if (priceEl) priceEl.textContent = `$${price.toFixed(6)}`;
                 renderTickerPrice('shd-ticker-price', price);
                 renderTickerPrice('core-shd-price', price);
                 shdPriceLoaded = true;
