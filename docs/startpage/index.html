@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SnipeHead — Choose your chain. Mine and trade SHD on PulseChain or Ethereum.">
+    <meta name="keywords" content="SnipeHead, SHD, Ethereum, PulseChain, DeFi, Crypto">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SnipeHead — Choose Your Chain">
+    <meta property="og:description" content="Mine and trade SHD on PulseChain or Ethereum. Decentralized and unstoppable.">
+    <meta property="og:url" content="https://snipehead.xyz/">
+    <meta property="og:image" content="https://snipehead.xyz/Logo_500.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SnipeHead — Choose Your Chain">
+    <meta name="twitter:description" content="Mine and trade SHD on PulseChain or Ethereum.">
+    <meta name="twitter:image" content="https://snipehead.xyz/Logo_500.png">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <title>SnipeHead</title>
+    <link rel="canonical" href="https://snipehead.xyz/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090a0d;
+            --bg-elevated: #12141a;
+            --text: #f3f4f8;
+            --text-secondary: #9da3b4;
+            --text-muted: #5f6575;
+            --gold: #c9962c;
+            --gold-glow: rgba(201, 150, 44, 0.35);
+            --eth: #6a7fd9;
+            --eth-deep: #4c5cad;
+            --eth-glow: rgba(106, 127, 217, 0.28);
+            --pls: #b855d6;
+            --pls-deep: #93409f;
+            --pls-glow: rgba(184, 85, 214, 0.28);
+            --border: rgba(255, 255, 255, 0.08);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 15%, transparent 72%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 15%, transparent 72%);
+        }
+
+        .bg-glow {
+            position: absolute;
+            width: 640px;
+            height: 640px;
+            top: -18%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, var(--gold-glow), transparent 68%);
+            opacity: 0.35;
+            filter: blur(10px);
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem 1.25rem 2.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .page {
+                padding: 2.25rem 2rem 3rem;
+            }
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.75rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease-out 0s forwards;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+        }
+
+        .brand-name {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .header-badge {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+        }
+
+        @media (min-width: 640px) {
+            .header-badge { display: inline-flex; }
+        }
+
+        .header-badge .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--gold-glow);
+            animation: pulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 0.65s ease-out 0.08s forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-kicker {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: clamp(2.1rem, 5.4vw, 3.25rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.12;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .hero p {
+            font-size: clamp(0.98rem, 2.1vw, 1.1rem);
+            color: var(--text-secondary);
+            max-width: 29rem;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+
+        .chains {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.15rem;
+            margin-bottom: 2.75rem;
+            opacity: 0;
+            animation: fadeUp 0.65s ease-out 0.18s forwards;
+        }
+
+        @media (min-width: 700px) {
+            .chains {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.35rem;
+            }
+        }
+
+        .chain-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2.25rem 1.5rem 2rem;
+            background: linear-gradient(165deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .chain-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.55;
+            pointer-events: none;
+            border-radius: inherit;
+            transition: opacity 0.3s ease;
+        }
+
+        .chain-card.pls::before {
+            background: radial-gradient(ellipse 75% 55% at 50% -5%, var(--pls-glow), transparent 70%);
+        }
+
+        .chain-card.eth::before {
+            background: radial-gradient(ellipse 75% 55% at 50% -5%, var(--eth-glow), transparent 70%);
+        }
+
+        .chain-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .chain-card:hover::before {
+            opacity: 1;
+        }
+
+        .chain-card.pls:hover {
+            border-color: rgba(184, 85, 214, 0.5);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.45), 0 0 34px var(--pls-glow);
+        }
+
+        .chain-card.eth:hover {
+            border-color: rgba(106, 127, 217, 0.5);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.45), 0 0 34px var(--eth-glow);
+        }
+
+        .chain-token {
+            width: min(170px, 52vw);
+            height: auto;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 14px 26px rgba(0,0,0,0.55));
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .chain-card:hover .chain-token {
+            transform: scale(1.05) translateY(-3px);
+        }
+
+        .chain-label {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chain-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.6rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chain-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.4rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 10px;
+            color: #0a0a0c;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chain-card.pls .chain-cta {
+            background: linear-gradient(135deg, var(--pls), var(--pls-deep));
+        }
+
+        .chain-card.eth .chain-cta {
+            background: linear-gradient(135deg, var(--eth), var(--eth-deep));
+        }
+
+        .chain-card:hover .chain-cta {
+            transform: scale(1.04);
+        }
+
+        .chain-card.pls:hover .chain-cta {
+            box-shadow: 0 8px 22px var(--pls-glow);
+        }
+
+        .chain-card.eth:hover .chain-cta {
+            box-shadow: 0 8px 22px var(--eth-glow);
+        }
+
+        .chain-cta svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .chain-card:hover .chain-cta svg {
+            transform: translateX(3px);
+        }
+
+        .meta {
+            margin-top: auto;
+            text-align: center;
+            opacity: 0;
+            animation: fadeUp 0.65s ease-out 0.28s forwards;
+        }
+
+        .meta-line {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 1.25rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.9rem;
+        }
+
+        .meta-line a {
+            color: var(--text-secondary);
+            transition: color 0.15s;
+        }
+
+        .meta-line a:hover {
+            color: var(--gold);
+        }
+
+        .footer-copy {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer-version {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .chain-card:focus-visible {
+            outline: 2px solid var(--eth);
+            outline-offset: 3px;
+        }
+
+        .chain-card.pls:focus-visible {
+            outline-color: var(--pls);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            header, .hero, .chains, .meta {
+                animation: none;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-layer" aria-hidden="true">
+        <div class="bg-grid"></div>
+        <div class="bg-glow"></div>
+    </div>
+
+    <div class="page">
+        <header>
+            <div class="brand">
+                <img src="Logo_200.png" alt="SnipeHead" width="40" height="40">
+                <span class="brand-name">SnipeHead</span>
+            </div>
+            <div class="header-badge">
+                <span class="live-dot"></span>
+                Live on two chains
+            </div>
+        </header>
+
+        <section class="hero">
+            <span class="hero-kicker">Decentralized. Non-custodial. Unstoppable.</span>
+            <h1>Choose your chain</h1>
+            <p>Mine SHD, trade, and join the ecosystem on PulseChain or Ethereum.</p>
+        </section>
+
+        <section class="chains" aria-label="Select blockchain">
+            <a class="chain-card pls" href="https://snipehead.xyz/pls" aria-label="Enter SnipeHead on PulseChain">
+                <img class="chain-token" src="pls-3d-token-v1.png" alt="PulseChain" width="170" height="170">
+                <h2 class="chain-label">PulseChain</h2>
+                <p class="chain-sub">PulseX · Low fees · Community native</p>
+                <span class="chain-cta">
+                    Enter PulseChain
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </span>
+            </a>
+
+            <a class="chain-card eth" href="https://snipehead.xyz/eth" aria-label="Enter SnipeHead on Ethereum">
+                <img class="chain-token" src="eth-3d-token-v1.png" alt="Ethereum" width="170" height="170">
+                <h2 class="chain-label">Ethereum</h2>
+                <p class="chain-sub">OG · V4 · SHD/WBTC</p>
+                <span class="chain-cta">
+                    Enter Ethereum
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </span>
+            </a>
+        </section>
+
+        <footer class="meta">
+            <div class="meta-line">
+                <a href="https://github.com/PBaieck-group" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+            <p class="footer-copy">&copy; 2025–2026 SnipeHead. Community-powered. Non-custodial. <span class="footer-version">v1.0.0</span></p>
+        </footer>
+    </div>
+</body>
+</html>
