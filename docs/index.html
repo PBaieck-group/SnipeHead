@@ -6,7 +6,7 @@
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://min-api.cryptocompare.com https://api.exchange.coinbase.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -2217,7 +2217,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.4.4</p>
+                    <p class="footer-version">v4.4.5</p>
                 </div>
             </footer>
         </div>
@@ -2837,14 +2837,59 @@
         let btcPriceLoaded = false; // becomes true after the first successful BTC price fetch
         let ethPriceLoaded = false; // becomes true after the first successful ETH price fetch
 
+        // CoinGecko's free API no longer sends CORS headers for browser requests
+        // (especially when rate-limited), so we try CORS-friendly sources first and
+        // normalise every result to CoinGecko's shape: { bitcoin:{usd,usd_24h_change}, ethereum:{...} }
+        async function fetchBtcEthFromAnySource() {
+            const sources = [
+                // 1) CryptoCompare - one call, includes 24h % change
+                async () => {
+                    const d = await fetchJsonWithRetry(
+                        'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH&tsyms=USD',
+                        { retries: 1, validate: d => !!(d?.RAW?.BTC?.USD?.PRICE || d?.RAW?.ETH?.USD?.PRICE) }
+                    );
+                    const pick = k => d.RAW?.[k]?.USD
+                        ? { usd: d.RAW[k].USD.PRICE, usd_24h_change: d.RAW[k].USD.CHANGEPCT24HOUR }
+                        : undefined;
+                    return { bitcoin: pick('BTC'), ethereum: pick('ETH') };
+                },
+                // 2) Coinbase Exchange - 24h stats (open/last) per product
+                async () => {
+                    const get = async id => {
+                        const d = await fetchJsonWithRetry(
+                            `https://api.exchange.coinbase.com/products/${id}/stats`,
+                            { retries: 1, validate: d => !!parseFloat(d?.last) }
+                        );
+                        const last = parseFloat(d.last), open = parseFloat(d.open);
+                        return { usd: last, usd_24h_change: open ? ((last - open) / open) * 100 : undefined };
+                    };
+                    const [b, e] = await Promise.allSettled([get('BTC-USD'), get('ETH-USD')]);
+                    return {
+                        bitcoin: b.status === 'fulfilled' ? b.value : undefined,
+                        ethereum: e.status === 'fulfilled' ? e.value : undefined
+                    };
+                },
+                // 3) CoinGecko - last resort
+                () => fetchJsonWithRetry(
+                    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true',
+                    { retries: 0, validate: d => !!(d?.bitcoin?.usd || d?.ethereum?.usd) }
+                ),
+            ];
+            let lastErr;
+            for (const src of sources) {
+                try {
+                    const r = await src();
+                    if (r?.bitcoin?.usd || r?.ethereum?.usd) return r;
+                } catch (e) { lastErr = e; }
+            }
+            throw lastErr || new Error('All BTC/ETH price sources failed');
+        }
+
         async function fetchBtcEthPrices() {
             // BTC and ETH reference prices (via CoinGecko simple price API)
             // shown only in the desktop ticker for extra market context.
             try {
-                const cgData = await fetchJsonWithRetry(
-                    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true',
-                    { validate: d => !!(d?.bitcoin?.usd || d?.ethereum?.usd) }
-                );
+                const cgData = await fetchBtcEthFromAnySource();
 
                 const btc = cgData?.bitcoin;
                 if (btc && btc.usd) {
