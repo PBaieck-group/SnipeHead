@@ -1740,6 +1740,11 @@
                         Deposit
                         <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
+                    <a href="https://snipehead.xyz/burn/" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>
+                        Burn
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
                 </nav>
 
                 <div class="sidebar-footer">
@@ -1853,7 +1858,7 @@
                             <div class="stat-icon" style="background: var(--violet-soft); color: var(--violet);">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                             </div>
-                            <span class="stat-label">Market Cap</span>
+                            <span class="stat-label">Market Cap &amp; Supply</span>
                         </div>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
                             <div>
@@ -1874,9 +1879,19 @@
                                 <span class="stat-row-label">V2 Pool</span>
                                 <span class="stat-row-value" id="liquidity-v2">Loading...</span>
                             </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Burned</span>
+                                <span class="stat-row-value" id="shd-burned">Loading...</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Total Supply</span>
+                                <span class="stat-row-value" id="shd-total-supply">Loading...</span>
+                            </div>
                         </div>
                         <div class="stat-footer">
-                            <span>Pools via Connected RPC</span>
+                               <span>Pools via Connected RPC</span>
+                               <span>&middot;</span>
+                               <a href="https://snipehead.xyz/burn/" target="_blank" rel="noopener noreferrer">Burn</a>
                         </div>
                     </div>
 
@@ -2222,7 +2237,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.4.6</p>
+                    <p class="footer-version">v4.5.0</p>
                 </div>
             </footer>
         </div>
@@ -2521,7 +2536,7 @@
             setInterval(tick, 1000);
         }
 
-        let priceInterval, onChainInterval, holderInterval, plsSupplyInterval;
+        let priceInterval, onChainInterval, holderInterval, plsSupplyInterval, burnInterval;
 
         function renderTickerPrice(elId, price, subColor) {
             const el = document.getElementById(elId);
@@ -3168,6 +3183,7 @@
                 "function getEthBalance(address addr) view returns (uint256 balance)",
                 "function ownerOf(uint256 tokenId) view returns (address)",
                 "function totalSupply() view returns (uint256)",
+                "function balanceOf(address account) view returns (uint256)",
                 "function decimals() view returns (uint8)"
             ]);
         } catch (err) {
@@ -3515,6 +3531,8 @@
                             renderTickerPrice('core-shd-price', shdUsdPrice);
                             coreFieldLoaded['core-shd-price'] = true;
                             shdPriceLoaded = true;
+                            lastShdUsdPrice = shdUsdPrice;
+                            renderBurnMarketCap();
 
                             // --- Market cap: on-chain totalSupply x on-chain SHD price ---
                             if (totalSupply) {
@@ -3900,6 +3918,69 @@
             });
         }
 
+        // --- SHD burn tracking ---
+        // Total burned = (original supply - current totalSupply) + SHD sitting in
+        // the burn addresses. The first term catches burns done through a token
+        // burn() function (which shrinks totalSupply); the second catches SHD
+        // sent to dead wallets (which stays inside totalSupply). Either way
+        // "Total Supply" = original supply - burned.
+        const SHD_INITIAL_SUPPLY = 1000000000;
+        const SHD_BURN_ADDRESSES = [
+            "0x000000000000000000000000000000000000dead",
+            "0x0000000000000000000000000000000000000000"
+        ];
+        let lastShdUsdPrice = null;
+        let shdBurnedAmount = null;
+
+        function renderBurnMarketCap() {
+            if (shdBurnedAmount === null) return;
+            const burnedEl = document.getElementById('shd-burned');
+            if (burnedEl) burnedEl.textContent = `${formatTokenAmount(shdBurnedAmount)} SHD`;
+            const supplyEl = document.getElementById('shd-total-supply');
+            if (supplyEl) {
+                const totalSupplyAfterBurn = Math.max(SHD_INITIAL_SUPPLY - shdBurnedAmount, 0);
+                supplyEl.textContent = `${formatTokenAmount(totalSupplyAfterBurn)} SHD`;
+            }
+        }
+
+        async function fetchBurnData() {
+            if (!ON_CHAIN_ABI) return;
+            try {
+                const calls = [
+                    { target: SHD_TOKEN_ADDRESS, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalSupply") },
+                    ...SHD_BURN_ADDRESSES.map(addr => ({
+                        target: SHD_TOKEN_ADDRESS,
+                        allowFailure: true,
+                        callData: ON_CHAIN_ABI.encodeFunctionData("balanceOf", [addr])
+                    }))
+                ];
+                const results = await withRpcFallback((provider) => {
+                    const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+                    return multicall.callStatic.aggregate3(calls);
+                });
+
+                const supply = decodeResult("totalSupply", results[0]);
+                if (!supply) throw new Error("totalSupply unavailable");
+                let inBurnWallets = 0;
+                for (let k = 0; k < SHD_BURN_ADDRESSES.length; k++) {
+                    const bal = decodeResult("balanceOf", results[k + 1]);
+                    if (!bal) throw new Error("burn balance unavailable");
+                    inBurnWallets += Number(ethers.utils.formatEther(bal[0]));
+                }
+                const supplyNum = Number(ethers.utils.formatEther(supply[0]));
+                shdBurnedAmount = Math.max(SHD_INITIAL_SUPPLY - supplyNum, 0) + inBurnWallets;
+                renderBurnMarketCap();
+            } catch (err) {
+                console.error("Failed to load burn data:", err);
+                if (shdBurnedAmount === null) {
+                    ['shd-burned', 'shd-total-supply'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = 'Unavailable';
+                    });
+                }
+            }
+        }
+
         function startPolling() {
             // Stagger the initial calls slightly instead of firing them all in the same
             // instant, to avoid a burst of simultaneous requests on first load
@@ -3907,6 +3988,7 @@
             // before the retry logic could catch up).
             fetchPrices();
             fetchOnChainData();
+            fetchBurnData();
             // fetchPlsTotalSupply hits PulseChain's explorer API, a different
             // host from DexScreener/CoinGecko, so it doesn't contend with the
             // rate-limit concern the other calls above are staggered for -
@@ -3927,6 +4009,8 @@
             fetchRecentTransactions();
             priceInterval = setInterval(fetchPrices, 45000);
             onChainInterval = setInterval(fetchOnChainData, 60000);
+            if (burnInterval) clearInterval(burnInterval);
+            burnInterval = setInterval(fetchBurnData, 60000);
             holderInterval = setInterval(fetchShdHolderCount, 90000);
             plsSupplyInterval = setInterval(fetchPlsTotalSupply, 300000);
             if (txInterval) clearInterval(txInterval);
@@ -3937,6 +4021,7 @@
             if (document.hidden) {
                 if (priceInterval) clearInterval(priceInterval);
                 if (onChainInterval) clearInterval(onChainInterval);
+                if (burnInterval) clearInterval(burnInterval);
                 if (holderInterval) clearInterval(holderInterval);
                 if (plsSupplyInterval) clearInterval(plsSupplyInterval);
                 if (txInterval) clearInterval(txInterval);
