@@ -390,25 +390,39 @@
             border-radius: var(--radius-pill);
             white-space: nowrap;
             min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
         }
 
-        /* Below 900px there isn't room for AGE + PLS price together,
-           so keep the ticker pill visible but only show the PLS price. */
-        @media (max-width: 899px) {
-            .topbar-ticker #shd-countdown,
-            .topbar-ticker .ticker-sep {
-                display: none;
-            }
-            .topbar-ticker {
-                gap: 0;
+        /* The ticker is sized off the TOPBAR's own width (container query), not the
+           viewport. With the 264px sidebar docked (>=1024px) the topbar is ~264px
+           narrower than the window, and it gets wider again if the sidebar is
+           closed, so viewport breakpoints can't know how much room there really is.
+           Items are added in priority order as room appears:
+             narrow : PLS
+             >=720  : + AGE and SHD
+             >=1160 : + BTC and ETH                                                  */
+        .topbar {
+            container-type: inline-size;
+            container-name: topbar;
+        }
+
+        .tk-age,
+        .tk-mid,
+        .tk-wide {
+            display: none;
+        }
+
+        @container topbar (min-width: 720px) {
+            .tk-age,
+            .tk-mid {
+                display: inline;
             }
         }
 
-        /* BTC/ETH prices are only shown once there's room (desktop);
-           mobile and tablet keep showing just PLS, unchanged. */
-        @media (max-width: 1023px) {
-            .topbar-ticker .ticker-extra {
-                display: none;
+        @container topbar (min-width: 1160px) {
+            .tk-wide {
+                display: inline;
             }
         }
 
@@ -699,7 +713,13 @@
             color: var(--text-muted);
         }
 
+        .stats-grid > *,
+        .core-row > * {
+            min-width: 0;
+        }
+
         .stat-value {
+            overflow-wrap: anywhere;
             font-family: 'Space Grotesk', 'Inter', sans-serif;
             font-size: 1.5rem;
             font-weight: 600;
@@ -1348,6 +1368,13 @@
             background: var(--red-soft);
         }
 
+        .tx-type.burn {
+            color: #fb923c;
+            background: rgba(251, 146, 60, 0.12);
+        }
+
+        .tx-pool.burn { color: #fb923c; border-color: rgba(251, 146, 60, 0.3); }
+
         .tx-pool {
             font-size: 0.72rem;
             font-weight: 600;
@@ -1780,15 +1807,15 @@
                     <span class="topbar-title">Dashboard</span>
                     <div class="topbar-ticker">
                         <span class="dot"></span>
-                        <span id="shd-countdown">AGE: Calculating...</span>
-                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
-                        <span class="ticker-extra">BTC <span id="btc-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="btc-change" style="font-weight:600;"></span></span>
-                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
-                        <span class="ticker-extra">ETH <span id="eth-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="eth-change" style="font-weight:600;"></span></span>
-                        <span class="ticker-sep" style="opacity:0.4">&middot;</span>
+                        <span id="shd-countdown" class="tk-age">AGE: Calculating...</span>
+                        <span class="tk-age" style="opacity:0.4">&middot;</span>
+                        <span class="tk-wide">BTC <span id="btc-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="btc-change" style="font-weight:600;"></span></span>
+                        <span class="tk-wide" style="opacity:0.4">&middot;</span>
+                        <span class="tk-wide">ETH <span id="eth-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="eth-change" style="font-weight:600;"></span></span>
+                        <span class="tk-wide" style="opacity:0.4">&middot;</span>
                         <span>PLS <span id="pls-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="pls-change" style="font-weight:600;"></span></span>
-                        <span class="ticker-sep ticker-extra" style="opacity:0.4">&middot;</span>
-                        <span class="ticker-extra">SHD <span id="shd-ticker-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="shd-ticker-change" style="font-weight:600;"></span></span>
+                        <span class="tk-mid" style="opacity:0.4">&middot;</span>
+                        <span class="tk-mid">SHD <span id="shd-ticker-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="shd-ticker-change" style="font-weight:600;"></span></span>
                     </div>
                     <div class="topbar-spacer"></div>
                 </div>
@@ -1964,7 +1991,7 @@
                     <div class="tx-header">
                         <h3 class="section-title">Recent Transactions</h3>
                         <div class="tx-meta">
-                            <span id="tx-status">Loading swaps…</span>
+                            <span id="tx-status">Loading swaps &amp; burns…</span>
                             <button type="button" class="dexscreener-reload-btn" id="tx-reload-btn" onclick="manualReloadTransactions(this)" aria-label="Reload transactions">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
                                 Reload
@@ -2237,7 +2264,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.5.0</p>
+                    <p class="footer-version">v4.6.0</p>
                 </div>
             </footer>
         </div>
@@ -2317,10 +2344,29 @@
         document.querySelectorAll('#mobile-menu .side-link[href^="#"]').forEach(link => {
             link.addEventListener('click', () => {
                 const menu = document.getElementById('mobile-menu');
-                if (menu.classList.contains('active')) {
+                // Only auto-close in the slide-over (mobile/tablet) layout. On desktop
+                // toggleMenu() collapses the docked sidebar instead, which is not
+                // what tapping a section link should do.
+                if (window.innerWidth < 1024 && menu.classList.contains('active')) {
                     toggleMenu();
                 }
             });
+        });
+
+        // If the window is resized up to desktop while the slide-over menu is open,
+        // clear its mobile "active" state so it can't leak into desktop behaviour.
+        window.addEventListener('resize', () => {
+            if (window.innerWidth < 1024) return;
+            const menu = document.getElementById('mobile-menu');
+            const hamburger = document.querySelector('.hamburger');
+            if (menu && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                if (hamburger) {
+                    hamburger.classList.remove('active');
+                    hamburger.setAttribute('aria-expanded',
+                        String(!document.body.classList.contains('desktop-sidebar-closed')));
+                }
+            }
         });
 
 
@@ -3081,6 +3127,9 @@
         const SWAP_TOPIC0 = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
         const TX_LOOKBACK_BLOCKS = 3000; // max lookback ~8h; usually stops earlier once we have enough swaps
         const TX_DISPLAY_LIMIT = 20;
+        // ERC-20 Transfer(address,address,uint256). A burn() call emits Transfer(holder, 0x0, value);
+        // SHD sent to the dead address is treated as a burn too (same as the burned stat above).
+        const TRANSFER_TOPIC0 = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
         let txInterval = null;
         let lastKnownPlsUsdForTx = null;
         let txLoadedOnce = false;
@@ -3526,7 +3575,7 @@
 
                         if (plsUsdPrice && pool.shd > 0) {
                             const shdUsdPrice = (pool.pls / pool.shd) * plsUsdPrice;
-                            document.getElementById('shd-price').textContent = `$${shdUsdPrice.toFixed(8)}`;
+                            renderTickerPrice('shd-price', shdUsdPrice);
                             renderTickerPrice('shd-ticker-price', shdUsdPrice);
                             renderTickerPrice('core-shd-price', shdUsdPrice);
                             coreFieldLoaded['core-shd-price'] = true;
@@ -3748,13 +3797,13 @@
         // RPC actually rejects the range (some public endpoints cap eth_getLogs width).
         // This keeps the common case at one round trip instead of always assuming
         // the provider needs small requests.
-        async function getLogsResilient(provider, pairAddress, fromBlock, toBlock, depth = 0) {
+        async function getLogsResilient(provider, pairAddress, fromBlock, toBlock, depth = 0, topics = [SWAP_TOPIC0]) {
             try {
                 return await provider.getLogs({
                     address: pairAddress,
                     fromBlock,
                     toBlock,
-                    topics: [SWAP_TOPIC0]
+                    topics
                 });
             } catch (e) {
                 if (depth >= 4 || toBlock - fromBlock < 100) {
@@ -3763,8 +3812,8 @@
                 }
                 const mid = fromBlock + Math.floor((toBlock - fromBlock) / 2);
                 const [a, b] = await Promise.all([
-                    getLogsResilient(provider, pairAddress, fromBlock, mid, depth + 1),
-                    getLogsResilient(provider, pairAddress, mid + 1, toBlock, depth + 1)
+                    getLogsResilient(provider, pairAddress, fromBlock, mid, depth + 1, topics),
+                    getLogsResilient(provider, pairAddress, mid + 1, toBlock, depth + 1, topics)
                 ]);
                 return [...a, ...b];
             }
@@ -3788,6 +3837,35 @@
             }
 
             return logs;
+        }
+
+        // SHD burns: Transfer events on the token itself whose recipient is the zero
+        // address (burn()/burnFrom()) or the dead address. Burns are rare, so one call
+        // over the whole lookback is enough.
+        async function fetchRecentBurnLogs(provider, fromBlock, toBlock) {
+            const burnTopics = SHD_BURN_ADDRESSES.map(a => ethers.utils.hexZeroPad(a, 32));
+            return getLogsResilient(provider, SHD_TOKEN_ADDRESS, fromBlock, toBlock, 0, [TRANSFER_TOPIC0, null, burnTopics]);
+        }
+
+        function decodeBurnLog(log) {
+            if (!log.data || log.data === '0x' || log.topics.length < 3) return null;
+            const from = topicToAddress(log.topics[1]);
+            if (!from || SHD_BURN_ADDRESSES.includes(from)) return null; // ignore dead/zero -> dead moves
+            const shdAmt = Number(ethers.utils.formatEther(BigInt(log.data)));
+            if (!shdAmt) return null;
+            return {
+                type: 'burn',
+                shd: shdAmt,
+                wpls: null,
+                priceUsd: null,
+                // Valued at the current SHD price (not the price at burn time)
+                usdValue: lastShdUsdPrice ? shdAmt * lastShdUsdPrice : null,
+                pool: 'burn',
+                trader: from,
+                txHash: log.transactionHash,
+                blockNumber: log.blockNumber,
+                logIndex: log.logIndex
+            };
         }
 
         async function fetchRecentTransactions() {
@@ -3825,9 +3903,10 @@
 
                 // Newest-first chunks; stop once we have enough logs per pool
                 const perPoolTarget = TX_DISPLAY_LIMIT;
-                const [logsV1, logsV2] = await Promise.all([
+                const [logsV1, logsV2, burnLogs] = await Promise.all([
                     fetchRecentSwapLogs(provider, LIQUIDITY_PAIRS.v1, fromBlock, latest, perPoolTarget),
-                    fetchRecentSwapLogs(provider, LIQUIDITY_PAIRS.v2, fromBlock, latest, perPoolTarget)
+                    fetchRecentSwapLogs(provider, LIQUIDITY_PAIRS.v2, fromBlock, latest, perPoolTarget),
+                    fetchRecentBurnLogs(provider, fromBlock, latest).catch(() => [])
                 ]);
 
                 const decoded = [];
@@ -3837,6 +3916,10 @@
                 }
                 for (const log of logsV2) {
                     const d = decodeSwapLog(log, 'v2', txPoolShdIsToken0.v2);
+                    if (d) decoded.push(d);
+                }
+                for (const log of burnLogs) {
+                    const d = decodeBurnLog(log);
                     if (d) decoded.push(d);
                 }
 
@@ -3857,8 +3940,8 @@
                 if (statusEl) {
                     statusEl.classList.remove('tx-status-error');
                     statusEl.textContent = top.length
-                        ? `${top.length} recent swaps · V1 & V2`
-                        : 'No recent swaps in lookback window';
+                        ? `${top.length} recent swaps & burns · V1 & V2`
+                        : 'No recent swaps or burns in lookback window';
                 }
             } catch (err) {
                 console.error('Recent transactions fetch error:', err);
@@ -3879,12 +3962,12 @@
             const tbody = document.getElementById('tx-tbody');
             if (!tbody) return;
             if (!txs.length) {
-                tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">No swaps found in the recent block range.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">No swaps or burns found in the recent block range.</td></tr>`;
                 return;
             }
             tbody.innerHTML = txs.map(tx => {
-                const typeClass = tx.type === 'buy' ? 'buy' : 'sell';
-                const typeLabel = tx.type === 'buy' ? 'Buy' : 'Sell';
+                const typeClass = tx.type === 'buy' ? 'buy' : tx.type === 'burn' ? 'burn' : 'sell';
+                const typeLabel = tx.type === 'buy' ? 'Buy' : tx.type === 'burn' ? '🔥 Burn' : 'Sell';
                 const explorerTx = `https://ipfs.scan.pulsechain.com/tx/${tx.txHash}`;
                 const explorerAddr = tx.trader
                     ? `https://ipfs.scan.pulsechain.com/address/${tx.trader}`
