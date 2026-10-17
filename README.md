@@ -14,7 +14,8 @@
 - **Token Address:** [0xB95bC84f9B6D0373642D586b81979B067572f7bc](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 - **Faucet V2 Address:** [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
 - **Mining V2 Address:** [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
-- **SnipeHead NFT (SNFT) Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
+- **Buy & Burn Address:** [0x3677e61a7a9e79fe45a882c201365c5165a5540e](https://ipfs.scan.pulsechain.com/address/0x3677e61a7a9e79fe45a882c201365c5165a5540e)
+- **SnipeHead NFT (SNFT) Address:** [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://ipfs.scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
 - **SnipeHead Launch Transaction:** [View on Explorer](https://ipfs.scan.pulsechain.com/tx/0xc8ae761ec0320037364625f5bc136b479aac5ebf5b067bedb86e3ccfe4a40d8b)
 
 ### 🖼️ SNFT Assets
@@ -30,8 +31,10 @@
 - **IPFS Faucet dApp Fallback:** [bafybeifst4rflwie3ya4jdh2sa7epopsktrl74ehjziyjmd5k56d3pq64i](https://bafybeifst4rflwie3ya4jdh2sa7epopsktrl74ehjziyjmd5k56d3pq64i.ipfs.dweb.link)
 - **IPFS Mining dApp Fallback:** [bafybeicf2oyipvxodm672pa3fvijijknxskd7yitqbe2fjr2n3aasq7fwu](https://bafybeicf2oyipvxodm672pa3fvijijknxskd7yitqbe2fjr2n3aasq7fwu.ipfs.dweb.link)
 - **IPFS SnipeHead SNFT dApp Fallback:** [bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4](https://bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4.ipfs.dweb.link/)
----
+- **IPFS Deposit dApp Fallback:** [bafybeiatqofllwicbokkdhldzdztmf2figiyqntz62xuw5phpa2cf2pcqy](https://bafybeiatqofllwicbokkdhldzdztmf2figiyqntz62xuw5phpa2cf2pcqy.ipfs.inbrowser.link/)
+- **IPFS Buy & Burn dApp Fallback:** [bafybeicsxvytyje2tzqu5ubbparwsqeo3mgsy5u2brx3dlbyidhlvy3634](https://bafybeicsxvytyje2tzqu5ubbparwsqeo3mgsy5u2brx3dlbyidhlvy3634.ipfs.inbrowser.link)
 
+---
 
 ## 🧱 Ecosystem
 
@@ -54,8 +57,8 @@ Fully trustless mining protocol:
 - Reward reserve is strictly separated from staked principal, with rewards hard-capped by what's actually funded — see the [Mining contract README](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeheadMiningDecentralizedV2/README.md) for the full design and 45-test Foundry suite.
 - Single-file, zero-dependency dApp — see the [Mining dApp README](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeheadMiningDecentralizedV2/README.md) for how it's built and how to run your own copy.
 
-**Mining Contract:** `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`
-**Contract Repository:** [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2)
+**Mining Contract:** `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`  
+**Contract Repository:** [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2)  
 **dApp Repository:** [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeheadMiningDecentralizedV2)
 
 #### 3. Faucet V2
@@ -71,7 +74,7 @@ A secure and fair community faucet to help new users get started with SHD.
 - Thoroughly tested with Foundry (12+ comprehensive tests) — see the [Faucet contract README](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeHead-faucetV2/README.md) for the full contract breakdown.
 - Single-file, zero-dependency dApp — see the [Faucet dApp README](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeHeadFaucetV2/README.md) for how it's built and how to run your own copy.
 
-**Contract Repository:** [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2)
+**Contract Repository:** [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2)  
 **dApp Repository:** [dApps/SnipeHeadFaucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeHeadFaucetV2)
 
 #### 4. SnipeHead NFT (SNFT)
@@ -92,16 +95,40 @@ A limited-edition **ERC-721** collection of **35 unique NFTs** on PulseChain.
 
 **IPFS SNFT dApp Fallback:** [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
 
+#### 5. Deposit (Mining Reward Funding)
+One-way community funding for the mining **reward reserve**. Anyone can deposit SHD into the mining contract so the system can keep paying rewards to miners. Deposits are permanent and non-refundable — depositors do not receive tokens back and do not earn mining rewards from depositing.
+
+**Mining Contract (reward reserve):** `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`  
+**dApp Repository:** [dApps/Deposit](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/Deposit)  
+**IPFS Deposit dApp:** [bafybeiatqofllwicbokkdhldzdztmf2figiyqntz62xuw5phpa2cf2pcqy](https://bafybeiatqofllwicbokkdhldzdztmf2figiyqntz62xuw5phpa2cf2pcqy.ipfs.inbrowser.link/)  
+**dApp README:** [dApps/Deposit/README.md](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/Deposit/README.md)
+
+#### 6. Buy & Burn
+Permissionless burn tooling:
+- **Direct burn** — permanently destroy SHD you already hold (via the token’s burn function).
+- **Buy & Burn** — send PLS to the contract; it swaps for SHD on PulseX (TWAP-protected) and burns it. Excess PLS can remain queued for later burns.
+- Helper actions: process queued PLS, refresh the price oracle, burn stuck SHD held by the contract.
+
+Burns are permanent and irreversible. PLS sent to Buy & Burn is spent, not refunded.
+
+**Buy & Burn Contract:** `0x3677e61a7a9e79fe45a882c201365c5165a5540e`  
+**Contract source:** [Contracts/SnipeHeadBuyAndBurnV2.sol](https://github.com/PBaieck-group/SnipeHead/blob/main/Contracts/SnipeHeadBuyAndBurnV2.sol)  
+**dApp Repository:** [dApps/BuyAndBurn](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/BuyAndBurn)  
+**IPFS Buy & Burn dApp:** [bafybeicsxvytyje2tzqu5ubbparwsqeo3mgsy5u2brx3dlbyidhlvy3634](https://bafybeicsxvytyje2tzqu5ubbparwsqeo3mgsy5u2brx3dlbyidhlvy3634.ipfs.inbrowser.link)  
+**dApp README:** [dApps/BuyAndBurn/README.md](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/BuyAndBurn/README.md)
+
 ---
 
 ## 📁 Repositories & Contracts
 
-| Component              | Status     | Contract Address                                   | Contract Folder | dApp Folder |
-|------------------------|------------|----------------------------------------------------|------------------|-------------|
+| Component              | Status     | Contract Address                                   | Contract Folder / Source | dApp Folder |
+|------------------------|------------|----------------------------------------------------|---------------------------|-------------|
 | SnipeHead (SHD)            | Live       | `0xB95bC84f9B6D0373642D586b81979B067572f7bc`     | [SnipeHead.sol](https://scan.mypinata.cloud/ipfs/bafybeienxyoyrhn5tswclvd3gdjy5mtkkwmu37aqtml6onbf7xnb3o22pe/#/address/0xB95bC84f9B6D0373642D586b81979B067572f7bc?tab=contract) | — |
 | Faucet V2              | Live       | `0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98`     | [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeHead-faucetV2) | [dApps/SnipeHeadFaucetV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeHeadFaucetV2) |
 | Decentralized Mining   | Live       | `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650`     | [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/SnipeheadMiningDecentralizedV2) | [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SnipeheadMiningDecentralizedV2) |
 | SnipeHead NFT (SNFT)   | Live       | `0x4A345c962DFA2492023a1D19bc88062B532a43c3`     | [SNFT](https://github.com/PBaieck-group/SnipeHead/tree/main/SNFT) | [dApps/SNFT](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SNFT) |
+| Buy & Burn             | Live       | `0x3677e61a7a9e79fe45a882c201365c5165a5540e`     | [Contracts/SnipeHeadBuyAndBurnV2.sol](https://github.com/PBaieck-group/SnipeHead/blob/main/Contracts/SnipeHeadBuyAndBurnV2.sol) | [dApps/BuyAndBurn](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/BuyAndBurn) |
+| Deposit (reward funding) | Live    | Uses Mining `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650` | — | [dApps/Deposit](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/Deposit) |
 
 ---
 
@@ -113,13 +140,17 @@ A limited-edition **ERC-721** collection of **35 unique NFTs** on PulseChain.
 
 **How to get SNFT:** Mint on the NFT dApp (public mint, max 2 per wallet) or via the contract. See the IPFS NFT dApp Fallback above.
 
+**Support the ecosystem:**
+- Fund mining rewards via the [Deposit dApp](https://bafybeiatqofllwicbokkdhldzdztmf2figiyqntz62xuw5phpa2cf2pcqy.ipfs.inbrowser.link/) (non-refundable)
+- Permanently reduce supply via the [Buy & Burn dApp](https://bafybeicsxvytyje2tzqu5ubbparwsqeo3mgsy5u2brx3dlbyidhlvy3634.ipfs.inbrowser.link)
+
 ---
 
 ## 🔄 About V2
 
 SnipeHead V2 is a complete upgrade from the original token. The old ecosystem components are now **deprecated** but still accessible for reference.
 
-V2 focuses on cleaner architecture, better security, and modular expansion — now including a limited NFT collection as part of the broader ecosystem.
+V2 focuses on cleaner architecture, better security, and modular expansion — including a limited NFT collection, community-funded mining rewards, and permissionless buy-and-burn tooling.
 
 ---
 
@@ -133,7 +164,7 @@ V2 focuses on cleaner architecture, better security, and modular expansion — n
 
 ## 💡 Vision
 
-SnipeHead V2 aims to grow from a token into a **sustainable DeFi ecosystem** on PulseChain by providing transparent, trustless, and community-friendly tools — including decentralized mining, a fair faucet, and a limited-edition NFT collection.
+SnipeHead V2 aims to grow from a token into a **sustainable DeFi ecosystem** on PulseChain by providing transparent, trustless, and community-friendly tools — including decentralized mining, a fair faucet, a limited-edition NFT collection, community-funded reward reserves, and permanent burn mechanisms.
 
 ---
 
@@ -141,6 +172,7 @@ SnipeHead V2 aims to grow from a token into a **sustainable DeFi ecosystem** on 
 
 This project is experimental and part of the evolving PulseChain ecosystem.
 Always do your own research (DYOR) before interacting with any smart contracts or trading tokens.
+Deposits to the mining reward reserve and burns (including Buy & Burn) are permanent and irreversible.
 
 ---
 
@@ -154,7 +186,10 @@ Always do your own research (DYOR) before interacting with any smart contracts o
 - **Mining Contract V2**: [0xa16C1FA26F13803083f0fd222D1EA083c1d6D650](https://ipfs.scan.pulsechain.com/address/0xa16C1FA26F13803083f0fd222D1EA083c1d6D650)
 - **Mining V2 contract README**: [SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeheadMiningDecentralizedV2/README.md)
 - **Mining V2 dApp README**: [dApps/SnipeheadMiningDecentralizedV2](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SnipeheadMiningDecentralizedV2/README.md)
-- **SnipeHead NFT (SNFT)**: [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link)
+- **Deposit dApp (reward reserve)**: [dApps/Deposit](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/Deposit) · [IPFS](https://bafybeiatqofllwicbokkdhldzdztmf2figiyqntz62xuw5phpa2cf2pcqy.ipfs.inbrowser.link/) · [README](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/Deposit/README.md)
+- **Buy & Burn**: [0x3677e61a7a9e79fe45a882c201365c5165a5540e](https://ipfs.scan.pulsechain.com/address/0x3677e61a7a9e79fe45a882c201365c5165a5540e) · [dApps/BuyAndBurn](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/BuyAndBurn) · [IPFS](https://bafybeicsxvytyje2tzqu5ubbparwsqeo3mgsy5u2brx3dlbyidhlvy3634.ipfs.inbrowser.link) · [README](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/BuyAndBurn/README.md)
+- **Buy & Burn contract source**: [Contracts/SnipeHeadBuyAndBurnV2.sol](https://github.com/PBaieck-group/SnipeHead/blob/main/Contracts/SnipeHeadBuyAndBurnV2.sol)
+- **SnipeHead NFT (SNFT)**: [0x4A345c962DFA2492023a1D19bc88062B532a43c3](https://ipfs.scan.pulsechain.com/address/0x4A345c962DFA2492023a1D19bc88062B532a43c3)
 - **IPFS SNFT dApp Fallback**: [bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla](https://bafybeigelpwmsvfricfa25x3upeyq5rwpprvg7enx6xtzxscexqr4lwzla.ipfs.inbrowser.link/)
 - **SnipeHead NFT dApp README**: [dApps/SNFT](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/SNFT/README.md)
 - **Trade on PulseX**: [ipfs.app.pulsex.com](https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc)
