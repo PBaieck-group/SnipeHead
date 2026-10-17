@@ -6,7 +6,7 @@
 
 ## 🚀 Overview
 
-- 🧠 **Portal**: [snipehead.xyz](https://www.snipehead.xyz)
+- 🧠 **Portal**: [snipehead.xyz](https://www.snipehead.xyz) · **IPFS Home:** [bafybeifub2qckcf6derqeaczdcpxxmpwsjrkjaqsbaa3kld5blktygyra4](https://bafybeifub2qckcf6derqeaczdcpxxmpwsjrkjaqsbaa3kld5blktygyra4.ipfs.inbrowser.link/)
 - **Token Name:** SnipeHead
 - **Symbol:** SHD
 - **Network:** PulseChain
@@ -28,6 +28,7 @@
 
 ### 🌐 IPFS Fallbacks
 
+- **IPFS Home (portal / ecosystem hub):** [bafybeifub2qckcf6derqeaczdcpxxmpwsjrkjaqsbaa3kld5blktygyra4](https://bafybeifub2qckcf6derqeaczdcpxxmpwsjrkjaqsbaa3kld5blktygyra4.ipfs.inbrowser.link/)
 - **IPFS Faucet dApp Fallback:** [bafybeifst4rflwie3ya4jdh2sa7epopsktrl74ehjziyjmd5k56d3pq64i](https://bafybeifst4rflwie3ya4jdh2sa7epopsktrl74ehjziyjmd5k56d3pq64i.ipfs.dweb.link)
 - **IPFS Mining dApp Fallback:** [bafybeicf2oyipvxodm672pa3fvijijknxskd7yitqbe2fjr2n3aasq7fwu](https://bafybeicf2oyipvxodm672pa3fvijijknxskd7yitqbe2fjr2n3aasq7fwu.ipfs.dweb.link)
 - **IPFS SnipeHead SNFT dApp Fallback:** [bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4](https://bafybeic3pyupjv7kipmbuwqjodeqffe27noq2kyv7zh32qwmphrue6tup4.ipfs.dweb.link/)
@@ -39,6 +40,8 @@
 ## 🧱 Ecosystem
 
 SnipeHead is evolving into a **multi-component decentralized ecosystem** built around the SHD token.
+
+**IPFS portal:** [HomeIPFS](https://bafybeifub2qckcf6derqeaczdcpxxmpwsjrkjaqsbaa3kld5blktygyra4.ipfs.inbrowser.link/) is the decentralized front door — dashboard plus sidebar links to Faucet, Mining, SNFT, Deposit, and Buy & Burn on IPFS (Pump.Tires remains centralized only). Source: [`dApps/HomeIPFS`](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/HomeIPFS).
 
 ### 🔹 Core Components
 
@@ -129,6 +132,7 @@ Burns are permanent and irreversible. PLS sent to Buy & Burn is spent, not refun
 | SnipeHead NFT (SNFT)   | Live       | `0x4A345c962DFA2492023a1D19bc88062B532a43c3`     | [SNFT](https://github.com/PBaieck-group/SnipeHead/tree/main/SNFT) | [dApps/SNFT](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/SNFT) |
 | Buy & Burn             | Live       | `0x3677e61a7a9e79fe45a882c201365c5165a5540e`     | [Contracts/SnipeHeadBuyAndBurnV2.sol](https://github.com/PBaieck-group/SnipeHead/blob/main/Contracts/SnipeHeadBuyAndBurnV2.sol) | [dApps/BuyAndBurn](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/BuyAndBurn) |
 | Deposit (reward funding) | Live    | Uses Mining `0xa16C1FA26F13803083f0fd222D1EA083c1d6D650` | — | [dApps/Deposit](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/Deposit) |
+| HomeIPFS (portal)        | Live       | —                                                  | — | [dApps/HomeIPFS](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/HomeIPFS) |
 
 ---
 
@@ -179,6 +183,7 @@ Deposits to the mining reward reserve and burns (including Buy & Burn) are perma
 ## 🔗 Links
 
 - **Website**: [snipehead.xyz](https://www.snipehead.xyz)
+- **HomeIPFS (decentralized portal)**: [dApps/HomeIPFS](https://github.com/PBaieck-group/SnipeHead/tree/main/dApps/HomeIPFS) · [IPFS](https://bafybeifub2qckcf6derqeaczdcpxxmpwsjrkjaqsbaa3kld5blktygyra4.ipfs.inbrowser.link/) · [README](https://github.com/PBaieck-group/SnipeHead/blob/main/dApps/HomeIPFS/README.md)
 - **Token**: [View on PulseChain Scan](https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc)
 - **Faucet V2**: [0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98](https://ipfs.scan.pulsechain.com/address/0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98)
 - **Faucet V2 contract README**: [SnipeHead-faucetV2](https://github.com/PBaieck-group/SnipeHead/blob/main/SnipeHead-faucetV2/README.md)
