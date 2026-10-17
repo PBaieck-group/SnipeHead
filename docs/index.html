@@ -6,7 +6,8 @@
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://min-api.cryptocompare.com https://api.exchange.coinbase.com https://api.scan.pulsechain.com https://rpc.pulsechain.com https://pulsechain-rpc.publicnode.com https://rpc.pulsechainstats.com https://rpc-pulsechain.g4mm4.io; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <!-- connect-src allows any https: origin so visitors can point the site at their own PulseChain RPC node. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://min-api.cryptocompare.com https://api.exchange.coinbase.com https://api.scan.pulsechain.com https:; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -799,6 +800,114 @@
         }
         .rpc-dot.fallback { background: #d97706; }
         .rpc-dot.offline { background: var(--red); }
+        .rpc-dot.trying { background: var(--text-muted); animation: rpc-pulse 1s infinite; }
+        @keyframes rpc-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Sidebar status pill is now a button that opens the RPC picker */
+        button.sidebar-status {
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        button.sidebar-status:hover { border-color: var(--border-hover); color: var(--text); }
+        button.sidebar-status:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .sidebar-status-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-status-edit { flex-shrink: 0; color: var(--text-muted); font-size: 0.7rem; }
+
+        /* RPC picker modal */
+        #rpc-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 16, 20, 0.55);
+            backdrop-filter: blur(8px);
+            z-index: 99998;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        #rpc-modal.open { display: flex; }
+        #rpc-content {
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+        }
+        #rpc-header {
+            padding: 1.15rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #rpc-header h2 { font-size: 1.15rem; font-weight: 600; }
+        #rpc-body { padding: 1.25rem 1.5rem 1.5rem; }
+        .rpc-status-row {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin-bottom: 0.85rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .rpc-status-row .rpc-dot { width: 9px; height: 9px; }
+        .rpc-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .rpc-field-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+        .rpc-select-row, .rpc-custom-row { display: flex; gap: 0.5rem; align-items: center; }
+        .rpc-custom-row { margin-top: 0.65rem; }
+        .rpc-custom-row[hidden], #rpc-remove-btn[hidden] { display: none !important; }
+        .rpc-select, .rpc-custom-row input[type="text"] {
+            flex: 1;
+            min-width: 0;
+            padding: 0.65rem 0.8rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+        }
+        .rpc-custom-row input[type="text"] {
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.8rem;
+        }
+        .rpc-select:focus-visible, .rpc-custom-row input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .rpc-btn-sm { padding: 0.55rem 0.8rem; font-size: 0.8rem; }
+        .rpc-hint { min-height: 1.1rem; margin-top: 0.5rem; font-size: 0.78rem; color: var(--text-muted); }
+        .rpc-hint.error { color: var(--red); }
+        .rpc-hint.ok { color: var(--green); }
+        .rpc-failover {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin-top: 0.9rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .rpc-failover input { margin-top: 0.2rem; accent-color: var(--accent); }
+        .rpc-note {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.78rem;
+            line-height: 1.55;
+            color: var(--text-muted);
+        }
+        @media (prefers-reduced-motion: reduce) { .rpc-dot.trying { animation: none; } }
 
         /* Section */
         .section {
@@ -1775,10 +1884,11 @@
                 </nav>
 
                 <div class="sidebar-footer">
-                    <div class="sidebar-status" id="rpc-status">
-                        <span class="rpc-dot" id="rpc-status-dot"></span>
-                        <span id="rpc-status-text">Connecting to network...</span>
-                    </div>
+                    <button type="button" class="sidebar-status" id="rpc-status" onclick="openRpcModal()" aria-haspopup="dialog" title="Choose your RPC node">
+                        <span class="rpc-dot trying" id="rpc-status-dot"></span>
+                        <span class="sidebar-status-text" id="rpc-status-text">Connecting to network...</span>
+                        <span class="sidebar-status-edit" aria-hidden="true">Change</span>
+                    </button>
                     <div class="sidebar-socials">
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer" aria-label="X">
                             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -2264,7 +2374,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.6.0</p>
+                    <p class="footer-version">v4.6.1</p>
                 </div>
             </footer>
         </div>
@@ -2302,6 +2412,48 @@
                     <button onclick="declineTerms()" class="btn btn-secondary">Decline</button>
                     <button onclick="acceptTerms()" id="accept-btn" class="btn btn-primary" disabled>Accept &amp; Continue</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RPC node picker -->
+    <div id="rpc-modal" role="dialog" aria-modal="true" aria-labelledby="rpc-modal-title">
+        <div id="rpc-content">
+            <div id="rpc-header">
+                <h2 id="rpc-modal-title">RPC node</h2>
+                <button type="button" onclick="closeRpcModal()" style="color:var(--text-muted); font-size:1.5rem; line-height:1;" aria-label="Close">&times;</button>
+            </div>
+            <div id="rpc-body">
+                <div class="rpc-status-row">
+                    <span class="rpc-dot trying" id="rpc-modal-dot" aria-hidden="true"></span>
+                    <span class="rpc-label" id="rpc-modal-label" role="status" aria-live="polite">Connecting…</span>
+                </div>
+
+                <label class="rpc-field-label" for="rpc-select">Read on-chain data from</label>
+                <div class="rpc-select-row">
+                    <select id="rpc-select" class="rpc-select"></select>
+                    <button type="button" id="rpc-remove-btn" class="btn btn-secondary rpc-btn-sm" hidden>Remove</button>
+                </div>
+
+                <div class="rpc-custom-row" id="rpc-custom-row" hidden>
+                    <input type="text" id="rpc-custom-input" placeholder="https://your-rpc.example.com" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Custom RPC URL" aria-describedby="rpc-hint">
+                    <button type="button" id="rpc-add-btn" class="btn btn-accent rpc-btn-sm">Add</button>
+                    <button type="button" id="rpc-cancel-btn" class="btn btn-secondary rpc-btn-sm">Cancel</button>
+                </div>
+                <div class="rpc-hint" id="rpc-hint" role="status" aria-live="polite"></div>
+
+                <label class="rpc-failover">
+                    <input type="checkbox" id="rpc-failover" checked>
+                    <span>Fall back to other RPCs if this one fails</span>
+                </label>
+
+                <p class="rpc-note">
+                    Used for on-chain reads: supply, burns, pools, holders and recent swaps. Price feeds
+                    (DexScreener, CoinGecko, etc.) are separate and not affected. Your wallet&rsquo;s network
+                    settings are never changed. Custom RPCs must use <strong>https</strong> and allow browser (CORS)
+                    requests. Your choice is saved only in this browser, and the node you pick can see your IP address
+                    and the queries this page makes.
+                </p>
             </div>
         </div>
     </div>
@@ -3032,65 +3184,225 @@
                    .toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 6 });
         }
 
-        const RPC_ENDPOINTS = [
-            "https://rpc.pulsechain.com",
-            "https://rpc-pulsechain.g4mm4.io",
-            "https://pulsechain-rpc.publicnode.com",
-            "https://rpc.pulsechainstats.com"
+        // ─────────────────────────────────────────────────────────────────────────────
+        // RPC manager
+        // Visitors can pick which PulseChain RPC node this page reads from (built-in
+        // list or their own https endpoint), and choose whether to fail over to the
+        // others. The choice is stored only in this browser (localStorage).
+        // The wallet's own network settings are never touched.
+        // ─────────────────────────────────────────────────────────────────────────────
+        const RPC_CHAIN_ID = 369;
+        const RPC_BUILTIN = [
+            { name: "PulseChain (official)", url: "https://rpc.pulsechain.com" },
+            { name: "G4mm4",                 url: "https://rpc-pulsechain.g4mm4.io" },
+            { name: "PublicNode",            url: "https://pulsechain-rpc.publicnode.com" },
+            { name: "PulseChainStats",       url: "https://rpc.pulsechainstats.com" }
         ];
-        const RPC_LABELS = {
-            "https://rpc.pulsechain.com": "rpc.pulsechain.com",
-            "https://rpc-pulsechain.g4mm4.io": "g4mm4.io",
-            "https://pulsechain-rpc.publicnode.com": "publicnode.com",
-            "https://rpc.pulsechainstats.com": "pulsechainstats.com",
-        };
-        const RPC_HEALTHCHECK_TIMEOUT_MS = 5000;
+        const RPC_PREFS_KEY = "snipehead_rpc_prefs_v1";
+        const RPC_MAX_CUSTOM = 5;
+        const RPC_COOLDOWN_MS = 60000;            // a failed RPC goes to the back of the line for this long
+        const RPC_HEALTHCHECK_TIMEOUT_MS = 5000;  // picking a working provider
+        const RPC_CALL_TIMEOUT_MS = 15000;        // an actual data request
 
-        function updateRpcStatusUI(url) {
-            const dot = document.getElementById('rpc-status-dot');
-            const text = document.getElementById('rpc-status-text');
-            if (!dot || !text) return;
+        const rpcBuiltinUrls = () => RPC_BUILTIN.map((r) => r.url);
+        const isBuiltinRpc = (url) => rpcBuiltinUrls().includes(url);
 
-            if (!url) {
-                dot.className = 'rpc-dot offline';
-                text.textContent = 'All RPC endpoints unreachable';
-                return;
-            }
-
-            const isPrimary = url === RPC_ENDPOINTS[0];
-            dot.className = isPrimary ? 'rpc-dot' : 'rpc-dot fallback';
-            text.textContent = isPrimary
-                ? `Connected via ${RPC_LABELS[url] || url}`
-                : `Connected via ${RPC_LABELS[url] || url} (backup)`;
+        // Returns { url } or { error }. https only, no embedded credentials, no fragment.
+        function normalizeRpcUrl(raw) {
+            const text = String(raw || "").trim();
+            if (!text) return { error: "Enter an RPC URL." };
+            if (text.length > 2048) return { error: "That URL is too long." };
+            let u;
+            try { u = new URL(text); } catch (e) { return { error: "That doesn't look like a valid URL." }; }
+            if (u.protocol !== "https:") return { error: "RPC URL must start with https://" };
+            if (u.username || u.password) return { error: "Remove the username/password from the URL." };
+            u.hash = "";
+            return { url: u.toString().replace(/\/+$/, "") };
         }
+
+        // Never show a custom URL in full: many RPC URLs embed an API key in the path or query.
+        function rpcName(url) {
+            const known = RPC_BUILTIN.find((r) => r.url === url);
+            if (known) return known.name;
+            try { return new URL(url).host; } catch (e) { return "Custom RPC"; }
+        }
+
+        function loadRpcPrefs() {
+            const defaults = { selected: RPC_BUILTIN[0].url, custom: [], failover: true };
+            try {
+                const raw = localStorage.getItem(RPC_PREFS_KEY);
+                if (!raw) return defaults;
+                const parsed = JSON.parse(raw);
+                const custom = [];
+                if (parsed && Array.isArray(parsed.custom)) {
+                    for (const c of parsed.custom) {
+                        const r = typeof c === "string" ? normalizeRpcUrl(c) : null;
+                        if (r && r.url && !isBuiltinRpc(r.url) && !custom.includes(r.url) && custom.length < RPC_MAX_CUSTOM) {
+                            custom.push(r.url);
+                        }
+                    }
+                }
+                const known = [...rpcBuiltinUrls(), ...custom];
+                return {
+                    selected: parsed && known.includes(parsed.selected) ? parsed.selected : defaults.selected,
+                    custom,
+                    failover: !(parsed && parsed.failover === false)
+                };
+            } catch (e) {
+                return defaults;
+            }
+        }
+
+        function saveRpcPrefs() {
+            try { localStorage.setItem(RPC_PREFS_KEY, JSON.stringify(rpcPrefs)); } catch (e) { /* storage blocked: choice just won't persist */ }
+        }
+
+        let rpcPrefs = loadRpcPrefs();
+        let rpcEpoch = 0;                    // bumped on every user change; stale async results don't touch the UI
+        let rpcServingUrl = null;            // URL that most recently answered
+        let rpcStatusState = "trying";
+        const rpcProviders = new Map();      // url -> StaticJsonRpcProvider
+        const rpcVerified = new Set();       // urls confirmed to be chain 369
+        const rpcFailedAt = new Map();       // url -> timestamp of last failure
 
         let cachedProvider = null;
         let cachedRpcUrl = null;
         let providerPromise = null;
 
+        const allRpcUrls = () => [...rpcBuiltinUrls(), ...rpcPrefs.custom];
+
+        function rpcWithTimeout(promise, ms, label) {
+            let timer;
+            const timeout = new Promise((_, reject) => {
+                timer = setTimeout(() => reject(new Error(`${label || "RPC"} timed out`)), ms);
+            });
+            return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+        }
+
+        // ── status display (sidebar pill + modal) ──
+        function setRpcStatus(state, label) {
+            rpcStatusState = state; // "ok" | "fallback" | "offline" | "trying"
+            const cls = state === "ok" ? "rpc-dot" : `rpc-dot ${state}`;
+            [["rpc-status-dot", "rpc-status-text"], ["rpc-modal-dot", "rpc-modal-label"]].forEach(([dotId, textId]) => {
+                const dot = document.getElementById(dotId);
+                const text = document.getElementById(textId);
+                if (dot) dot.className = cls;
+                if (text) text.textContent = label;
+            });
+        }
+
+        function setRpcHint(msg, isError) {
+            const el = document.getElementById("rpc-hint");
+            if (!el) return;
+            el.textContent = msg || "";
+            el.className = "rpc-hint" + (msg ? (isError ? " error" : " ok") : "");
+        }
+
+        function markRpcServing(url) {
+            rpcServingUrl = url;
+            const isSelected = url === rpcPrefs.selected;
+            setRpcStatus(isSelected ? "ok" : "fallback",
+                isSelected ? `Connected via ${rpcName(url)}` : `Connected via ${rpcName(url)} (backup)`);
+        }
+
+        function markRpcOffline() {
+            rpcServingUrl = null;
+            setRpcStatus("offline", rpcPrefs.failover
+                ? "All RPC endpoints unreachable"
+                : `${rpcName(rpcPrefs.selected)} unreachable`);
+        }
+
+        // ── providers ──
+        function getRpcProvider(url) {
+            let p = rpcProviders.get(url);
+            if (p) return p;
+            // StaticJsonRpcProvider + explicit network: no repeated eth_chainId round trips.
+            // `timeout` makes a hung node fail instead of hanging the page.
+            p = new ethers.providers.StaticJsonRpcProvider(
+                { url, timeout: RPC_CALL_TIMEOUT_MS },
+                { chainId: RPC_CHAIN_ID, name: "pulsechain" }
+            );
+            rpcProviders.set(url, p);
+            return p;
+        }
+
+        function dropRpcProvider(url) {
+            rpcProviders.delete(url);
+            rpcVerified.delete(url);
+            rpcFailedAt.delete(url);
+        }
+
+        // The static network skips ethers' own chain check, so confirm the node really is PulseChain.
+        // A node on another chain would otherwise return plausible-looking but wrong data.
+        async function verifyRpcChain(url, provider) {
+            if (rpcVerified.has(url)) return;
+            const hex = await provider.send("eth_chainId", []);
+            let ok = false;
+            try { ok = BigInt(hex) === BigInt(RPC_CHAIN_ID); } catch (e) { ok = false; }
+            if (!ok) {
+                const err = new Error(`RPC is not on PulseChain (chain ID ${RPC_CHAIN_ID})`);
+                err.wrongChain = true;
+                throw err;
+            }
+            rpcVerified.add(url);
+        }
+
+        // Selected RPC first. With fallback on, the rest follow; RPCs that failed recently go last
+        // so a dead selection doesn't cost a full timeout on every refresh.
+        function rpcCandidates() {
+            const sel = rpcPrefs.selected;
+            if (!rpcPrefs.failover) return [sel];
+            const now = Date.now();
+            const cooling = (u) => now - (rpcFailedAt.get(u) || 0) < RPC_COOLDOWN_MS;
+            const order = [sel, ...allRpcUrls().filter((u) => u !== sel)];
+            return [...order.filter((u) => !cooling(u)), ...order.filter(cooling)];
+        }
+
+        // On a backup RPC? Re-test the selected one once its cooldown has expired.
+        function shouldRecheckSelected() {
+            if (!rpcPrefs.failover || cachedRpcUrl === rpcPrefs.selected) return false;
+            const failedAt = rpcFailedAt.get(rpcPrefs.selected);
+            return failedAt !== undefined && Date.now() - failedAt >= RPC_COOLDOWN_MS;
+        }
+
+        // Returns a provider that just passed a health check (chain ID + block number).
         async function getWorkingProvider(forceRefresh = false) {
-            if (cachedProvider && !forceRefresh) return cachedProvider;
+            if (forceRefresh && cachedRpcUrl) rpcFailedAt.set(cachedRpcUrl, Date.now());
+            if (cachedProvider && !forceRefresh && !shouldRecheckSelected()) return cachedProvider;
             if (providerPromise) return providerPromise;
 
+            const epoch = rpcEpoch;
+            if (!rpcServingUrl) setRpcStatus("trying", "Connecting…");
+
             providerPromise = (async () => {
-                for (const url of RPC_ENDPOINTS) {
+                let lastErr;
+                for (const url of rpcCandidates()) {
                     try {
-                        const provider = new ethers.providers.JsonRpcProvider(url);
-                        await Promise.race([
-                            provider.getBlockNumber(),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error("RPC timeout")), RPC_HEALTHCHECK_TIMEOUT_MS))
-                        ]);
-                        cachedProvider = provider;
-                        cachedRpcUrl = url;
-                        console.log(`Using PulseChain RPC: ${url}`);
-                        updateRpcStatusUI(url);
+                        const provider = getRpcProvider(url);
+                        await rpcWithTimeout((async () => {
+                            await verifyRpcChain(url, provider);
+                            await provider.getBlockNumber();
+                        })(), RPC_HEALTHCHECK_TIMEOUT_MS, rpcName(url));
+                        rpcFailedAt.delete(url);
+                        if (epoch === rpcEpoch) {
+                            cachedProvider = provider;
+                            cachedRpcUrl = url;
+                            markRpcServing(url);
+                        }
+                        console.log(`Using PulseChain RPC: ${rpcName(url)}`);
                         return provider;
                     } catch (err) {
-                        console.warn(`RPC unavailable (${url}):`, err.message);
+                        lastErr = err;
+                        rpcFailedAt.set(url, Date.now());
+                        console.warn(`RPC unavailable (${rpcName(url)}):`, err.message);
                     }
                 }
-                updateRpcStatusUI(null);
-                throw new Error("All PulseChain RPC endpoints are unavailable");
+                if (epoch === rpcEpoch) {
+                    cachedProvider = null;
+                    cachedRpcUrl = null;
+                    markRpcOffline();
+                }
+                throw lastErr || new Error("All PulseChain RPC endpoints are unavailable");
             })();
 
             try {
@@ -3100,16 +3412,198 @@
             }
         }
 
+        // Run fn(provider) against the selected RPC, falling through the rest if fallback is on.
         async function withRpcFallback(fn) {
-            try {
-                const provider = await getWorkingProvider();
-                return await fn(provider);
-            } catch (err) {
-                console.warn("RPC call failed, switching endpoint:", err.message);
-                const provider = await getWorkingProvider(true);
-                return await fn(provider);
+            const epoch = rpcEpoch;
+            if (!rpcServingUrl) setRpcStatus("trying", "Connecting…");
+            let lastErr;
+            for (const url of rpcCandidates()) {
+                const provider = getRpcProvider(url);
+                try {
+                    const result = await rpcWithTimeout((async () => {
+                        await verifyRpcChain(url, provider);
+                        return fn(provider);
+                    })(), RPC_CALL_TIMEOUT_MS, rpcName(url));
+                    rpcFailedAt.delete(url);
+                    if (epoch === rpcEpoch) markRpcServing(url);
+                    return result;
+                } catch (err) {
+                    // The node answered but the contract call itself reverted: that's not an RPC
+                    // outage, so don't blame (or skip) the node.
+                    if (err && err.code === "CALL_EXCEPTION") {
+                        rpcFailedAt.delete(url);
+                        if (epoch === rpcEpoch) markRpcServing(url);
+                        throw err;
+                    }
+                    lastErr = err;
+                    rpcFailedAt.set(url, Date.now());
+                    console.warn(`RPC call failed (${rpcName(url)}):`, err.message);
+                }
+            }
+            if (epoch === rpcEpoch) {
+                cachedProvider = null;
+                cachedRpcUrl = null;
+                markRpcOffline();
+            }
+            throw lastErr || new Error("All PulseChain RPC endpoints failed");
+        }
+
+        // ── selection / UI wiring ──
+        function refreshRpcDependentData() {
+            // Re-read everything that comes from the chain, using the new RPC.
+            if (typeof fetchOnChainData === "function") fetchOnChainData();
+            if (typeof fetchBurnData === "function") fetchBurnData();
+            if (typeof fetchRecentTransactions === "function") fetchRecentTransactions();
+        }
+
+        function populateRpcSelect() {
+            const sel = document.getElementById("rpc-select");
+            if (!sel) return;
+            sel.textContent = "";
+            const addOption = (value, text) => {
+                const o = document.createElement("option");
+                o.value = value;
+                o.textContent = text;
+                sel.appendChild(o);
+            };
+            RPC_BUILTIN.forEach((r) => addOption(r.url, r.name));
+            rpcPrefs.custom.forEach((u) => addOption(u, `${rpcName(u)} (custom)`));
+            addOption("__custom__", "+ Add custom RPC…");
+            sel.value = rpcPrefs.selected;
+            document.getElementById("rpc-remove-btn").hidden = !rpcPrefs.custom.includes(rpcPrefs.selected);
+            document.getElementById("rpc-failover").checked = rpcPrefs.failover;
+        }
+
+        function selectRpc(url) {
+            rpcPrefs.selected = url;
+            saveRpcPrefs();
+            rpcEpoch++;
+            rpcServingUrl = null;
+            cachedProvider = null;
+            cachedRpcUrl = null;
+            providerPromise = null;
+            rpcFailedAt.delete(url); // a deliberate choice deserves a fresh attempt
+            populateRpcSelect();
+            setRpcStatus("trying", "Connecting…");
+            refreshRpcDependentData();
+        }
+
+        function showCustomRpcRow(show) {
+            document.getElementById("rpc-custom-row").hidden = !show;
+            const input = document.getElementById("rpc-custom-input");
+            if (show) {
+                input.focus();
+            } else {
+                input.value = "";
+                setRpcHint("");
             }
         }
+
+        function onRpcSelectChange() {
+            const sel = document.getElementById("rpc-select");
+            if (sel.value === "__custom__") {
+                sel.value = rpcPrefs.selected; // revert until a custom RPC is actually added
+                showCustomRpcRow(true);
+                return;
+            }
+            showCustomRpcRow(false);
+            selectRpc(sel.value);
+        }
+
+        async function addCustomRpc() {
+            const input = document.getElementById("rpc-custom-input");
+            const btn = document.getElementById("rpc-add-btn");
+            setRpcHint("");
+            const parsed = normalizeRpcUrl(input.value);
+            if (parsed.error) { setRpcHint(parsed.error, true); return; }
+            const url = parsed.url;
+
+            if (isBuiltinRpc(url) || rpcPrefs.custom.includes(url)) {
+                showCustomRpcRow(false);
+                selectRpc(url);
+                return;
+            }
+            if (rpcPrefs.custom.length >= RPC_MAX_CUSTOM) {
+                setRpcHint(`You can save up to ${RPC_MAX_CUSTOM} custom RPCs. Remove one first.`, true);
+                return;
+            }
+
+            btn.disabled = true;
+            setRpcHint("Testing RPC…");
+            try {
+                const provider = getRpcProvider(url);
+                await rpcWithTimeout(verifyRpcChain(url, provider), RPC_HEALTHCHECK_TIMEOUT_MS * 2, "RPC");
+            } catch (err) {
+                dropRpcProvider(url);
+                setRpcHint(
+                    err && err.wrongChain
+                        ? `That RPC is not PulseChain (chain ID ${RPC_CHAIN_ID}).`
+                        : "Could not reach that RPC. It must be online and allow requests from browsers (CORS).",
+                    true
+                );
+                btn.disabled = false;
+                return;
+            }
+            btn.disabled = false;
+            rpcPrefs.custom.push(url);
+            showCustomRpcRow(false);
+            selectRpc(url);
+        }
+
+        function removeCustomRpc() {
+            const url = rpcPrefs.selected;
+            if (!rpcPrefs.custom.includes(url)) return;
+            rpcPrefs.custom = rpcPrefs.custom.filter((u) => u !== url);
+            dropRpcProvider(url);
+            selectRpc(RPC_BUILTIN[0].url);
+        }
+
+        function onRpcFailoverChange(e) {
+            rpcPrefs.failover = !!e.target.checked;
+            saveRpcPrefs();
+            rpcEpoch++;
+            rpcServingUrl = null;
+            cachedProvider = null;
+            cachedRpcUrl = null;
+            providerPromise = null;
+            setRpcStatus("trying", "Connecting…");
+            refreshRpcDependentData();
+        }
+
+        let rpcModalOpener = null;
+        function openRpcModal() {
+            const modal = document.getElementById("rpc-modal");
+            if (!modal) return;
+            rpcModalOpener = document.activeElement;
+            populateRpcSelect();
+            modal.classList.add("open");
+            document.getElementById("rpc-select").focus();
+        }
+        function closeRpcModal() {
+            const modal = document.getElementById("rpc-modal");
+            if (!modal) return;
+            modal.classList.remove("open");
+            showCustomRpcRow(false);
+            if (rpcModalOpener && typeof rpcModalOpener.focus === "function") rpcModalOpener.focus();
+        }
+
+        function initRpcManager() {
+            populateRpcSelect();
+            document.getElementById("rpc-select").addEventListener("change", onRpcSelectChange);
+            document.getElementById("rpc-add-btn").addEventListener("click", addCustomRpc);
+            document.getElementById("rpc-cancel-btn").addEventListener("click", () => showCustomRpcRow(false));
+            document.getElementById("rpc-remove-btn").addEventListener("click", removeCustomRpc);
+            document.getElementById("rpc-failover").addEventListener("change", onRpcFailoverChange);
+            document.getElementById("rpc-custom-input").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") { e.preventDefault(); addCustomRpc(); }
+            });
+            const modal = document.getElementById("rpc-modal");
+            modal.addEventListener("click", (e) => { if (e.target === modal) closeRpcModal(); });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && modal.classList.contains("open")) closeRpcModal();
+            });
+        }
+        initRpcManager();
 
         const FAUCET_CONTRACT = "0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98";
         const SHD_TOKEN_ADDRESS = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
