@@ -1,17 +1,19 @@
-///Addresses (PulseChain Testnet V4, chain ID 943)
+### Addresses (PulseChain Testnet V4, chain ID 943)
 
-SHDLaunchFactory	0x9dB37A5102e59f254e4DBB2493fA6aa5E1B8c51E
-SHD (test)	        0x60eB086a1b15eDADd73351d6Da128F3fB64F6Cb0
-V2 factory (mock)	0xF5590631f05a3789dB59eBC0c46687B9Dd35d337
-BuyAndBurn sink	        0x163c077ef5eED651718dB5D50A1EF65F5D2FB462
-Example token	        0x51dFE21F47fD5576B1D6F576A3CDe1570776Cf7f
+| Contract              | Address                                      |
+|-----------------------|----------------------------------------------|
+| SHDLaunchFactory      | `0x9dB37A5102e59f254e4DBB2493fA6aa5E1B8c51E` |
+| SHD (test)            | `0x60eB086a1b15eDADd73351d6Da128F3fB64F6Cb0` |
+| V2 factory (mock)     | `0xF5590631f05a3789dB59eBC0c46687B9Dd35d337` |
+| BuyAndBurn sink       | `0x163c077ef5eED651718dB5D50A1EF65F5D2FB462` |
+| Example token         | `0x51dFE21F47fD5576B1D6F576A3CDe1570776Cf7f` |
 
+### Addresses (PulseChain Mainnet, chain ID 369)
 
-
-///Addresses (PulseChain Mainnet, chain ID 369)
-
-SHDLaunchFactory:       0x60eB086a1b15eDADd73351d6Da128F3fB64F6Cb0
-SHD:                    0xB95bC84f9B6D0373642D586b81979B067572f7bc
-BuyAndBurn:             0x3677e61A7a9E79Fe45a882C201365C5165A5540e
-PulseX factory:         0x29eA7545DEf87022BAdc76323F373EA1e707C523
-Creation:               0xcecf38b2be7ad4063858b691aa392270dccc2d04a1c4a6385cc1d02ab2c66564
+| Contract              | Address                                      |
+|-----------------------|----------------------------------------------|
+| SHDLaunchFactory      | `0x60eB086a1b15eDADd73351d6Da128F3fB64F6Cb0` |
+| SHD                   | `0xB95bC84f9B6D0373642D586b81979B067572f7bc` |
+| BuyAndBurn            | `0x3677e61A7a9E79Fe45a882C201365C5165A5540e` |
+| PulseX factory        | `0x29eA7545DEf87022BAdc76323F373EA1e707C523` |
+| Creation              | `0xcecf38b2be7ad4063858b691aa392270dccc2d04a1c4a6385cc1d02ab2c66564` |
