@@ -1,2 +1,5 @@
 Shd-Launcher/.env
 Shd-Launcher/.env
+node_modules/
+SNFT/lib/
+dApps/SnipeHeadFaucetV2/.vscode/
