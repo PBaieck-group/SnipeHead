@@ -1,24 +1,2 @@
-# Node.js
-node_modules/
-npm-debug.log
-
-# Environment Variables (everywhere)
-.env
-**/.env
-**/.env.*
-
-# IDEs and Editors
-.vscode/
-.idea/
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Build artifacts
-dist/
-build/
-SNFT/lib/
-SNFT/cache/
-SNFT/out/
-SNFT/broadcast/
+Shd-Launcher/.env
+Shd-Launcher/.env
