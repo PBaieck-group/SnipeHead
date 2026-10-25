@@ -7,7 +7,7 @@
        script-src is pinned by SHA-256 hash to the page's inline script blocks (no 'unsafe-inline'), and the markup has no
        inline event-handler attributes: see "Event delegation" at the end of the main script.
        After ANY edit inside an inline script block, run  python3 csp-hash.py index.html  to rewrite the hashes below. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6FyZUTs0nV+ugfgLxRDcDJUYit4I+2rDpDVAa9E07ws=' 'sha256-/WbARlGSnGo3gGo36CF+a2qsB8foFq1Hj1JpC3QpvGE=' 'sha256-RvxpU07AmPCVu80dmibWk9Oai57v9zQ1NnZbPdKMK98=' 'sha256-ruR0rjvOvY8A2364qW9GpZf5A+PL+594AuxfpCzWjBk='; style-src 'self' 'unsafe-inline'; img-src data: blob:; font-src 'self'; connect-src https: ; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; worker-src 'none'; manifest-src 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6FyZUTs0nV+ugfgLxRDcDJUYit4I+2rDpDVAa9E07ws=' 'sha256-/WbARlGSnGo3gGo36CF+a2qsB8foFq1Hj1JpC3QpvGE=' 'sha256-RvxpU07AmPCVu80dmibWk9Oai57v9zQ1NnZbPdKMK98=' 'sha256-4p0J7CkcTgneCpxYjj7InMgV3awqLQfZikFcMPpTypA='; style-src 'self' 'unsafe-inline'; img-src data: blob:; font-src 'self'; connect-src https: ; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; worker-src 'none'; manifest-src 'none'" />
   <meta name="referrer" content="no-referrer" />
   <!-- Clickjacking: the real protection is the frame-ancestors / X-Frame-Options response header set on the host
        (see _headers). This is only a fallback: the page starts hidden and is revealed only when it is not framed,
@@ -235,6 +235,15 @@
     }
     .stat label { color: var(--muted); display: block; font-size: 0.68rem; }
     .stat value { font-weight: 600; font-size: 0.78rem; }
+    /* 24h price change chip: green up / red down, hidden while empty */
+    .chg { font-size: 0.68rem; font-weight: 700; white-space: nowrap; color: var(--muted); }
+    .chg:empty { display: none; }
+    .chg.up { color: var(--green); }
+    .chg.down { color: var(--red); }
+    .token-img .chg { position: absolute; top: 6px; right: 6px; padding: 2px 6px; border-radius: 6px; background: rgba(10,10,11,0.78); }
+    .top-card-head { display: flex; align-items: baseline; gap: 8px; }
+    .top-card-head .top-card-name { flex: 1; min-width: 0; }
+    .top-card-head .chg { flex: none; }
     .progress-bar {
       height: 4px; background: #0f0f10; border-radius: 2px; overflow: hidden; margin-top: 3px;
     }
@@ -1160,7 +1169,7 @@
         exampleToken: ""
       }
     };
-    const APP_VERSION = "1.0.0";
+    const APP_VERSION = "1.1.0";
     const ACTIVE_NETWORK = "mainnet";
     const NET = NETWORKS[ACTIVE_NETWORK];
     const CHAIN_ID = BigInt(NET.chainId), CHAIN_ID_HEX = "0x" + NET.chainId.toString(16);
@@ -2009,9 +2018,11 @@
       markWarnings(tokens);
       if (currentTradeToken) currentTradeToken = tokens.find(t => t.address.toLowerCase() === currentTradeToken.address.toLowerCase()) || currentTradeToken;
     }
+    let lastHead = 0, lastHeadAt = 0;   // newest block number seen by the sync; the cards reuse it instead of asking again
     function syncIndex() { return syncing || (syncing = _sync().finally(() => { syncing = null; })); }
     async function _sync() {
       const head = await getReadProvider().getBlockNumber();
+      lastHead = head; lastHeadAt = Date.now();
       const safeHead = head - CONFIRMATIONS;     // never index blocks that could still be reorged
       if (safeHead > idx.lastBlock) {
         const span = Math.max(1, safeHead - NET.factoryDeployBlock);
@@ -2090,7 +2101,7 @@
           <div class="top-card" data-click="goToken" data-a="${esc(t.address)}">
             <div class="top-card-img">${cardImg(t)}</div>
             <div class="top-card-body">
-              <div class="top-card-name" title="${esc(t.name)}">${esc(t.name)}</div>
+              <div class="top-card-head"><div class="top-card-name" title="${esc(t.name)}">${esc(t.name)}</div><span class="chg" data-chg="${t.address.toLowerCase()}" title="24h price change"></span></div>
               <div class="top-card-meta"><span class="top-card-sym" title="$${esc(t.symbol)}">$${esc(t.symbol)}</span> · ${modeBadge} ${status} ${riskBadge(t)}</div>
               ${t.mode === 1 && !t.graduated
                 ? `<div style="margin-top:6px;font-size:0.72rem;color:var(--muted)">${(t.progress*100).toFixed(1)}% to graduation</div>
@@ -2100,6 +2111,8 @@
           </div>`;
       }).join("");
       if (row.dataset.sig !== html) { row.dataset.sig = html; row.innerHTML = html; }   // skip identical redraws so logos don't flicker on every sync
+      top.forEach(t => { const k = t.address.toLowerCase(); if (isLiveToken(t)) paintCardMarket(k); else if (curveChg[k]) paintChg(k, curveChg[k].chg24); });   // fill the 24h chips from cache
+      loadCardMarket(top).catch(e => console.warn("card market", e));
       updateTopArrows();
     }
     function topScroll(dir) {
@@ -2152,6 +2165,7 @@
     const cardMarket = {};   // token(lower) -> { mcap, vol24 (bigint|null), at }
     const pairInfo = {};     // token(lower) -> { pair, tokenIs0 }
     const CARD_SWAP_TOPIC = ethers.id("Swap(address,uint256,uint256,uint256,uint256,address)");
+    const CARD_SYNC_TOPIC = ethers.id("Sync(uint112,uint112)");
     const CARD_TTL = 60000;
     const BLOCKS_24H = 8640;
 
@@ -2162,49 +2176,221 @@
       const cm = cardMarket[t.address.toLowerCase()];
       return {
         mcap: cm ? fmtMcap(cm.mcap) : "…",
-        vol: cm ? (cm.vol24 == null ? "—" : fmt(cm.vol24)) : "…"
+        vol: cm ? (cm.vol24 == null ? "—" : fmt(cm.vol24)) : "…",
+        chg: cm ? cm.chg24 : null
       };
+    }
+    // 24h price change chip. Empty (and hidden by CSS) until the pair data is in.
+    function chgView(c) {
+      if (c == null || !isFinite(c)) return { cls: "chg", text: "" };
+      const a = Math.abs(c);
+      if (a < 0.005) return { cls: "chg", text: "0.00%" };
+      const n = a >= 1000 ? Math.round(a).toLocaleString("en-US") : a >= 100 ? a.toFixed(1) : a.toFixed(2);
+      return c > 0 ? { cls: "chg up", text: "▲ " + n + "%" } : { cls: "chg down", text: "▼ " + n + "%" };
+    }
+    const chgHtml = (c, k) => { const v = chgView(c); return `<span class="${v.cls}" data-chg="${k}" title="24h price change">${v.text}</span>`; };
+    const curveChg = {};   // bonding-curve token(lower) -> { chg24, at }; kept apart from cardMarket so curve Mcap/Volume are never overwritten
+    function paintChg(k, c) {
+      document.querySelectorAll(`[data-chg="${k}"]`).forEach(el => { const v = chgView(c); el.className = v.cls; el.textContent = v.text; });
     }
     function paintCardMarket(k) {
       const cm = cardMarket[k];
       if (!cm) return;
       document.querySelectorAll(`[data-mcap="${k}"]`).forEach(el => { el.textContent = fmtMcap(cm.mcap); });
       document.querySelectorAll(`[data-vol="${k}"]`).forEach(el => { el.textContent = cm.vol24 == null ? "—" : fmt(cm.vol24); });
+      document.querySelectorAll(`[data-chg="${k}"]`).forEach(el => { const v = chgView(cm.chg24); el.className = v.cls; el.textContent = v.text; });
     }
-    async function loadCardMarket(list) {
-      const now = Date.now();
-      const todo = list.filter(t => isLiveToken(t) && !(cardMarket[t.address.toLowerCase()] && now - cardMarket[t.address.toLowerCase()].at < CARD_TTL));
-      if (!todo.length) return;
-      const rp = getReadProvider();
-      let latest;
-      try { latest = await rp.getBlockNumber(); } catch { return; }
-      await pool(todo, 4, async t => {
-        const k = t.address.toLowerCase();
-        let info = pairInfo[k];
-        if (!info) {
-          const pair = await getTokenPair(t);
-          if (!pair) return;
-          const token0 = (await new ethers.Contract(pair, ["function token0() view returns (address)"], rp).token0()).toLowerCase();
-          info = pairInfo[k] = { pair, tokenIs0: token0 === k };
-        }
-        const pc = new ethers.Contract(info.pair, ["function getReserves() view returns (uint112,uint112,uint32)"], rp);
-        const [r0, r1] = await pc.getReserves();
-        const tokRes = info.tokenIs0 ? r0 : r1, shdRes = info.tokenIs0 ? r1 : r0;
-        const price = tokRes > 0n ? Number(shdRes) / Number(tokRes) : 0;
-        let vol24 = null;
-        try {
-          const from = Math.max(t.createdBlock || 0, latest - BLOCKS_24H);
-          const logs = await getLogsChunked({ address: info.pair, topics: [CARD_SWAP_TOPIC] }, from, latest, 9000);
-          const coder = ethers.AbiCoder.defaultAbiCoder();
-          vol24 = 0n;
-          for (const l of logs) {
-            const [a0In, a1In, a0Out, a1Out] = coder.decode(["uint256", "uint256", "uint256", "uint256"], l.data);
-            vol24 += info.tokenIs0 ? (a1In + a1Out) : (a0In + a0Out);   // SHD side of the swap
-          }
-        } catch (e) { console.warn("card volume", k, e); }
-        cardMarket[k] = { mcap: price * supplyNum(), vol24, at: Date.now() };
-        paintCardMarket(k);
+    // ─── Fewer RPC calls for the cards (public RPCs rate-limit) ───
+    //  • every pair goes into ONE eth_getLogs (address list), every curve token into one more, instead of one query per token
+    //  • after the first load only the new blocks are fetched; a rolling 24h window is kept in memory
+    //  • current reserves = the newest Sync log, so getReserves (one multicall) is only needed for pairs with no event in 24h
+    //  • token0 is worked out locally (V2 sorts by address) and getPair goes through one multicall
+    //  • the head block comes from the 20s index sync; the Top row and the grid share one batch
+    const V2F_IFACE = new ethers.Interface(["function getPair(address,address) view returns (address)"]);
+    const PAIR_ABI = ["function getReserves() view returns (uint112,uint112,uint32)"];
+    const PAIR_IFACE = new ethers.Interface(PAIR_ABI);
+    const cardState = {}, curveState = {};   // token(lower) -> { upTo, ev|tr, ... }
+    const cardPending = new Map();
+    let cardFailUntil = 0, cardTimer = null, cardChain = Promise.resolve();
+    const FRESH_GAP = 600;   // blocks (~100 min): a token not refreshed for longer is reloaded as a whole window so it cannot drag the batch's block range back
+    const topicOf = a => "0x" + a.toLowerCase().slice(2).padStart(64, "0");
+    async function cardHead(rp) { return (lastHead && Date.now() - lastHeadAt < 45000) ? lastHead : await rp.getBlockNumber(); }
+    function splitCardGroups(items, states, kOf, latest) {
+      const fresh = [], known = [];
+      for (const t of items) {
+        const k = kOf(t), st = states[k];
+        if (st && latest - st.upTo <= FRESH_GAP) known.push(t); else { delete states[k]; fresh.push(t); }
+      }
+      return { fresh, known, knownFrom: known.length ? Math.min(...known.map(t => states[kOf(t)].upTo)) + 1 : 0 };
+    }
+
+    function loadCardMarket(list) {
+      for (const t of list) cardPending.set(t.address.toLowerCase(), t);
+      if (!cardTimer) cardTimer = setTimeout(() => {   // Top row and grid ask in the same tick: one batch for both
+        cardTimer = null;
+        const batch = [...cardPending.values()]; cardPending.clear();
+        cardChain = cardChain
+          .then(() => Date.now() < cardFailUntil ? null : loadCardMarketNow(batch))
+          .catch(e => { cardFailUntil = Date.now() + 60000; console.warn("card market", e); })
+          .then(() => Date.now() < cardFailUntil ? null : loadCurveChgNow(batch))
+          .catch(e => { cardFailUntil = Date.now() + 60000; console.warn("curve change", e); });
+      }, 50);
+      return Promise.resolve();
+    }
+
+    // Bonding-curve tokens have no pair yet: price each factory Bought/Sold (SHD per token) and compare newest vs oldest in the last 24h.
+    async function loadCurveChgNow(list) {
+      const now = Date.now(), seen = new Set(), kOf = t => t.address.toLowerCase();
+      const todo = list.filter(t => {
+        const k = kOf(t);
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return !isLiveToken(t) && Number(t.mode) === 1 && t.trades > 0 && !(curveChg[k] && now - curveChg[k].at < CARD_TTL);
       });
+      if (!todo.length) return;
+      const rp = getReadProvider(), latest = await cardHead(rp), cut = latest - BLOCKS_24H;
+      const evTopics = [IFACE.getEvent("Bought").topicHash, IFACE.getEvent("Sold").topicHash];
+      const { fresh, known, knownFrom } = splitCardGroups(todo, curveState, kOf, latest);
+      const pull = async (group, from) => {
+        if (!group.length || from > latest) return;
+        const logs = await getLogsChunked({ address: FACTORY, topics: [evTopics, group.map(t => topicOf(t.address))] }, from, latest, 9000);
+        logs.sort((x, y) => (x.blockNumber - y.blockNumber) || (x.index - y.index));
+        const by = {};
+        for (const l of logs) {
+          const p = IFACE.parseLog(l); if (!p) continue;
+          const buy = p.name === "Bought", shd = buy ? p.args.shdIn : p.args.shdOut, tok = buy ? p.args.tokensOut : p.args.tokensIn;
+          if (tok > 0n && shd > 0n) { const k = p.args.token.toLowerCase(); (by[k] = by[k] || []).push({ b: l.blockNumber, p: Number(shd) / Number(tok) }); }
+        }
+        for (const t of group) {
+          const k = kOf(t), st = curveState[k] || (curveState[k] = { upTo: from - 1, tr: [] });
+          for (const x of by[k] || []) if (x.b > st.upTo) st.tr.push(x);
+          st.upTo = latest;
+        }
+      };
+      await pull(fresh, cut);
+      await pull(known, knownFrom);
+      for (const t of todo) {
+        const k = kOf(t), st = curveState[k]; if (!st) continue;
+        st.tr = st.tr.filter(x => x.b >= cut);
+        const c = st.tr.length ? (st.tr[st.tr.length - 1].p / st.tr[0].p - 1) * 100 : 0;   // 0 or 1 trades in the window = no measurable move
+        curveChg[k] = { chg24: c, at: Date.now() };
+        paintChg(k, c);
+      }
+    }
+
+    async function loadCardMarketNow(list) {
+      const now = Date.now(), seen = new Set(), kOf = t => t.address.toLowerCase();
+      const todo = list.filter(t => {
+        const k = kOf(t);
+        if (seen.has(k) || !isLiveToken(t)) return false;
+        seen.add(k);
+        return !(cardMarket[k] && now - cardMarket[k].at < CARD_TTL);
+      });
+      if (!todo.length) return;
+      const rp = getReadProvider(), mc = await hasMulticall(rp);
+      const latest = await cardHead(rp), cut = latest - BLOCKS_24H, sd = SHD.toLowerCase();
+      const coder = ethers.AbiCoder.defaultAbiCoder();
+
+      // 1) pair address per token (never changes): one multicall for the unknown ones. token0 = the lower address.
+      const needPair = todo.filter(t => !pairInfo[kOf(t)]);
+      if (needPair.length) {
+        let res = null;
+        if (mc) { try { res = await multicall(rp, needPair.map(t => ({ target: NET.contracts.v2Factory, iface: V2F_IFACE, fn: "getPair", args: [t.address, SHD] }))); } catch (e) { console.warn("pair multicall", e); } }
+        for (let i = 0; i < needPair.length; i++) {
+          const t = needPair[i], k = kOf(t);
+          let pair;
+          if (res && res[i].ok) pair = res[i].value[0];
+          else { try { pair = await getTokenPair(t); } catch { pair = null; } }   // one by one only when Multicall3 is missing/failed
+          if (pair && pair !== ethers.ZeroAddress) pairInfo[k] = { pair, tokenIs0: k < sd };
+        }
+      }
+      const act = todo.filter(t => pairInfo[kOf(t)]);
+      if (!act.length) return;
+
+      // 2) Swap + Sync logs of all pairs in one query: whole window for new tokens, only the new blocks for known ones
+      const { fresh, known, knownFrom } = splitCardGroups(act, cardState, kOf, latest);
+      const failed = new Map();   // k -> true when it was a known token (keep what is on screen)
+      const pull = async (group, from) => {
+        if (!group.length || from > latest) return;
+        try {
+          const logs = await getLogsChunked({ address: group.map(t => pairInfo[kOf(t)].pair), topics: [[CARD_SWAP_TOPIC, CARD_SYNC_TOPIC]] }, from, latest, 9000);
+          logs.sort((x, y) => (x.blockNumber - y.blockNumber) || (x.index - y.index));
+          const by = {};
+          for (const l of logs) { const a = l.address.toLowerCase(); (by[a] = by[a] || []).push(l); }
+          for (const t of group) {
+            const k = kOf(t), pi = pairInfo[k];
+            const st = cardState[k] || (cardState[k] = { upTo: from - 1, ev: [], base: null, res: null });
+            for (const l of by[pi.pair.toLowerCase()] || []) {
+              if (l.blockNumber <= st.upTo) continue;
+              if (l.topics[0] === CARD_SYNC_TOPIC) {
+                const [r0, r1] = coder.decode(["uint256", "uint256"], l.data);
+                st.ev.push({ b: l.blockNumber, tx: l.transactionHash, r: [r0, r1], vol: 0n, sw: null });
+              } else {
+                const sw = coder.decode(["uint256", "uint256", "uint256", "uint256"], l.data);   // a0In, a1In, a0Out, a1Out
+                const vol = pi.tokenIs0 ? sw[1] + sw[3] : sw[0] + sw[2];   // SHD side of the swap
+                const e = st.ev[st.ev.length - 1];
+                if (e && e.tx === l.transactionHash && !e.sw) { e.vol = vol; e.sw = [sw[0], sw[1], sw[2], sw[3]]; }   // a swap sits right after its own Sync
+                else st.ev.push({ b: l.blockNumber, tx: l.transactionHash, r: null, vol, sw: [sw[0], sw[1], sw[2], sw[3]] });
+              }
+            }
+            st.upTo = latest;
+          }
+        } catch (e) {
+          console.warn("card logs", e); cardFailUntil = Date.now() + 60000;
+          group.forEach(t => { const k = kOf(t); failed.set(k, group === known); delete cardState[k]; });
+        }
+      };
+      await pull(fresh, cut);
+      await pull(known, knownFrom);
+
+      // 3) trim to 24h (the last Sync that falls out becomes the "price 24h ago") and find the current reserves
+      const items = [];
+      for (const t of act) {
+        const k = kOf(t);
+        if (failed.get(k) === true) continue;   // known token whose refresh failed: leave the card as it is, retry after the back-off
+        const logsOk = !failed.has(k), st = cardState[k] || { ev: [], base: null, res: null };
+        let n = 0;
+        while (n < st.ev.length && st.ev[n].b < cut) { if (st.ev[n].r) st.base = st.ev[n].r; n++; }
+        if (n) st.ev.splice(0, n);
+        let cur = null;
+        for (let j = st.ev.length - 1; j >= 0 && !cur; j--) cur = st.ev[j].r;
+        items.push({ t, k, st, logsOk, cur: cur || st.base || st.res });
+      }
+      // only pairs with no event in 24h still need getReserves, and it is read once (one multicall); their Sync history is empty so it cannot change unnoticed
+      const needRes = items.filter(x => !x.cur);
+      if (needRes.length) {
+        let res = null;
+        if (mc) { try { res = await multicall(rp, needRes.map(x => ({ target: pairInfo[x.k].pair, iface: PAIR_IFACE, fn: "getReserves" }))); } catch (e) { console.warn("reserves multicall", e); } }
+        for (let i = 0; i < needRes.length; i++) {
+          const x = needRes[i];
+          let r = res && res[i].ok ? [res[i].value[0], res[i].value[1]] : null;
+          if (!r) { try { const v = await new ethers.Contract(pairInfo[x.k].pair, PAIR_ABI, rp).getReserves(); r = [v[0], v[1]]; } catch {} }
+          if (r) x.cur = x.st.res = r;
+        }
+      }
+
+      // 4) publish
+      for (const x of items) {
+        if (!x.cur) continue;
+        const pi = pairInfo[x.k], tokRes = pi.tokenIs0 ? x.cur[0] : x.cur[1], shdRes = pi.tokenIs0 ? x.cur[1] : x.cur[0];
+        const price = tokRes > 0n ? Number(shdRes) / Number(tokRes) : 0;
+        let vol24 = null, chg24 = null;
+        if (x.logsOk) {
+          vol24 = 0n; for (const e of x.st.ev) vol24 += e.vol;
+          let open = x.st.base;
+          if (!open) {   // window starts inside the pair's history we fetched: undo the first swap to get the reserves before it
+            const f = x.st.ev.find(e => e.r);
+            if (f) open = f.sw ? [f.r[0] - f.sw[0] + f.sw[2], f.r[1] - f.sw[1] + f.sw[3]] : f.r;
+          }
+          if (open) {
+            const oTok = pi.tokenIs0 ? open[0] : open[1], oShd = pi.tokenIs0 ? open[1] : open[0];
+            const p0 = oTok > 0n ? Number(oShd) / Number(oTok) : 0;
+            chg24 = p0 > 0 && price > 0 ? (price / p0 - 1) * 100 : null;
+          } else chg24 = price > 0 ? 0 : null;   // no pool activity in 24h = unchanged
+        }
+        cardMarket[x.k] = { mcap: price * supplyNum(), vol24, chg24, at: Date.now() };
+        paintCardMarket(x.k);
+      }
     }
 
     function renderTokens() {
@@ -2268,7 +2454,7 @@
 
         return `
           <div class="token-card" data-click="goToken" data-a="${esc(t.address)}">
-            <div class="token-img">${imgHtml}</div>
+            <div class="token-img">${imgHtml}${chgHtml(liveCard ? cms.chg : curveChg[kAddr]?.chg24, kAddr)}</div>
             <div class="token-body">
               <div class="token-top">
                 <div>
