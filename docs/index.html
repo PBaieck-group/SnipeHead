@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim daily, mine, and trade SHD in a decentralized ecosystem.">
-    <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Faucet, Mining, Crypto, DEX">
+    <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim free SHD, mine, trade, and launch your own tokens with SHD in a decentralized ecosystem.">
+    <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Launch, Launchpad, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
     <!-- connect-src allows any https: origin so visitors can point the site at their own PulseChain RPC node. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://mystati.snipehead.xyz; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://min-api.cryptocompare.com https://api.exchange.coinbase.com https://api.scan.pulsechain.com https:; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
-    <meta property="og:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
+    <meta property="og:description" content="Claim free SHD tokens, mine for more, then launch your own tokens with SHD. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
     <meta property="og:image" content="https://snipehead.xyz/Logo_200.png">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://snipehead.xyz/Logo_200.png">
     <meta name="twitter:title" content="SnipeHead - Built on PulseChain">
-    <meta name="twitter:description" content="Claim free SHD tokens daily or mine for more. Decentralized and unstoppable.">
+    <meta name="twitter:description" content="Claim free SHD tokens, mine for more, then launch your own tokens with SHD. Decentralized and unstoppable.">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
     <title>SnipeHead - PulseChain</title>
@@ -601,6 +601,128 @@
             box-shadow: var(--shadow-sm);
         }
 
+        /* Liquid-glass buttons (hero + CTA only) */
+        .hero-actions .btn,
+        .cta-actions .btn {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            padding: 0.7rem 1.4rem;
+            border-radius: var(--radius-pill);
+            color: #e9edf0;
+            font-weight: 600;
+            letter-spacing: 0.005em;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            backdrop-filter: blur(14px) saturate(180%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+                inset 0 0 10px rgba(255, 255, 255, 0.03),
+                0 8px 20px rgba(0, 0, 0, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .hero-actions .btn-primary,
+        .cta-actions .btn-primary {
+            background: linear-gradient(180deg, rgba(45, 212, 191, 0.26) 0%, rgba(45, 212, 191, 0.08) 100%);
+            border-color: rgba(45, 212, 191, 0.28);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -1px 0 rgba(45, 212, 191, 0.12),
+                inset 0 0 12px rgba(45, 212, 191, 0.08),
+                0 8px 20px rgba(0, 0, 0, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Specular sheen across the top half */
+        .hero-actions .btn::before,
+        .cta-actions .btn::before {
+            content: "";
+            position: absolute;
+            inset: 1px 6% 52% 6%;
+            border-radius: var(--radius-pill);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: -1;
+            transition: opacity 0.2s ease;
+        }
+
+        .hero-actions .btn:hover,
+        .cta-actions .btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+                inset 0 0 12px rgba(255, 255, 255, 0.05),
+                0 12px 28px rgba(0, 0, 0, 0.4),
+                0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-actions .btn-primary:hover,
+        .cta-actions .btn-primary:hover {
+            background: linear-gradient(180deg, rgba(45, 212, 191, 0.36) 0%, rgba(45, 212, 191, 0.12) 100%);
+            border-color: rgba(45, 212, 191, 0.4);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.32),
+                inset 0 -1px 0 rgba(45, 212, 191, 0.15),
+                inset 0 0 14px rgba(45, 212, 191, 0.1),
+                0 12px 26px rgba(0, 0, 0, 0.4),
+                0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-actions .btn:hover::before,
+        .cta-actions .btn:hover::before {
+            opacity: 1;
+        }
+
+        .hero-actions .btn:active,
+        .cta-actions .btn:active {
+            transform: scale(0.97);
+        }
+
+        .hero-actions .btn:focus-visible,
+        .cta-actions .btn:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.55);
+            outline-offset: 3px;
+        }
+
+        /* Give the CTA band some colour to refract, like the hero */
+        .cta-band {
+            background:
+                radial-gradient(ellipse 55% 90% at 100% 0%, rgba(45, 212, 191, 0.12), transparent 60%),
+                radial-gradient(ellipse 45% 80% at 0% 100%, rgba(167, 139, 250, 0.1), transparent 60%),
+                var(--bg-card);
+        }
+
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .hero-actions .btn,
+            .cta-actions .btn {
+                background: rgba(40, 40, 46, 0.9);
+            }
+            .hero-actions .btn-primary,
+            .cta-actions .btn-primary {
+                background: rgba(24, 110, 100, 0.9);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-actions .btn,
+            .cta-actions .btn {
+                transition: none;
+            }
+            .hero-actions .btn:hover,
+            .cta-actions .btn:hover {
+                transform: none;
+            }
+        }
+
         /* Hero banner */
         .hero-banner {
             position: relative;
@@ -983,6 +1105,44 @@
         @keyframes pulse-soft {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
+        }
+
+        .dexscreener-view-toggle {
+            display: inline-flex;
+            margin: 0 auto;
+            padding: 2px;
+            gap: 2px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .dexscreener-view-toggle button {
+            padding: 0.25rem 0.65rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .dexscreener-view-toggle button:hover {
+            color: var(--text);
+        }
+
+        .dexscreener-view-toggle button.active {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        @media (max-width: 479px) {
+            .dexscreener-header .live-label {
+                display: none;
+            }
         }
 
         .dexscreener-reload-btn {
@@ -1871,6 +2031,11 @@
                         SNFT - ETH
                         <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
+                    <a href="https://snipehead.xyz/launch/" class="side-link" target="_blank" rel="noopener noreferrer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2zM9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+                        Launch
+                        <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
                     <a href="https://snipehead.xyz/deposit/" class="side-link" target="_blank" rel="noopener noreferrer">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/></svg>
                         Deposit
@@ -1945,13 +2110,14 @@
                     </div>
                     <h1>Welcome to <span>SnipeHead</span></h1>
                     <p class="hero-sub">
-                        Flow free from corp systems. Claim free SHD tokens then mine to maximize your rewards on PulseChain.
+                        Flow free from corp systems. Claim free SHD tokens, mine to maximize your rewards, then launch your own tokens with SHD on PulseChain.
                     </p>
                     <div class="hero-actions">
                         <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
                         <a href="https://snipehead.xyz/faucet/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Claim Tokens</a>
                         <a href="https://snipehead.xyz/mine/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Start Mining</a>
                         <a href="https://snipehead.xyz/snft/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Mint SNFT</a>
+                        <a href="https://snipehead.xyz/launch/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Launch Token</a>
                     </div>
                 </section>
 
@@ -2042,14 +2208,10 @@
                             <div class="stat-icon" style="background: var(--rose-soft); color: var(--rose);">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
                             </div>
-                            <span class="stat-label">Faucet &amp; Mining</span>
+                            <span class="stat-label">Mining</span>
                         </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                        <div style="display:grid; grid-template-columns:1fr; gap:0.75rem;">
                             <div>
-                                <p class="stat-value" style="font-size:1.25rem;" id="faucet-balance">Loading...</p>
-                                <p class="stat-sub">Faucet Balance</p>
-                            </div>
-                            <div style="border-left:1px solid var(--border); padding-left:0.75rem;">
                                 <p class="stat-value" style="font-size:1.25rem;" id="total-mined">Loading...</p>
                                 <p class="stat-sub">Mining Power</p>
                             </div>
@@ -2078,13 +2240,17 @@
                             <div id="dexscreener-embed">
                                 <div class="dexscreener-header">
                                     <span class="live-label"><span class="live-dot"></span> Live Chart</span>
+                                    <div class="dexscreener-view-toggle" role="group" aria-label="Chart view">
+                                        <button type="button" class="active" data-view="chart" aria-pressed="true" onclick="setDexscreenerView('chart', this)">Chart</button>
+                                        <button type="button" data-view="trades" aria-pressed="false" onclick="setDexscreenerView('trades', this)">Chart + Txns</button>
+                                    </div>
                                     <button type="button" id="dexscreener-reload-btn" class="dexscreener-reload-btn" onclick="manualReloadDexscreenerEmbed(this)" aria-label="Reload chart">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
                                         Reload
                                     </button>
                                 </div>
                                 <div class="dexscreener-chart-body">
-                                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
+                                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&trades=0&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
                                 </div>
                             </div>
                         </div>
@@ -2358,12 +2524,13 @@
                 <section class="section">
                     <div class="card cta-band card-static">
                         <h2>Join the <span>SnipeHead</span> Ecosystem</h2>
-                        <p>Explore the faucet to claim your free SHD tokens then dive into mining for exclusive rewards.</p>
+                        <p>Claim your free SHD tokens, dive into mining for exclusive rewards, then launch your own tokens with SHD.</p>
                         <div class="cta-actions">
                             <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
                             <a href="https://snipehead.xyz/faucet/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Claim Tokens</a>
                             <a href="https://snipehead.xyz/mine/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Start Mining</a>
                             <a href="https://snipehead.xyz/snft/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Mint SNFT</a>
+                            <a href="https://snipehead.xyz/launch/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Launch Token</a>
                         </div>
                     </div>
                 </section>
@@ -2379,7 +2546,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.6.3</p>
+                    <p class="footer-version">v4.7.0</p>
                 </div>
             </footer>
         </div>
@@ -2578,6 +2745,28 @@
             if (!chartUrl) return;
             iframe.dataset.loaded = 'true';
             iframe.src = chartUrl;
+        }
+
+        // Chart-only (default) vs chart + transactions. Swaps the embed's
+        // trades flag and reloads the iframe; reload/stall logic keeps using
+        // whichever view is currently selected via dataset.src.
+        function setDexscreenerView(view, btn) {
+            const iframe = document.getElementById('dexscreener-iframe');
+            if (!iframe || !iframe.dataset.src) return;
+            const flag = view === 'trades' ? 'trades=1' : 'trades=0';
+            const next = iframe.dataset.src.replace(/trades=[01]/, flag);
+            document.querySelectorAll('.dexscreener-view-toggle button').forEach(b => {
+                const on = b === btn;
+                b.classList.toggle('active', on);
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            if (next === iframe.dataset.src) return;
+            iframe.dataset.src = next;
+            if (iframe.dataset.loaded) {
+                reloadDexscreenerEmbed();
+            } else {
+                loadDexscreenerEmbed();
+            }
         }
 
         const DEXSCREENER_STALL_MS = 3 * 60 * 1000;
@@ -3610,8 +3799,7 @@
         }
         initRpcManager();
 
-        const FAUCET_CONTRACT = "0x12a283b6bD04D75c2d83ec110C6E5F91fC34fA98";
-        const SHD_TOKEN_ADDRESS = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
+                const SHD_TOKEN_ADDRESS = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
         const WPLS_TOKEN_ADDRESS = "0xA1077a294dDE1B09bB078844df40758a5D0f9a27";
         const LIQUIDITY_PAIRS = {
             v1: "0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8",
@@ -3723,7 +3911,6 @@
                 "function totalMined() view returns (uint256)",
                 "function getContractSHDBalance() view returns (uint256)",
                 "function getRewardReserve() view returns (uint256)",
-                "function getFaucetBalance() view returns (uint256)",
                 "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
                 "function token0() view returns (address)",
                 "function token1() view returns (address)",
@@ -3789,7 +3976,6 @@
                 { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("totalMined") },
                 { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getContractSHDBalance") },
                 { target: MINING_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getRewardReserve") },
-                { target: FAUCET_CONTRACT, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getFaucetBalance") },
                 { target: LIQUIDITY_PAIRS.v1, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
                 { target: LIQUIDITY_PAIRS.v2, allowFailure: true, callData: ON_CHAIN_ABI.encodeFunctionData("getReserves") },
                 // WPLS/DAI reference pool - used to derive PLS's USD price directly
@@ -3877,7 +4063,7 @@
         // instead of blanking it to "Error".
         const onChainFieldLoaded = {
             'total-mined': false, 'contract-balance': false, 'reward-reserve': false,
-            'faucet-balance': false, 'liquidity-v1': false, 'liquidity-v2': false,
+            'liquidity-v1': false, 'liquidity-v2': false,
             'snft-minted': false, 'snft-pls': false, 'snft-holders': false,
             'shd-market-cap': false, 'shd-liquidity': false
         };
@@ -3908,7 +4094,6 @@
                 const totalMined = decodeResult("totalMined", results[i++]);
                 const contractBalance = decodeResult("getContractSHDBalance", results[i++]);
                 const rewardReserve = decodeResult("getRewardReserve", results[i++]);
-                const faucetBalance = decodeResult("getFaucetBalance", results[i++]);
                 const v1Reserves = decodeResult("getReserves", results[i++]);
                 const v2Reserves = decodeResult("getReserves", results[i++]);
                 const plsReserves = decodeResult("getReserves", results[i++]);
@@ -4020,7 +4205,6 @@
                 if (totalMined) { document.getElementById('total-mined').textContent = formatTokenAmount(Number(ethers.utils.formatEther(totalMined[0]))) + " SHD"; onChainFieldLoaded['total-mined'] = true; }
                 if (contractBalance) { document.getElementById('contract-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(contractBalance[0]))) + " SHD"; onChainFieldLoaded['contract-balance'] = true; }
                 if (rewardReserve) { document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD"; onChainFieldLoaded['reward-reserve'] = true; }
-                if (faucetBalance) { document.getElementById('faucet-balance').textContent = formatTokenAmount(Number(ethers.utils.formatEther(faucetBalance[0]))) + " SHD"; onChainFieldLoaded['faucet-balance'] = true; }
 
                 // --- PLS and SHD USD prices, computed straight from pool reserves ---
                 // (DexScreener is still used elsewhere for 24h change/buys-sells/market
