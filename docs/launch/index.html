@@ -7,7 +7,7 @@
        script-src is pinned by SHA-256 hash to the page's inline script blocks (no 'unsafe-inline'), and the markup has no
        inline event-handler attributes: see "Event delegation" at the end of the main script.
        After ANY edit inside an inline script block, run  python3 csp-hash.py index.html  to rewrite the hashes below. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6FyZUTs0nV+ugfgLxRDcDJUYit4I+2rDpDVAa9E07ws=' 'sha256-/WbARlGSnGo3gGo36CF+a2qsB8foFq1Hj1JpC3QpvGE=' 'sha256-RvxpU07AmPCVu80dmibWk9Oai57v9zQ1NnZbPdKMK98=' 'sha256-5NY9XoqnG7Re0bgwTcaWbG1tXXBQDFEmJrZssGNOAZc='; style-src 'self' 'unsafe-inline'; img-src data: blob:; font-src 'self'; connect-src https: ; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; worker-src 'none'; manifest-src 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6FyZUTs0nV+ugfgLxRDcDJUYit4I+2rDpDVAa9E07ws=' 'sha256-/WbARlGSnGo3gGo36CF+a2qsB8foFq1Hj1JpC3QpvGE=' 'sha256-RvxpU07AmPCVu80dmibWk9Oai57v9zQ1NnZbPdKMK98=' 'sha256-U0760aym6EEsBI/dCT0DcI54ja94DX1pRFaQs/mcgvA='; style-src 'self' 'unsafe-inline'; img-src data: blob:; font-src 'self'; connect-src https: ; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; worker-src 'none'; manifest-src 'none'" />
   <meta name="referrer" content="no-referrer" />
   <!-- Clickjacking: the real protection is the frame-ancestors / X-Frame-Options response header set on the host
        (see _headers). This is only a fallback: the page starts hidden and is revealed only when it is not framed,
@@ -1169,7 +1169,7 @@
         exampleToken: ""
       }
     };
-    const APP_VERSION = "1.1.1";
+    const APP_VERSION = "1.1.2";
     const ACTIVE_NETWORK = "mainnet";
     const NET = NETWORKS[ACTIVE_NETWORK];
     const CHAIN_ID = BigInt(NET.chainId), CHAIN_ID_HEX = "0x" + NET.chainId.toString(16);
@@ -2519,7 +2519,7 @@
 
     function creatorActionHtml(t) {
       const act = creatorNextAction(t);
-      if (!act || act.key === "wait" || act.key === "live") return "";   // nothing to add: progress / live status is already on the card
+      if (!act || act.key === "wait" || act.key === "live" || act.key === "rewarded") return "";   // nothing to add: progress / live status is already on the card; creator already knows about the reward
       if (act.key === "launch") {
         return `<div class="creator-cta" data-click="noop">
           <div class="creator-cta-detail">${esc(act.detail)}</div>
@@ -2956,7 +2956,7 @@
         const g = t.grad;
         a += `<div style="${box}"><b>🎓 Graduated</b><div style="color:var(--muted);font-size:.85rem;margin-top:6px">Liquidity is in the PulseX V2 pair and the LP is burned.</div><div id="pairLine" style="margin-top:6px;font-size:.85rem"></div>
           ${g ? `<div class="token-stats" style="margin-top:10px"><div class="stat"><label>SHD to LP</label><value>${fmt(g.shdToLp)}</value></div><div class="stat"><label>Tokens to LP</label><value>${fmt(g.tokensToLp)}</value></div><div class="stat"><label>LP burned</label><value>${fmt(g.lpBurned)}</value></div><div class="stat"><label>Creator reward</label><value>${fmt(g.creatorReward)} SHD</value></div></div>` : ""}
-          <div style="margin-top:10px;font-size:.85rem">${creatorGotText(t, t.symbol)}</div></div>`;
+          </div>`;
       } else if (eligible) {
         a += `<div style="${box}"><b>🎯 Target reached</b><p style="color:var(--muted);font-size:.85rem;margin:6px 0 12px">Anyone can graduate this token: liquidity is added to the V2 pair, the LP is burned and the creator gets a reward.</p><button class="btn btn-primary" id="gradBtn" style="width:100%" data-click="graduate">Graduate to DEX</button></div>`;
       } else if (canTradeCurve) {
@@ -3532,7 +3532,7 @@
             <p style="font-size:0.72rem;color:var(--muted);max-width:180px;margin:0">Tokens here trade against SHD. You need SHD to buy $${esc(t.symbol)}.</p>
             ${(() => {
               const act = creatorNextAction(t);
-              if (!act || act.key === "wait" || act.key === "live") return "";   // progress / live status is already shown on this page
+              if (!act || act.key === "wait" || act.key === "live" || act.key === "rewarded") return "";   // progress / live status is already shown on this page; creator already knows about the reward
               if (act.key === "graduate") {
                 return `<button class="btn btn-primary" id="gradBtnPage" data-click="graduatePage">Graduate & claim reward</button>
                   <p style="font-size:0.72rem;color:var(--muted);max-width:180px">${esc(act.detail)}</p>`;
@@ -4362,12 +4362,29 @@
         return "";
       }).join("");
       if (track.dataset.sig === htmlItems + wrap.clientWidth) return;   // nothing changed: don't restart the scroll
+      // remember how far through the loop the scroll is, so a new event doesn't make it jump back to the start
+      let frac = 0;
+      try {
+        const tx = new DOMMatrixReadOnly(getComputedStyle(track).transform).m41, half = track.scrollWidth / 2;
+        if (half > 0 && isFinite(tx)) frac = Math.min(1, Math.max(0, -tx / half));
+      } catch {}
       // one group must be at least as wide as the ticker, otherwise a short feed would leave a gap before it repeats
       track.innerHTML = `<div class="activity-group">${htmlItems}</div>`;
       const w = track.firstElementChild.scrollWidth, need = wrap.clientWidth;
-      const one = w > 0 ? htmlItems.repeat(Math.max(1, Math.ceil(need / w))) : htmlItems;
+      if (!(w > 0) || !(need > 0)) {   // not laid out yet (hidden tab, fonts/CSS still loading): measuring now would give a far too short duration = a far too fast scroll
+        if ((renderActivityTicker.retries = (renderActivityTicker.retries || 0) + 1) <= 20) setTimeout(renderActivityTicker, 250);
+        return;
+      }
+      renderActivityTicker.retries = 0;
+      const one = htmlItems.repeat(Math.max(1, Math.ceil(need / w)));
       track.innerHTML = `<div class="activity-group">${one}</div><div class="activity-group" aria-hidden="true">${one}</div>`;
-      track.style.setProperty("--ticker-dur", Math.max(20, track.firstElementChild.scrollWidth / 50) + "s");   // ~50px per second
+      // duration comes from the REAL width of one group at a fixed speed, so it can never be faster than TICKER_PX_PER_SEC
+      const groupW = track.firstElementChild.getBoundingClientRect().width;
+      const TICKER_PX_PER_SEC = 40;
+      const dur = Math.max(30, groupW / TICKER_PX_PER_SEC);
+      track.style.setProperty("--ticker-dur", dur + "s");
+      track.style.animation = "none"; void track.offsetWidth; track.style.animation = "";   // restart with the new duration...
+      track.style.animationDelay = "-" + (frac * dur).toFixed(2) + "s";                      // ...but from where it was
       track.dataset.sig = htmlItems + wrap.clientWidth;
     }
     let tickerResizeT;
