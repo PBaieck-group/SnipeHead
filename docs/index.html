@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Never tell other sites (RPC nodes, explorer, embeds) which page the visitor came from. -->
+    <meta name="referrer" content="no-referrer">
     <meta name="description" content="SnipeHead (SHD) is a community-powered token on PulseChain. Claim free SHD, mine, trade, and launch your own tokens with SHD in a decentralized ecosystem.">
     <meta name="keywords" content="PulseChain, SHD, SnipeHead, DeFi, Launch, Launchpad, Mining, Crypto, DEX">
     <meta name="robots" content="index, follow">
-    <!-- connect-src allows any https: origin so visitors can point the site at their own PulseChain RPC node. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://mystati.snipehead.xyz; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://api.dexscreener.com https://api.coingecko.com https://min-api.cryptocompare.com https://api.exchange.coinbase.com https://api.scan.pulsechain.com https:; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+    <!-- connect-src allows any https: origin (and http://localhost / 127.0.0.1 / [::1]) so visitors can point the site at their own PulseChain RPC node. -->
+    <!-- frame-src keeps pulsex.mypinata.cloud: the PulseX app may be served from PulseX's Pinata gateway, and an embedded page's redirects must also be allowed. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: http://localhost:* http://127.0.0.1:* http://[::1]:*; frame-src https://dexscreener.com https://ipfs.app.pulsex.com https://pulsex.mypinata.cloud; img-src 'self' data: https:; font-src 'self'; base-uri 'self'; form-action 'none';">
     <meta property="og:title" content="SnipeHead - Built on PulseChain">
     <meta property="og:description" content="Claim free SHD tokens, mine for more, then launch your own tokens with SHD. Decentralized and unstoppable.">
     <meta property="og:url" content="https://snipehead.xyz/">
@@ -21,13 +24,31 @@
     <link rel="apple-touch-icon" href="favicon.png">
     <title>SnipeHead - PulseChain</title>
     <link rel="canonical" href="https://snipehead.xyz/">
+    <!-- ethers v5.7.2 is vendored: same-origin, so it ships with the site and any IPFS pin. Verify: openssl dgst -sha384 -binary ethers-5.7.2.umd.min.js | openssl base64 -A -->
     <script
-  src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"
-  integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J"
-  crossorigin="anonymous">
+  src="ethers-5.7.2.umd.min.js"
+  integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J">
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/space-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <style>
+        /* Self-hosted fonts (Inter, Space Grotesk: SIL OFL 1.1; see fonts/README.md) */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: swap;
+            src: url(fonts/inter-latin-wght-normal.woff2) format('woff2');
+            unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+        }
+        @font-face {
+            font-family: 'Space Grotesk';
+            font-style: normal;
+            font-weight: 300 700;
+            font-display: swap;
+            src: url(fonts/space-grotesk-latin-wght-normal.woff2) format('woff2');
+            unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+        }
         :root {
             --bg: #0a0a0b;
             --bg-sidebar: #111113;
@@ -1160,6 +1181,12 @@
             min-height: 0;
         }
 
+        #dexscreener-embed:not(.loaded) iframe,
+        #dexscreener-embed:not(.loaded) .dexscreener-reload-btn,
+        #dexscreener-embed.loaded .swap-placeholder {
+            display: none;
+        }
+
         .dexscreener-chart-body iframe {
             position: absolute;
             inset: 0;
@@ -1183,6 +1210,50 @@
             width: 100%;
             height: 100%;
             border: 0;
+        }
+
+        .swap-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.9rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .swap-placeholder-title {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .swap-placeholder-note {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            max-width: 32ch;
+        }
+
+        .swap-credit {
+            margin-top: 0.6rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .swap-credit a {
+            color: var(--accent);
+        }
+
+        #pulsex-embed:not(.loaded) iframe,
+        #pulsex-embed.fallback iframe {
+            display: none;
+        }
+
+        #pulsex-embed.loaded .swap-placeholder {
+            display: none;
         }
 
         .widget-fallback {
@@ -1921,6 +1992,11 @@
     </style>
 </head>
 <body>
+    <noscript>
+        <div style="padding:1rem 1.25rem; background:#1a1a1d; color:#f4f4f5; border-bottom:2px solid #f87171; font-family:system-ui,sans-serif; text-align:center;">
+            This site needs JavaScript. Live data, explorer links, and the buy and contract links are all loaded by script, so they won't work with JavaScript disabled.
+        </div>
+    </noscript>
     <div id="toast-container"></div>
 
     <div class="app-shell">
@@ -1973,12 +2049,12 @@
                         Bridge
                         <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
-                    <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="side-link" target="_blank" rel="noopener noreferrer">
+                    <a href="https://ipfs.app.pulsex.com/?outputCurrency={SHD}" class="side-link" target="_blank" rel="noopener noreferrer">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c1.11 0 2.08.402 2.599 1M12 8V6m0 14v-2m0-10c-1.11 0-2.08.402-2.599 1"/></svg>
                         Buy SHD
                         <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
-                    <a href="https://pump.tires/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc/" class="side-link" target="_blank" rel="noopener noreferrer">
+                    <a href="https://pump.tires/token/{SHD}/" class="side-link" target="_blank" rel="noopener noreferrer">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm6 0V9a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         Pump.Tires
                         <svg class="ext-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -2061,9 +2137,9 @@
                         <span class="dot"></span>
                         <span id="shd-countdown" class="tk-age">AGE: Calculating...</span>
                         <span class="tk-age" style="opacity:0.4">&middot;</span>
-                        <span class="tk-wide">BTC <span id="btc-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="btc-change" style="font-weight:600;"></span></span>
+                        <span class="tk-wide" title="WBTC price from the PulseX WBTC/WPLS pool">WBTC <span id="btc-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="btc-change" style="font-weight:600;"></span></span>
                         <span class="tk-wide" style="opacity:0.4">&middot;</span>
-                        <span class="tk-wide">ETH <span id="eth-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="eth-change" style="font-weight:600;"></span></span>
+                        <span class="tk-wide" title="WETH price from the PulseX WETH/DAI pool">WETH <span id="eth-price" style="color:var(--text); font-weight:600;">$0.00</span> <span id="eth-change" style="font-weight:600;"></span></span>
                         <span class="tk-wide" style="opacity:0.4">&middot;</span>
                         <span>PLS <span id="pls-price" style="color:var(--text); font-weight:600;">$0.00000000</span> <span id="pls-change" style="font-weight:600;"></span></span>
                         <span class="tk-mid" style="opacity:0.4">&middot;</span>
@@ -2085,7 +2161,7 @@
                         Flow free from corp systems. Claim free SHD tokens, mine to maximize your rewards, then launch your own tokens with SHD on PulseChain.
                     </p>
                     <div class="hero-actions">
-                        <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
+                        <a href="https://ipfs.app.pulsex.com/?outputCurrency={SHD}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
                         <a href="https://snipehead.xyz/faucet/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Claim Tokens</a>
                         <a href="https://snipehead.xyz/mine/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Start Mining</a>
                         <a href="https://snipehead.xyz/snft/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Mint SNFT</a>
@@ -2104,15 +2180,7 @@
                         </div>
                         <p class="stat-value" id="shd-price">Loading...</p>
                         <p class="stat-change" id="shd-change">&nbsp;</p>
-                        <div style="display:flex; gap:0.75rem; margin-top:0.35rem; font-size:0.75rem;">
-                            <span class="text-green" id="shd-buys">&nbsp;</span>
-                            <span class="text-red" id="shd-sells">&nbsp;</span>
-                        </div>
                         <div class="stat-meta">
-                            <div class="stat-row">
-                                <span class="stat-row-label">SHD Holders</span>
-                                <span class="stat-row-value" id="shd-holders">Loading...</span>
-                            </div>
                             <div class="stat-row">
                                 <span class="stat-row-label">SNFT Minted</span>
                                 <span class="stat-row-value" id="snft-minted">Loading...</span>
@@ -2127,7 +2195,7 @@
                             </div>
                         </div>
                         <div class="stat-footer">
-                            <a href="https://ipfs.scan.pulsechain.com/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc?tab=holders" target="_blank" rel="noopener noreferrer">Holders</a>
+                            <a data-explorer-path="/token/{SHD}?tab=holders" target="_blank" rel="noopener noreferrer">Holders</a>
                             <span>&middot;</span>
                             <a href="https://snipehead.xyz/snft/" target="_blank" rel="noopener noreferrer">View SNFT</a>
                         </div>
@@ -2222,19 +2290,33 @@
                                     </button>
                                 </div>
                                 <div class="dexscreener-chart-body">
-                                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/0xB95bC84f9B6D0373642D586b81979B067572f7bc?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&trades=0&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart"></iframe>
+                                    <div class="swap-placeholder">
+                                        <p class="swap-placeholder-title">Price chart by DexScreener</p>
+                                        <p class="swap-placeholder-note">This is DexScreener&rsquo;s chart, embedded from dexscreener.com. Nothing is requested from DexScreener until you load it.</p>
+                                        <button type="button" class="btn btn-primary" id="dexscreener-load-btn">Load chart</button>
+                                    </div>
+                                    <iframe id="dexscreener-iframe" data-src="https://dexscreener.com/pulsechain/{SHD}?embed=1&loadChartSettings=0&info=0&chartLeftToolbar=0&chartDefaultOnMobile=1&chartTheme=dark&theme=dark&trades=0&chartStyle=0&chartType=usd&interval=15" title="SHD Price Chart" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
                                 </div>
                             </div>
+                            <p class="swap-credit">Chart by DexScreener (dexscreener.com) &middot; <a href="https://dexscreener.com/pulsechain/{SHD}" target="_blank" rel="noopener noreferrer">Open on DexScreener</a></p>
                         </div>
                         <div class="swap-col">
                             <div id="pulsex-embed">
+                                <div class="swap-placeholder">
+                                    <p class="swap-placeholder-title">Swap widget by PulseX</p>
+                                    <p class="swap-placeholder-note">This is PulseX&rsquo;s own app, embedded from ipfs.app.pulsex.com. Nothing is requested from PulseX until you load it.</p>
+                                    <button type="button" class="btn btn-primary" id="pulsex-load-btn">Load swap widget</button>
+                                </div>
                                 <iframe
-                                    title="PulseX Widget — SHD Swap"
-                                    src="https://ipfs.app.pulsex.com/?outputCurrency=0xB95bC84f9B6D0373642D586b81979B067572f7bc"
-                                    onerror="this.parentNode.classList.add('fallback')"
+                                    id="pulsex-iframe"
+                                    title="PulseX Widget &mdash; SHD Swap"
+                                    data-src="https://ipfs.app.pulsex.com/?outputCurrency={SHD}"
+                                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                                    referrerpolicy="no-referrer"
                                 ></iframe>
-                                <p class="widget-fallback">Unable to load swap widget. Visit <a href="https://pump.tires/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">pump.tires</a> or <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">PulseX</a> to trade SHD.</p>
+                                <p class="widget-fallback">Unable to load swap widget. Visit <a href="https://pump.tires/token/{SHD}" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">pump.tires</a> or <a href="https://ipfs.app.pulsex.com/?outputCurrency={SHD}" style="color:var(--accent)" target="_blank" rel="noopener noreferrer">PulseX</a> to trade SHD.</p>
                             </div>
+                            <p class="swap-credit">Swap widget by PulseX (ipfs.app.pulsex.com) &middot; <a href="https://ipfs.app.pulsex.com/?outputCurrency={SHD}" target="_blank" rel="noopener noreferrer">Open in PulseX</a></p>
                         </div>
                     </div>
                 </section>
@@ -2296,7 +2378,7 @@
                                     <span class="core-change" id="core-pls-change">&nbsp;</span>
                                 </div>
                             </div>
-                            <div class="core-col" data-label="Market Cap" id="core-pls-mcap">Loading...</div>
+                            <div class="core-col" data-label="Market Cap">&mdash;</div>
                             <div class="core-col" data-label="Liquidity" id="core-pls-liquidity">Loading...</div>
                         </div>
 
@@ -2407,7 +2489,7 @@
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Explorer</span>
-                                    <span class="info-value">https://ipfs.scan.pulsechain.com</span>
+                                    <span class="info-value" data-explorer-url></span>
                                 </div>
                             </div>
                             <div style="margin-top:1.25rem;">
@@ -2453,14 +2535,14 @@
                     <div class="card card-static contract-bar">
                         <div style="min-width:0;">
                             <p class="contract-label">SnipeHead Contract Address</p>
-                            <p id="contract-address" class="contract-addr no-scrollbar" data-full-address="0xb95bc84f9b6d0373642d586b81979b067572f7bc" title="0xb95bc84f9b6d0373642d586b81979b067572f7bc">0xb95bc84f9b6d0373642d586b81979b067572f7bc</p>
+                            <p id="contract-address" class="contract-addr no-scrollbar" data-full-address="{SHD}" title="{SHD}" data-shd-text></p>
                         </div>
                         <div class="contract-actions">
                             <button onclick="copyContract(this)" class="btn btn-primary" style="font-size:0.8125rem; padding:0.5rem 1rem;">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                 Copy
                             </button>
-                            <a href="https://ipfs.scan.pulsechain.com/address/0xb95bc84f9b6d0373642d586b81979b067572f7bc?tab=contract" class="btn btn-secondary" style="font-size:0.8125rem; padding:0.5rem 1rem;" target="_blank" rel="noopener noreferrer">
+                            <a data-explorer-path="/address/{SHD}?tab=contract" class="btn btn-secondary" style="font-size:0.8125rem; padding:0.5rem 1rem;" target="_blank" rel="noopener noreferrer">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 View
                             </a>
@@ -2498,7 +2580,7 @@
                         <h2>Join the <span>SnipeHead</span> Ecosystem</h2>
                         <p>Claim your free SHD tokens, dive into mining for exclusive rewards, then launch your own tokens with SHD.</p>
                         <div class="cta-actions">
-                            <a href="https://ipfs.app.pulsex.com/?outputCurrency=0xb95bc84f9b6d0373642d586b81979b067572f7bc" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
+                            <a href="https://ipfs.app.pulsex.com/?outputCurrency={SHD}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Buy SnipeHead</a>
                             <a href="https://snipehead.xyz/faucet/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Claim Tokens</a>
                             <a href="https://snipehead.xyz/mine/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Start Mining</a>
                             <a href="https://snipehead.xyz/snft/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Mint SNFT</a>
@@ -2518,7 +2600,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v4.7.1</p>
+                    <p class="footer-version">v5.0.0</p>
                 </div>
             </footer>
         </div>
@@ -2580,7 +2662,7 @@
                 </div>
 
                 <div class="rpc-custom-row" id="rpc-custom-row" hidden>
-                    <input type="text" id="rpc-custom-input" placeholder="https://your-rpc.example.com" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Custom RPC URL" aria-describedby="rpc-hint">
+                    <input type="text" id="rpc-custom-input" placeholder="https://your-rpc.example.com or http://localhost:8545" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Custom RPC URL" aria-describedby="rpc-hint">
                     <button type="button" id="rpc-add-btn" class="btn btn-accent rpc-btn-sm">Add</button>
                     <button type="button" id="rpc-cancel-btn" class="btn btn-secondary rpc-btn-sm">Cancel</button>
                 </div>
@@ -2588,14 +2670,14 @@
 
                 <label class="rpc-failover">
                     <input type="checkbox" id="rpc-failover" checked>
-                    <span>Fall back to other RPCs if this one fails</span>
+                    <span>Fall back to other RPCs if this one fails, and cross-check live numbers between RPCs</span>
                 </label>
 
                 <p class="rpc-note">
-                    Used for on-chain reads: supply, burns, pools, holders and recent swaps. Price feeds
-                    (DexScreener, CoinGecko, etc.) are separate and not affected. Your wallet&rsquo;s network
-                    settings are never changed. Custom RPCs must use <strong>https</strong> and allow browser (CORS)
-                    requests. Your choice is saved only in this browser, and the node you pick can see your IP address
+                    Used for all on-chain reads: prices (including BTC and ETH), burns, pools and recent swaps. With fallback on, prices, burns and holder counts are read from two different RPCs at the same block and only shown if they match.
+                    The embedded chart and swap widgets come from other sites and are not affected. Your wallet&rsquo;s network
+                    settings are never changed. Custom RPCs must use <strong>https</strong> (or <strong>http://localhost</strong> for a node on your own
+                    computer) and allow browser (CORS) requests. Your choice is saved only in this browser, and the node you pick can see your IP address
                     and the queries this page makes.
                 </p>
             </div>
@@ -2603,6 +2685,23 @@
     </div>
 
     <script>
+        // The SHD token contract: the one place this address lives (EIP-55 checksummed).
+        // getAddress() throws if a character is ever mistyped, so a bad address fails loudly
+        // instead of quietly pointing links, wallets and queries at the wrong token.
+        // HTML uses the {SHD} placeholder; it is filled in just below.
+        const SHD_TOKEN_ADDRESS = ethers.utils.getAddress("0xB95bC84f9B6D0373642D586b81979B067572f7bc");
+        const fillShd = (text) => text.split("{SHD}").join(SHD_TOKEN_ADDRESS);
+        ["href", "data-src", "title", "data-full-address", "data-explorer-path"].forEach((attr) => {
+            document.querySelectorAll(`[${attr}*="{SHD}"]`).forEach((el) => el.setAttribute(attr, fillShd(el.getAttribute(attr))));
+        });
+        document.querySelectorAll("[data-shd-text]").forEach((el) => { el.textContent = SHD_TOKEN_ADDRESS; });
+
+        // Block explorer: the one place its address lives. Change it here and every link,
+        // the Network Details row and the wallet "add network" call follow.
+        const EXPLORER_URL = "https://ipfs.scan.pulsechain.com";
+        document.querySelectorAll("[data-explorer-path]").forEach((a) => { a.href = EXPLORER_URL + a.dataset.explorerPath; });
+        document.querySelectorAll("[data-explorer-url]").forEach((el) => { el.textContent = EXPLORER_URL; });
+
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
             const hamburger = document.querySelector('.hamburger');
@@ -2677,7 +2776,7 @@
         }
 
         function declineTerms() {
-            window.location.href = "https://pump.tires/token/0xb95bc84f9b6d0373642d586b81979b067572f7bc";
+            window.location.href = `https://pump.tires/token/${SHD_TOKEN_ADDRESS}`;
         }
 
         function acceptTerms() {
@@ -2709,6 +2808,25 @@
             }
         });
 
+        // --- PulseX swap widget: a third-party app, so it loads only when the visitor asks ---
+        (function setupPulsexWidget() {
+            const box = document.getElementById('pulsex-embed');
+            const btn = document.getElementById('pulsex-load-btn');
+            const frame = document.getElementById('pulsex-iframe');
+            if (!box || !btn || !frame) return;
+            const LOAD_TIMEOUT_MS = 20000;
+            btn.addEventListener('click', () => {
+                if (frame.dataset.loaded) return;
+                frame.dataset.loaded = 'true';
+                box.classList.add('loaded');
+                let done = false;
+                // iframes don't fire "error" for a failed load, so a timeout drives the fallback message.
+                frame.addEventListener('load', () => { done = true; box.classList.remove('fallback'); }, { once: true });
+                setTimeout(() => { if (!done) box.classList.add('fallback'); }, LOAD_TIMEOUT_MS);
+                frame.src = frame.dataset.src;
+            });
+        })();
+
         // --- DexScreener embed loader ---
         function loadDexscreenerEmbed() {
             const iframe = document.getElementById('dexscreener-iframe');
@@ -2716,8 +2834,16 @@
             const chartUrl = iframe.dataset.src;
             if (!chartUrl) return;
             iframe.dataset.loaded = 'true';
+            const box = document.getElementById('dexscreener-embed');
+            if (box) box.classList.add('loaded');
             iframe.src = chartUrl;
         }
+
+        // The chart is DexScreener's own site, so it loads only when the visitor clicks "Load chart".
+        (function setupDexscreenerLoadButton() {
+            const btn = document.getElementById('dexscreener-load-btn');
+            if (btn) btn.addEventListener('click', loadDexscreenerEmbed);
+        })();
 
         // Chart-only (default) vs chart + transactions. Swaps the embed's
         // trades flag and reloads the iframe; reload/stall logic keeps using
@@ -2734,11 +2860,8 @@
             });
             if (next === iframe.dataset.src) return;
             iframe.dataset.src = next;
-            if (iframe.dataset.loaded) {
-                reloadDexscreenerEmbed();
-            } else {
-                loadDexscreenerEmbed();
-            }
+            // Before the chart is loaded this only remembers the chosen view; it does not contact DexScreener.
+            if (iframe.dataset.loaded) reloadDexscreenerEmbed();
         }
 
         const DEXSCREENER_STALL_MS = 3 * 60 * 1000;
@@ -2749,7 +2872,7 @@
         function reloadDexscreenerEmbed() {
             const iframe = document.getElementById('dexscreener-iframe');
             const chartUrl = iframe && iframe.dataset.src;
-            if (!iframe || !chartUrl) return;
+            if (!iframe || !chartUrl || !iframe.dataset.loaded) return;
             iframe.src = 'about:blank';
             requestAnimationFrame(() => { iframe.src = chartUrl; });
         }
@@ -2773,9 +2896,7 @@
             clearTimeout(dexscreenerHiddenTimer);
             const iframe = document.getElementById('dexscreener-iframe');
             if (!iframe) return;
-            if (!iframe.dataset.loaded) {
-                loadDexscreenerEmbed();
-            } else if (dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
+            if (iframe.dataset.loaded && dexscreenerHiddenSince && (Date.now() - dexscreenerHiddenSince) > DEXSCREENER_STALL_MS) {
                 reloadDexscreenerEmbed();
             }
             dexscreenerHiddenSince = null;
@@ -2808,12 +2929,6 @@
                     markDexscreenerVisible();
                 }
             });
-        } else {
-            if (document.readyState === 'complete') {
-                loadDexscreenerEmbed();
-            } else {
-                window.addEventListener('load', loadDexscreenerEmbed);
-            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2861,30 +2976,6 @@
             return { zeroCount: match[1].length, sig: match[2].slice(0, 4) };
         }
 
-        let shdHolderCountLoaded = false; // becomes true after the first successful holder count fetch
-
-        async function fetchShdHolderCount() {
-            if (document.hidden) return;
-            const el = document.getElementById('shd-holders');
-            if (!el) return;
-            try {
-                const res = await fetch(`https://api.scan.pulsechain.com/api/v2/tokens/${SHD_TOKEN_ADDRESS}/counters`, { signal: AbortSignal.timeout(10000) });
-                const data = await res.json();
-                const count = data.token_holders_count;
-                if (count !== undefined && count !== null) {
-                    el.textContent = Number(count).toLocaleString();
-                    shdHolderCountLoaded = true;
-                } else if (!shdHolderCountLoaded) {
-                    el.textContent = 'N/A';
-                }
-            } catch (e) {
-                console.error('SHD holder count fetch error:', e);
-                // Only show an error state if we've never loaded a real count yet;
-                // otherwise leave the last-known-good value on screen.
-                if (!shdHolderCountLoaded) el.textContent = 'Error';
-            }
-        }
-
         function updateCountdown() {
             const creation = new Date('2026-03-26T10:03:55-04:00');
             function tick() {
@@ -2900,7 +2991,7 @@
             setInterval(tick, 1000);
         }
 
-        let priceInterval, onChainInterval, holderInterval, plsSupplyInterval, burnInterval;
+        let onChainInterval, burnInterval;
 
         function renderTickerPrice(elId, price, subColor) {
             const el = document.getElementById(elId);
@@ -2933,400 +3024,287 @@
             }
         }
 
-        // --- Retry-with-backoff fetch helper ---
-        // Retries transient failures (timeouts, network errors, non-2xx, rate limits)
-        // with short exponential backoff before giving up. Each caller decides what
-        // "success" means via an optional validate() check on the parsed JSON, so we
-        // don't retry forever on a response that came back 200 but had no usable data.
-        async function fetchJsonWithRetry(url, { retries = 2, baseDelayMs = 800, timeoutMs = 10000, validate = null } = {}) {
-            let lastErr;
-            let lastParsedData; // last successfully-parsed JSON, even if it failed validate() --
-                                 // lets a caller render a partial result instead of nothing
-                                 // when every retry comes back incomplete.
-            for (let attempt = 0; attempt <= retries; attempt++) {
-                try {
-                    const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const data = await res.json();
-                    lastParsedData = data;
-                    if (validate && !validate(data)) throw new Error('Response failed validation (empty/unexpected payload)');
-                    return data;
-                } catch (e) {
-                    lastErr = e;
-                    if (attempt < retries) {
-                        // Jitter (+/-30%) so requests that failed together (e.g. a burst of
-                        // calls fired at page load) don't all retry at the exact same
-                        // millisecond and re-trigger the same rate limit again.
-                        const base = baseDelayMs * Math.pow(2, attempt); // 800ms, 1600ms, ...
-                        const jitter = base * 0.3 * (Math.random() * 2 - 1);
-                        await new Promise(r => setTimeout(r, base + jitter));
-                    }
-                }
-            }
-            if (lastErr && lastParsedData !== undefined) lastErr.partialData = lastParsedData;
-            throw lastErr;
-        }
-
-        // pls-price and shd-price are now computed straight from on-chain pool
-        // reserves in fetchOnChainData() (see reservesToPlsUsdPrice / the SHD
-        // price block there) instead of DexScreener, so they're no longer at the
-        // mercy of DexScreener's rate limits. Market cap and liquidity are also
-        // computed on-chain there now (totalSupply x price, and 2x each pool's
-        // PLS-side value). DexScreener is only used here for numbers that
-        // genuinely require an indexer/history and can't come from a single
-        // reserves snapshot: 24h % change and buy/sell counts.
-        let plsChangeLoaded = false;
-        let shdExtrasLoaded = false;
-
+        // ── 24h % change, computed on-chain (no DexScreener) ──
+        // PulseX V2 pools emit a Sync event with the new reserves after every trade. For
+        // each pool we find the last Sync at or before the block from ~24h ago, turn those
+        // reserves into a USD price with the same math as the live price, and compare it
+        // with the live on-chain price. The 24h-ago prices are cached and refreshed every
+        // CHANGE_BASELINE_TTL_MS, so the extra RPC load is a few log queries every few
+        // minutes rather than on every poll.
+        const SYNC_TOPIC0 = "0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1";
+        const CHANGE_BASELINE_TTL_MS = 15 * 60 * 1000;
+        const CHANGE_BASELINE_RETRY_MS = 2 * 60 * 1000;
+        const CHANGE_WINDOWS = [3000, 30000, 100000]; // blocks searched backwards from the target block
         const PLS_PAIR_ADDRESS = '0xE56043671df55dE5CDf8459710433C10324DE0aE';
+        const lastCoreUsdPrice = {};       // latest on-chain USD price per Core token (set in renderCoreTokens)
+        let changeBaseline = null;         // USD price ~24h ago: { pls, shd, hex, plsx, inc, prvx } (null = unknown)
+        let changeBaselineNextTry = 0;
+        let changeBaselineLoading = false;
 
-        // LIQUIDITY_PAIRS.v1 (the primary SHD pool) is the only pair required here -
-        // it's the one used for the SHD 24h change/buys-sells numbers.
-        // Computed lazily (not as a top-level const) because LIQUIDITY_PAIRS isn't
-        // declared until later in this script block - evaluating this eagerly at
-        // parse time would throw a temporal-dead-zone ReferenceError and halt the
-        // whole script. This function is only ever called at runtime, by which point
-        // LIQUIDITY_PAIRS has long since been initialized.
-        function essentialPairsPresent(pairs) {
-            if (!pairs.some(p => p && p.priceUsd)) return false;
-            return pairs.some(p => p?.pairAddress?.toLowerCase() === LIQUIDITY_PAIRS.v1.toLowerCase());
-        }
-
-        async function fetchPrimaryMarketData() {
-            // LIQUIDITY_PAIRS.v2 isn't fetched here anymore - its liquidity is
-            // computed on-chain in fetchOnChainData() alongside v1's, and it was
-            // only ever needed here for market cap/liquidity aggregation.
-            const addrList = [PLS_PAIR_ADDRESS, LIQUIDITY_PAIRS.v1];
-            const addrs = addrList.join(',');
+        // Like getLogsResilient, but a slice that still fails after splitting throws instead
+        // of returning [] - an empty result here would otherwise be mistaken for "no Sync
+        // in this window" and we'd quietly pick an older, wrong reserve snapshot.
+        async function getLogsStrict(provider, address, fromBlock, toBlock, topics, depth = 0) {
             try {
-                const data = await fetchJsonWithRetry(
-                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${addrs}`,
-                    {
-                        retries: 3,
-                        baseDelayMs: 900,
-                        // Only require the primary SHD pool. PLS_PAIR_ADDRESS is
-                        // allowed to be missing from the payload without failing
-                        // validation - it's rendered when present, but its absence
-                        // shouldn't force a retry (or block partial-data rendering)
-                        // of data we already have.
-                        validate: d => essentialPairsPresent(d?.pairs || [])
-                    }
-                );
-                renderPrimaryMarketDataFromPayload(data.pairs || []);
-                return;
+                return await provider.getLogs({ address, fromBlock, toBlock, topics });
             } catch (e) {
-                console.error("Primary market data fetch error (after retries):", e);
-                // If we at least got a partial, still-incomplete response, render what's
-                // usable from it instead of blanking everything.
-                if (e?.partialData) {
-                    renderPrimaryMarketDataFromPayload(e.partialData.pairs || []);
-                }
-            }
-
-            // The combined 3-pair request failed outright (no parseable JSON on any
-            // attempt) - most likely a transient rate limit or network blip on
-            // DexScreener's side. Before giving up, try one lean fallback request for
-            // just the pair we actually need: a smaller request is less likely to
-            // trip the same limit, and it's the minimum needed to avoid showing
-            // "Unavailable" for numbers we might otherwise still be able to get.
-            if (!shdExtrasLoaded) {
-                try {
-                    const fallbackData = await fetchJsonWithRetry(
-                        `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${LIQUIDITY_PAIRS.v1}`,
-                        {
-                            retries: 1,
-                            baseDelayMs: 1200,
-                            validate: d => essentialPairsPresent(d?.pairs || [])
-                        }
-                    );
-                    renderPrimaryMarketDataFromPayload(fallbackData.pairs || []);
-                    return;
-                } catch (fallbackErr) {
-                    console.error("Fallback primary market data fetch error:", fallbackErr);
-                    if (fallbackErr?.partialData) {
-                        renderPrimaryMarketDataFromPayload(fallbackErr.partialData.pairs || []);
-                    }
-                }
+                if (depth >= 3 || toBlock - fromBlock < 100) throw e;
+                const mid = fromBlock + Math.floor((toBlock - fromBlock) / 2);
+                const [a, b] = await Promise.all([
+                    getLogsStrict(provider, address, fromBlock, mid, topics, depth + 1),
+                    getLogsStrict(provider, address, mid + 1, toBlock, topics, depth + 1)
+                ]);
+                return [...a, ...b];
             }
         }
 
-        function renderPrimaryMarketDataFromPayload(pairs) {
-            // --- PLS 24h change only (price itself comes from on-chain reserves) ---
-            const plsPair = pairs.find(p => p?.pairAddress?.toLowerCase() === PLS_PAIR_ADDRESS.toLowerCase());
-            if (plsPair && plsPair.priceUsd) {
-                renderTickerChange('pls-change', plsPair.priceChange?.h24);
-                renderTickerChange('core-pls-change', plsPair.priceChange?.h24);
-                coreChangeLoaded.pls = true;
-                plsChangeLoaded = true;
+        // Block number from roughly `hours` ago, using the chain's measured block time.
+        async function blockNearHoursAgo(provider, hours) {
+            const SAMPLE = 5000;
+            const latest = await provider.getBlock('latest');
+            const older = await provider.getBlock(latest.number - SAMPLE);
+            const secPerBlock = (latest.timestamp - older.timestamp) / SAMPLE;
+            if (!(secPerBlock > 1 && secPerBlock < 60)) throw new Error('Unexpected block time');
+            return Math.max(1, latest.number - Math.round((hours * 3600) / secPerBlock));
+        }
+
+        // Reserves from the last Sync event at or before targetBlock (null if none in the search range).
+        async function lastSyncReserves(provider, pair, targetBlock) {
+            let hi = targetBlock;
+            for (const span of CHANGE_WINDOWS) {
+                if (hi < 0) break;
+                const lo = Math.max(0, hi - span + 1);
+                const logs = await getLogsStrict(provider, pair, lo, hi, [SYNC_TOPIC0]);
+                if (logs.length) {
+                    const last = logs.reduce((a, b) =>
+                        (b.blockNumber > a.blockNumber || (b.blockNumber === a.blockNumber && b.logIndex > a.logIndex)) ? b : a);
+                    const [reserve0, reserve1] = ethers.utils.defaultAbiCoder.decode(['uint112', 'uint112'], last.data);
+                    return { reserve0, reserve1 };
+                }
+                hi = lo - 1;
             }
+            return null;
+        }
 
-            // --- SHD 24h change / buys-sells only (price comes from on-chain reserves) ---
-            const shdPair = pairs.find(p => p?.pairAddress?.toLowerCase() === LIQUIDITY_PAIRS.v1.toLowerCase());
-            if (shdPair && shdPair.priceUsd) {
-                shdExtrasLoaded = true;
+        // Same math as renderCoreTokens(), applied to a reserves snapshot.
+        function corePriceFromReserves(t, reserves, plsUsd) {
+            const meta = coreTokenMeta[t.id];
+            if (!reserves || !meta || meta.isToken0 === null || meta.decimals === null || !meta.quoteAddress || meta.quoteDecimals === null) return null;
+            const quoteUsd = meta.quoteAddress.toLowerCase() === WPLS_TOKEN_ADDRESS.toLowerCase() ? plsUsd : 1;
+            if (!quoteUsd) return null;
+            const tokenRaw = meta.isToken0 ? reserves.reserve0 : reserves.reserve1;
+            const quoteRaw = meta.isToken0 ? reserves.reserve1 : reserves.reserve0;
+            const tokenAmt = Number(ethers.utils.formatUnits(tokenRaw, meta.decimals));
+            const quoteAmt = Number(ethers.utils.formatUnits(quoteRaw, meta.quoteDecimals));
+            if (!tokenAmt) return null;
+            return (quoteAmt / tokenAmt) * quoteUsd;
+        }
 
-                renderTickerChange('shd-ticker-change', shdPair.priceChange?.h24);
-                renderTickerChange('core-shd-change', shdPair.priceChange?.h24);
+        async function loadChangeBaseline() {
+            if (changeBaselineLoading || Date.now() < changeBaselineNextTry) return;
+            // Pool token order is filled in by fetchOnChainData(); wait for it.
+            if (!poolToken0Cache.v1 || !poolToken0Cache.pls) return;
+            changeBaselineLoading = true;
+            try {
+                await ensureBtcEthMeta();
+                const snapshots = await withRpcFallback(async (provider) => {
+                    const target = await blockNearHoursAgo(provider, 24);
+                    const pools = { pls: PLS_PAIR_ADDRESS, shd: LIQUIDITY_PAIRS.v1, eth: BTC_ETH_FEEDS.eth.pair, btc: BTC_ETH_FEEDS.btc.pair };
+                    CORE_TOKENS.forEach(t => { pools[t.id] = t.pair; });
+                    const ids = Object.keys(pools);
+                    const settled = await Promise.allSettled(ids.map(id => lastSyncReserves(provider, pools[id], target)));
+                    // Every lookup failing points at this RPC (log range limits, etc.): throw so
+                    // withRpcFallback moves on to the next one. Partial failures just leave gaps.
+                    if (settled.every(s => s.status === 'rejected')) throw settled[0].reason;
+                    const out = {};
+                    ids.forEach((id, i) => { out[id] = settled[i].status === 'fulfilled' ? settled[i].value : null; });
+                    return out;
+                });
+
+                const plsUsd = snapshots.pls ? reservesToPlsUsdPrice(snapshots.pls, poolToken0Cache.pls) : null;
+                const prices = { pls: plsUsd, shd: null };
+                if (plsUsd && snapshots.shd) {
+                    const pool = reservesToPool(snapshots.shd, poolToken0Cache.v1);
+                    if (pool && pool.shd > 0) prices.shd = (pool.pls / pool.shd) * plsUsd;
+                }
+                CORE_TOKENS.forEach(t => { prices[t.id] = corePriceFromReserves(t, snapshots[t.id], plsUsd); });
+                ['eth', 'btc'].forEach(id => {
+                    const r = btcEthPriceFromReserves(id, snapshots[id], plsUsd);
+                    prices[id] = (r && r.liquidityUsd >= BTC_ETH_MIN_LIQUIDITY_USD) ? r.price : null;
+                });
+                changeBaseline = prices;
+                changeBaselineNextTry = Date.now() + CHANGE_BASELINE_TTL_MS;
+            } catch (e) {
+                console.warn("24h change baseline failed:", e.message);
+                changeBaselineNextTry = Date.now() + CHANGE_BASELINE_RETRY_MS;
+            } finally {
+                changeBaselineLoading = false;
+            }
+            renderChanges24h();
+        }
+
+        function pctChange(now, then) {
+            if (!(now > 0) || !(then > 0)) return null;
+            return (now / then - 1) * 100;
+        }
+
+        function renderChanges24h() {
+            if (!changeBaseline) return;
+            const pls = pctChange(lastPlsUsdPrice, changeBaseline.pls);
+            if (pls !== null) {
+                renderTickerChange('pls-change', pls);
+                renderTickerChange('core-pls-change', pls);
+                coreChangeLoaded.pls = true;
+            }
+            const shd = pctChange(lastShdUsdPrice, changeBaseline.shd);
+            if (shd !== null) {
+                renderTickerChange('shd-ticker-change', shd);
+                renderTickerChange('core-shd-change', shd);
                 coreChangeLoaded.shd = true;
-
                 const changeEl = document.getElementById('shd-change');
-                const change24h = shdPair.priceChange?.h24;
-                if (changeEl && typeof change24h === 'number') {
-                    const isUp = change24h >= 0;
-                    changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}% (24h)`;
+                if (changeEl) {
+                    const isUp = shd >= 0;
+                    changeEl.textContent = `${isUp ? '▲' : '▼'} ${Math.abs(shd).toFixed(2)}% (24h)`;
                     changeEl.classList.toggle('text-green', isUp);
                     changeEl.classList.toggle('text-red', !isUp);
-                } else if (changeEl) {
-                    changeEl.textContent = '';
-                }
-
-                const buysEl = document.getElementById('shd-buys');
-                const sellsEl = document.getElementById('shd-sells');
-                const txns24h = shdPair.txns?.h24;
-                if (buysEl && sellsEl && txns24h) {
-                    buysEl.textContent = `${txns24h.buys ?? 0} buys`;
-                    sellsEl.textContent = `${txns24h.sells ?? 0} sells`;
-                } else if (buysEl && sellsEl) {
-                    buysEl.textContent = '';
-                    sellsEl.textContent = '';
                 }
             }
-
+            ['eth', 'btc'].forEach(id => {
+                const v = pctChange(lastBtcEthUsd[id], changeBaseline[id]);
+                if (v !== null) renderTickerChange(BTC_ETH_FEEDS[id].changeEl, v);
+            });
+            CORE_TOKENS.forEach(t => {
+                const v = pctChange(lastCoreUsdPrice[t.id], changeBaseline[t.id]);
+                if (v !== null) {
+                    renderTickerChange(`core-${t.id}-change`, v);
+                    coreChangeLoaded[t.id] = true;
+                }
+            });
         }
 
-        // 24h % change for the PulseChain Core tokens - the only thing about
-        // them that still comes from DexScreener rather than raw reserves,
-        // since % change needs price history, not just a snapshot.
-        async function fetchCoreTokensChange() {
-            const addrs = CORE_TOKENS.map(t => t.pair).join(',');
+        // Called after every on-chain refresh: re-render against the newest live prices and,
+        // if the cached 24h-ago prices are stale, refresh them in the background.
+        function updateChanges24h() {
+            loadChangeBaseline();
+            renderChanges24h();
+        }
+
+        // Latest on-chain PLS/USD price, used for the 24h change calculation.
+        let lastPlsUsdPrice = null;
+
+        // ── BTC / ETH tickers, derived on-chain from PulseX pools (no outside price APIs) ──
+        // ETH: WETH/DAI (PulseX v1) gives a USD price directly. BTC: WBTC/WPLS (PulseX v2),
+        // converted to USD with the on-chain PLS/USD price. These are bridged "from Ethereum"
+        // tokens, so the numbers are PulseX prices: a thin pool can drift from the wider
+        // market, and BTC_ETH_MIN_LIQUIDITY_USD hides a price whose pool has become too small.
+        // Each feed's pair is checked on-chain (token0/token1 must be the expected tokens),
+        // so a wrong address shows "—" rather than a wrong price.
+        const BTC_ETH_MIN_LIQUIDITY_USD = 25000;
+        const DAI_TOKEN_ADDRESS = "0xefD766cCb38EaF1dfd701853BFCe31359239F305"; // DAI from Ethereum
+        const BTC_ETH_FEEDS = {
+            eth: {
+                pair: "0x2Bb9baA3092cE864390bF3e687ABF72bE19E03DC",
+                base: "0x02DcdD04e3F455D838cd1249292C58f3B79e3C3C", baseDecimals: 18, // WETH from Ethereum
+                quoteIsPls: false, // quote is DAI (~$1)
+                priceEl: 'eth-price', changeEl: 'eth-change'
+            },
+            btc: {
+                pair: "0x8c52470a05eEB2fCe4905688Ec59bFDd32E71D07",
+                base: "0xb17D901469B9208B17d916112988A3FeD19b5cA1", baseDecimals: 8,  // WBTC from Ethereum
+                quoteIsPls: true,  // quote is WPLS, converted with the PLS/USD price
+                priceEl: 'btc-price', changeEl: 'btc-change'
+            }
+        };
+        const PAIR_TOKEN_ABI = [
+            "function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+            "function token0() view returns (address)",
+            "function token1() view returns (address)"
+        ];
+        const btcEthMeta = {};      // id -> { baseIsToken0 } or { invalid: true }
+        const lastBtcEthUsd = {};   // id -> latest on-chain USD price (null if unavailable)
+        const btcEthShown = {};     // id -> true once a real price has been displayed
+
+        // Works out each pool's token order once, and flags a pool whose tokens aren't the expected pair.
+        async function ensureBtcEthMeta() {
+            const pending = Object.keys(BTC_ETH_FEEDS).filter((id) => !btcEthMeta[id]);
+            if (!pending.length) return;
+            // Read through the cross-check too, so one bad node can't mislabel a pool.
+            const tokens = await withRpcQuorum(async (provider) => {
+                const out = {};
+                for (const id of pending) {
+                    const pair = new ethers.Contract(BTC_ETH_FEEDS[id].pair, PAIR_TOKEN_ABI, provider);
+                    const [t0, t1] = await Promise.all([pair.token0(), pair.token1()]);
+                    out[id] = [t0, t1];
+                }
+                return out;
+            });
+            for (const id of pending) {
+                if (btcEthMeta[id]) continue;
+                const f = BTC_ETH_FEEDS[id];
+                const base = f.base.toLowerCase();
+                const quote = (f.quoteIsPls ? WPLS_TOKEN_ADDRESS : DAI_TOKEN_ADDRESS).toLowerCase();
+                const a = tokens[id][0].toLowerCase(), b = tokens[id][1].toLowerCase();
+                if (a === base && b === quote) btcEthMeta[id] = { baseIsToken0: true };
+                else if (a === quote && b === base) btcEthMeta[id] = { baseIsToken0: false };
+                else {
+                    btcEthMeta[id] = { invalid: true };
+                    console.warn(`${id.toUpperCase()} pool tokens are not the expected pair; price hidden.`);
+                }
+            }
+        }
+
+        // { price, liquidityUsd } from a reserves snapshot, or null if it can't be computed.
+        function btcEthPriceFromReserves(id, reserves, plsUsd) {
+            const f = BTC_ETH_FEEDS[id], m = btcEthMeta[id];
+            if (!reserves || !m || m.invalid) return null;
+            const quoteUsd = f.quoteIsPls ? plsUsd : 1;
+            if (!quoteUsd) return null;
+            const baseRaw = m.baseIsToken0 ? reserves.reserve0 : reserves.reserve1;
+            const quoteRaw = m.baseIsToken0 ? reserves.reserve1 : reserves.reserve0;
+            const base = Number(ethers.utils.formatUnits(baseRaw, f.baseDecimals));
+            const quote = Number(ethers.utils.formatEther(quoteRaw));
+            if (!(base > 0) || !(quote > 0)) return null;
+            return { price: (quote / base) * quoteUsd, liquidityUsd: 2 * quote * quoteUsd };
+        }
+
+        // Called after every on-chain refresh (needs the latest PLS/USD price for BTC).
+        async function updateBtcEth() {
+            const ids = Object.keys(BTC_ETH_FEEDS);
             try {
-                const data = await fetchJsonWithRetry(
-                    `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${addrs}`,
-                    {
-                        retries: 2,
-                        baseDelayMs: 900,
-                        validate: d => Array.isArray(d?.pairs) && d.pairs.length > 0
-                    }
-                );
-                const pairs = data.pairs || [];
-                CORE_TOKENS.forEach(t => {
-                    const pair = pairs.find(p => p?.pairAddress?.toLowerCase() === t.pair.toLowerCase());
-                    if (pair) {
-                        renderTickerChange(`core-${t.id}-change`, pair.priceChange?.h24);
-                        coreChangeLoaded[t.id] = true;
-                    } else if (!coreChangeLoaded[t.id]) {
-                        const el = document.getElementById(`core-${t.id}-change`);
-                        if (el) el.textContent = '';
+                await ensureBtcEthMeta();
+                const snaps = await withRpcQuorum(async (provider) => {
+                    const reserves = await Promise.all(ids.map(id =>
+                        new ethers.Contract(BTC_ETH_FEEDS[id].pair, PAIR_TOKEN_ABI, provider).getReserves()));
+                    const out = {};
+                    ids.forEach((id, i) => { out[id] = reserves[i]; });
+                    return out;
+                });
+                ids.forEach(id => {
+                    const f = BTC_ETH_FEEDS[id];
+                    const el = document.getElementById(f.priceEl);
+                    const r = btcEthPriceFromReserves(id, snaps[id], lastPlsUsdPrice);
+                    if (r && r.liquidityUsd >= BTC_ETH_MIN_LIQUIDITY_USD) {
+                        lastBtcEthUsd[id] = r.price;
+                        btcEthShown[id] = true;
+                        if (el) el.textContent = `$${Math.round(r.price).toLocaleString()}`;
+                    } else if (r || btcEthMeta[id]?.invalid) {
+                        // Pool too small (or wrong pair): hide rather than show a shaky price.
+                        lastBtcEthUsd[id] = null;
+                        btcEthShown[id] = false;
+                        if (el) el.textContent = '\u2014';
+                        renderTickerChange(f.changeEl, null);
+                    } else if (!btcEthShown[id] && el) {
+                        el.textContent = '\u2014'; // e.g. PLS price not ready yet; keeps last good value otherwise
                     }
                 });
             } catch (e) {
-                console.error("PulseChain Core 24h change fetch error:", e);
+                console.warn("BTC/ETH on-chain price failed:", e.message);
+                ids.forEach(id => {
+                    const el = document.getElementById(BTC_ETH_FEEDS[id].priceEl);
+                    if (!btcEthShown[id] && el) el.textContent = 'Unavailable';
+                });
             }
-        }
-
-        // PLS total supply, for the Core row's market cap - there's no
-        // ERC20 totalSupply() to call on-chain since PLS is the native coin,
-        // not a contract, so this comes from the explorer's stats API
-        // instead. Refreshed infrequently since total supply changes slowly;
-        // a failure here just leaves market cap on its last-known value (or
-        // "Loading...") rather than blanking the rest of the row.
-        //
-        // Both of the explorer's own endpoints have proven unreliable in
-        // practice - the legacy `?module=stats&action=X` API is being
-        // deprecated and reliably fails validation, and /api/v2/stats has
-        // been timing out outright rather than erroring, which points to
-        // the instance itself being slow/overloaded rather than a request
-        // format problem. Bumped its timeout since 10s wasn't enough, and
-        // added a pinned fallback below so the market cap cell never gets
-        // stuck on "Loading..." forever if the explorer just doesn't
-        // respond - total supply moves slowly enough that a static
-        // approximate figure is a reasonable last resort, not just a raw
-        // guess.
-        const PLS_TOTAL_SUPPLY_FALLBACK = 135085881560694; // approx, per CoinGecko as of writing - update periodically
-        let plsTotalSupply = null;
-        // Cached from the most recent successful on-chain reserves read, so that
-        // whenever plsTotalSupply finishes loading (which races the very first
-        // fetchOnChainData() call - see below) we can render core-pls-mcap right
-        // away instead of waiting for the next 60s on-chain poll to come around.
-        let lastPlsUsdPrice = null;
-        // Renders core-pls-mcap immediately from whatever we currently have
-        // (plsTotalSupply x lastPlsUsdPrice), rather than waiting for the next
-        // scheduled fetchOnChainData() poll. Called both from fetchOnChainData
-        // itself and from fetchPlsTotalSupply once total supply resolves -
-        // whichever of the two finishes second is what actually paints the
-        // cell, instead of the two racing and one silently losing.
-        function renderPlsMarketCap() {
-            if (plsTotalSupply && lastPlsUsdPrice) {
-                setCoreCellText('core-pls-mcap', `$${Math.round(plsTotalSupply * lastPlsUsdPrice).toLocaleString()}`);
-                coreFieldLoaded['core-pls-mcap'] = true;
-            }
-        }
-        async function fetchPlsTotalSupply() {
-            try {
-                const data = await fetchJsonWithRetry(
-                    'https://api.scan.pulsechain.com/api/v2/stats',
-                    {
-                        retries: 1, baseDelayMs: 900, timeoutMs: 15000,
-                        validate: d => !!(Number(d?.market_cap) > 0 && Number(d?.coin_price) > 0)
-                    }
-                );
-                plsTotalSupply = Number(data.market_cap) / Number(data.coin_price);
-                renderPlsMarketCap();
-                return;
-            } catch (e) {
-                console.error("PLS total supply fetch error (v2/stats):", e);
-            }
-            try {
-                const data = await fetchJsonWithRetry(
-                    'https://api.scan.pulsechain.com/api?module=stats&action=ethsupply',
-                    { retries: 1, baseDelayMs: 900, validate: d => !!d?.result }
-                );
-                if (data?.result) {
-                    plsTotalSupply = Number(ethers.utils.formatEther(data.result));
-                    renderPlsMarketCap();
-                    return;
-                }
-            } catch (e) {
-                console.error("PLS total supply fetch error (legacy):", e);
-            }
-            // Both PulseChain-explorer sources failed (in practice they fail every
-            // time - the v2/stats endpoint doesn't populate market_cap/coin_price
-            // for the native coin on this instance, and the legacy module is
-            // deprecated). Before giving up, try CoinGecko's coin endpoint, which
-            // does reliably report total_supply for PulseChain.
-            try {
-                const cgData = await fetchJsonWithRetry(
-                    'https://api.coingecko.com/api/v3/coins/pulsechain?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false',
-                    {
-                        retries: 1, baseDelayMs: 900,
-                        validate: d => Number(d?.market_data?.total_supply) > 0
-                    }
-                );
-                plsTotalSupply = Number(cgData.market_data.total_supply);
-                renderPlsMarketCap();
-                return;
-            } catch (e) {
-                console.error("PLS total supply fetch error (coingecko):", e);
-            }
-            // All live sources failed. If we've never successfully loaded a
-            // real value (i.e. this isn't just a transient blip on top of a
-            // last-known-good number), fall back to the pinned estimate
-            // rather than leaving market cap on "Loading..." indefinitely.
-            if (plsTotalSupply === null) {
-                plsTotalSupply = PLS_TOTAL_SUPPLY_FALLBACK;
-            }
-            renderPlsMarketCap();
-        }
-
-        let btcPriceLoaded = false; // becomes true after the first successful BTC price fetch
-        let ethPriceLoaded = false; // becomes true after the first successful ETH price fetch
-
-        // CoinGecko's free API no longer sends CORS headers for browser requests
-        // (especially when rate-limited), so we try CORS-friendly sources first and
-        // normalise every result to CoinGecko's shape: { bitcoin:{usd,usd_24h_change}, ethereum:{...} }
-        async function fetchBtcEthFromAnySource() {
-            const sources = [
-                // 1) CryptoCompare - one call, includes 24h % change
-                async () => {
-                    const d = await fetchJsonWithRetry(
-                        'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH&tsyms=USD',
-                        { retries: 1, validate: d => !!(d?.RAW?.BTC?.USD?.PRICE || d?.RAW?.ETH?.USD?.PRICE) }
-                    );
-                    const pick = k => d.RAW?.[k]?.USD
-                        ? { usd: d.RAW[k].USD.PRICE, usd_24h_change: d.RAW[k].USD.CHANGEPCT24HOUR }
-                        : undefined;
-                    return { bitcoin: pick('BTC'), ethereum: pick('ETH') };
-                },
-                // 2) Coinbase Exchange - 24h stats (open/last) per product
-                async () => {
-                    const get = async id => {
-                        const d = await fetchJsonWithRetry(
-                            `https://api.exchange.coinbase.com/products/${id}/stats`,
-                            { retries: 1, validate: d => !!parseFloat(d?.last) }
-                        );
-                        const last = parseFloat(d.last), open = parseFloat(d.open);
-                        return { usd: last, usd_24h_change: open ? ((last - open) / open) * 100 : undefined };
-                    };
-                    const [b, e] = await Promise.allSettled([get('BTC-USD'), get('ETH-USD')]);
-                    return {
-                        bitcoin: b.status === 'fulfilled' ? b.value : undefined,
-                        ethereum: e.status === 'fulfilled' ? e.value : undefined
-                    };
-                },
-                // 3) CoinGecko - last resort
-                () => fetchJsonWithRetry(
-                    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true',
-                    { retries: 0, validate: d => !!(d?.bitcoin?.usd || d?.ethereum?.usd) }
-                ),
-            ];
-            let lastErr;
-            for (const src of sources) {
-                try {
-                    const r = await src();
-                    if (r?.bitcoin?.usd || r?.ethereum?.usd) return r;
-                } catch (e) { lastErr = e; }
-            }
-            throw lastErr || new Error('All BTC/ETH price sources failed');
-        }
-
-        async function fetchBtcEthPrices() {
-            // BTC and ETH reference prices (via CoinGecko simple price API)
-            // shown only in the desktop ticker for extra market context.
-            try {
-                const cgData = await fetchBtcEthFromAnySource();
-
-                const btc = cgData?.bitcoin;
-                if (btc && btc.usd) {
-                    document.getElementById('btc-price').textContent =
-                        `$${Math.round(btc.usd).toLocaleString()}`;
-                    renderTickerChange('btc-change', btc.usd_24h_change);
-                    btcPriceLoaded = true;
-                }
-
-                const eth = cgData?.ethereum;
-                if (eth && eth.usd) {
-                    document.getElementById('eth-price').textContent =
-                        `$${Math.round(eth.usd).toLocaleString()}`;
-                    renderTickerChange('eth-change', eth.usd_24h_change);
-                    ethPriceLoaded = true;
-                }
-
-                // If the response came back but was missing one side (validate only
-                // requires one of the two), treat the missing one as a failure below.
-                if (!btc?.usd && !btcPriceLoaded) {
-                    const btcEl = document.getElementById('btc-price');
-                    if (btcEl) btcEl.textContent = 'Unavailable';
-                }
-                if (!eth?.usd && !ethPriceLoaded) {
-                    const ethEl = document.getElementById('eth-price');
-                    if (ethEl) ethEl.textContent = 'Unavailable';
-                }
-            } catch (e) {
-                console.error("BTC/ETH price fetch error (after retries):", e);
-                // The markup ships with placeholder "$0.00" text for both, which would
-                // look like a real zero price on silent failure. Only show "Unavailable"
-                // if we've never successfully loaded a real price yet; once we have one,
-                // a later transient failure just leaves the last-known-good value shown.
-                if (!btcPriceLoaded) {
-                    const btcEl = document.getElementById('btc-price');
-                    if (btcEl) btcEl.textContent = 'Unavailable';
-                }
-                if (!ethPriceLoaded) {
-                    const ethEl = document.getElementById('eth-price');
-                    if (ethEl) ethEl.textContent = 'Unavailable';
-                }
-            }
-        }
-
-        async function fetchPrices() {
-            if (document.hidden) return;
-            // PLS/SHD/market-cap now come from one combined request (fetchPrimaryMarketData);
-            // BTC/ETH is a separate host (CoinGecko) so it stays independent.
-            await Promise.allSettled([
-                fetchPrimaryMarketData(),
-                fetchBtcEthPrices(),
-                fetchCoreTokensChange(),
-            ]);
+            renderChanges24h();
         }
 
         const MINING_CONTRACT = "0xa16c1fa26f13803083f0fd222d1ea083c1d6d650";
@@ -3373,14 +3351,18 @@
         const rpcBuiltinUrls = () => RPC_BUILTIN.map((r) => r.url);
         const isBuiltinRpc = (url) => rpcBuiltinUrls().includes(url);
 
-        // Returns { url } or { error }. https only, no embedded credentials, no fragment.
+        // http:// is only accepted for a node running on the visitor's own machine.
+        const RPC_LOCAL_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
+
+        // Returns { url } or { error }. https only (http only for localhost), no embedded credentials, no fragment.
         function normalizeRpcUrl(raw) {
             const text = String(raw || "").trim();
             if (!text) return { error: "Enter an RPC URL." };
             if (text.length > 2048) return { error: "That URL is too long." };
             let u;
             try { u = new URL(text); } catch (e) { return { error: "That doesn't look like a valid URL." }; }
-            if (u.protocol !== "https:") return { error: "RPC URL must start with https://" };
+            const isLocal = u.protocol === "http:" && RPC_LOCAL_HOSTS.includes(u.hostname);
+            if (u.protocol !== "https:" && !isLocal) return { error: "RPC URL must start with https:// (http:// is only allowed for localhost)." };
             if (u.username || u.password) return { error: "Remove the username/password from the URL." };
             u.hash = "";
             return { url: u.toString().replace(/\/+$/, "") };
@@ -3614,6 +3596,150 @@
             throw lastErr || new Error("All PulseChain RPC endpoints failed");
         }
 
+        // ── cross-checking: one bad node can't feed fake prices, burns or holder counts ──
+        // Live numbers are read from two different RPCs at the SAME block and only accepted when the
+        // answers are identical. If they differ, another node breaks the tie; if no two agree,
+        // nothing is shown. Needs the fallback option on (the other RPCs are what it checks against).
+        const RPC_CHECK_PROBE = 3;               // nodes asked for their block height up front
+        const RPC_CHECK_MAX_SKEW_BLOCKS = 30;    // with 3+ nodes, one this far from the median height is ignored
+        const RPC_CHECK_PIN_BEHIND = 1;          // read 1 block behind the lowest head so a node a block late can't cause a false mismatch
+        const RPC_REQUIRE_CROSSCHECK = false;    // true = refuse to show data when only one RPC answers (instead of showing it flagged "unverified")
+
+        function rpcFingerprint(value) {
+            return JSON.stringify(value, (k, v) => (typeof v === "bigint" ? v.toString() : v));
+        }
+
+        // Wraps a provider so every "latest" state read is answered at one fixed block.
+        function pinRpcProvider(provider, blockNumber) {
+            const atPin = (tag) => (tag === undefined || tag === "latest" ? blockNumber : tag);
+            const overrides = {
+                call: (tx, tag) => provider.call(tx, atPin(tag)),
+                getBalance: (addr, tag) => provider.getBalance(addr, atPin(tag)),
+                getCode: (addr, tag) => provider.getCode(addr, atPin(tag)),
+                getStorageAt: (addr, pos, tag) => provider.getStorageAt(addr, pos, atPin(tag)),
+                getBlockNumber: () => Promise.resolve(blockNumber)
+            };
+            return new Proxy(provider, {
+                get(target, prop) {
+                    if (Object.prototype.hasOwnProperty.call(overrides, prop)) return overrides[prop];
+                    const v = target[prop];
+                    return typeof v === "function" ? v.bind(target) : v;
+                }
+            });
+        }
+
+        async function withRpcQuorum(fn) {
+            if (!rpcPrefs.failover) return withRpcFallback(fn);
+            const epoch = rpcEpoch;
+            if (!rpcServingUrl) setRpcStatus("trying", "Connecting…");
+
+            const queue = rpcCandidates();
+            const live = [];   // reachable nodes: { url, provider, head }
+            const probe = async (urls) => {
+                const settled = await Promise.allSettled(urls.map((url) => {
+                    const provider = getRpcProvider(url);
+                    return rpcWithTimeout((async () => {
+                        await verifyRpcChain(url, provider);
+                        return { url, provider, head: await provider.getBlockNumber() };
+                    })(), RPC_HEALTHCHECK_TIMEOUT_MS, rpcName(url));
+                }));
+                settled.forEach((s, i) => {
+                    if (s.status === "fulfilled") {
+                        live.push(s.value);
+                        rpcFailedAt.delete(urls[i]);
+                    } else {
+                        rpcFailedAt.set(urls[i], Date.now());
+                        console.warn(`RPC unavailable (${rpcName(urls[i])}):`, s.reason && s.reason.message);
+                    }
+                });
+            };
+
+            await probe(queue.splice(0, RPC_CHECK_PROBE));
+            if (live.length < 2 && queue.length) await probe(queue.splice(0));
+            if (!live.length) {
+                if (epoch === rpcEpoch) { cachedProvider = null; cachedRpcUrl = null; markRpcOffline(); }
+                throw new Error("All PulseChain RPC endpoints are unavailable");
+            }
+
+            let nodes = live.slice();
+            if (nodes.length >= 3) {
+                const heads = nodes.map((n) => n.head).sort((a, b) => a - b);
+                const median = heads[heads.length >> 1];
+                nodes = nodes.filter((n) => Math.abs(n.head - median) <= RPC_CHECK_MAX_SKEW_BLOCKS);
+            }
+            const pin = Math.min(...nodes.map((n) => n.head)) - RPC_CHECK_PIN_BEHIND;
+
+            const outcomes = [];   // { url, ok, value, fp, err }
+            const runOn = async (node) => {
+                try {
+                    const value = await rpcWithTimeout(Promise.resolve(fn(pinRpcProvider(node.provider, pin))), RPC_CALL_TIMEOUT_MS, rpcName(node.url));
+                    outcomes.push({ url: node.url, ok: true, value, fp: rpcFingerprint(value) });
+                    rpcFailedAt.delete(node.url);
+                } catch (err) {
+                    outcomes.push({ url: node.url, ok: false, err });
+                    if (!(err && err.code === "CALL_EXCEPTION")) rpcFailedAt.set(node.url, Date.now());
+                    console.warn(`RPC call failed (${rpcName(node.url)}):`, err && err.message);
+                }
+            };
+            const agreed = () => {
+                const groups = new Map();
+                for (const o of outcomes) {
+                    if (!o.ok) continue;
+                    if (!groups.has(o.fp)) groups.set(o.fp, []);
+                    groups.get(o.fp).push(o);
+                }
+                for (const g of groups.values()) if (g.length >= 2) return g;
+                return null;
+            };
+
+            await Promise.all(nodes.splice(0, 2).map(runOn));
+            let group = agreed();
+            while (!group) {
+                // Another opinion is needed: a node we already probed, else probe the next unused RPC.
+                let next = nodes.shift();
+                while (!next && queue.length) {
+                    const before = live.length;
+                    await probe([queue.shift()]);
+                    const added = live[before];
+                    if (added && added.head >= pin) next = added;
+                }
+                if (!next) break;
+                await runOn(next);
+                group = agreed();
+            }
+
+            if (group) {
+                if (epoch === rpcEpoch) {
+                    rpcServingUrl = group[0].url;
+                    setRpcStatus("ok", `Verified by ${group.length} RPCs`);
+                }
+                return group[0].value;
+            }
+            const oks = outcomes.filter((o) => o.ok);
+            if (oks.length === 1 && !RPC_REQUIRE_CROSSCHECK) {
+                if (epoch === rpcEpoch) {
+                    rpcServingUrl = oks[0].url;
+                    setRpcStatus("fallback", `${rpcName(oks[0].url)} (unverified: no second RPC answered)`);
+                }
+                return oks[0].value;
+            }
+            if (epoch === rpcEpoch) {
+                rpcServingUrl = null;
+                if (oks.length >= 2) setRpcStatus("offline", "RPCs disagree: data not updated");
+                else markRpcOffline();
+            }
+            if (oks.length >= 2) {
+                console.warn("RPC nodes returned different answers:", oks.map((o) => rpcName(o.url)).join(" vs "));
+                const err = new Error("RPC nodes returned different answers; not showing unverified data");
+                err.rpcMismatch = true;
+                throw err;
+            }
+            const revert = outcomes.find((o) => o.err && o.err.code === "CALL_EXCEPTION");
+            if (revert) throw revert.err;
+            const last = outcomes.length ? outcomes[outcomes.length - 1].err : null;
+            throw last || new Error("Not enough PulseChain RPC endpoints answered to cross-check");
+        }
+
         // ── selection / UI wiring ──
         function refreshRpcDependentData() {
             // Re-read everything that comes from the chain, using the new RPC.
@@ -3771,7 +3897,6 @@
         }
         initRpcManager();
 
-                const SHD_TOKEN_ADDRESS = "0xb95bc84f9b6d0373642d586b81979b067572f7bc";
         const WPLS_TOKEN_ADDRESS = "0xA1077a294dDE1B09bB078844df40758a5D0f9a27";
         const LIQUIDITY_PAIRS = {
             v1: "0xB5b4Be04D13e101524F7c57F2eBe2154a58C5DB8",
@@ -3839,6 +3964,7 @@
                 if (!tokenAmount) return;
 
                 const priceUsd = (quoteAmount / tokenAmount) * quoteUsdPrice;
+                lastCoreUsdPrice[t.id] = priceUsd;
                 renderTickerPrice(`core-${t.id}-price`, priceUsd);
                 coreFieldLoaded[`core-${t.id}-price`] = true;
 
@@ -3854,13 +3980,8 @@
             });
 
             // Only sweep the fields THIS function is responsible for (the
-            // HEX/PLSX/INC/PRVX rows). core-pls-* and core-shd-* live in
-            // coreFieldLoaded too (for the "has this ever loaded" bookkeeping
-            // used elsewhere), but they're rendered separately above in
-            // fetchOnChainData - sweeping them here as well was overwriting a
-            // legitimately still-loading PLS market cap (waiting on
-            // fetchPlsTotalSupply, which resolves slightly later than this
-            // first on-chain round) with "Unavailable" every single call.
+            // HEX/PLSX/INC/PRVX rows); core-pls-* and core-shd-* are rendered
+            // separately in fetchOnChainData.
             CORE_TOKENS.forEach(t => {
                 ['price', 'mcap', 'liquidity'].forEach(suffix => {
                     const id = `core-${t.id}-${suffix}`;
@@ -3908,9 +4029,8 @@
         // --- PulseChain Core (HEX / PLSX / INC / PRVX) ---
         // Prices/market cap/liquidity are derived on-chain from each token's
         // WPLS pair reserves (same approach as SHD above), converted to USD
-        // via the already-computed plsUsdPrice. DexScreener is only used for
-        // the 24h % change, which isn't derivable from a single reserves
-        // snapshot (see fetchCoreTokensChange near fetchPrimaryMarketData).
+        // via the already-computed plsUsdPrice. The 24h % change comes from each
+        // pool's Sync event history (see updateChanges24h above).
         const CORE_TOKENS = [
             { id: 'hex',  address: '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39', pair: '0xf1F4ee610b2bAbB05C635F726eF8B0C568c8dc65' },
             { id: 'plsx', address: '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab', pair: '0x1b45b9148791d3a104184Cd5DFE5CE57193a3ee9' },
@@ -3932,7 +4052,7 @@
         // so a later transient failure leaves the last-known-good value on
         // screen instead of blanking it.
         const coreFieldLoaded = {
-            'core-pls-price': false, 'core-pls-mcap': false, 'core-pls-liquidity': false,
+            'core-pls-price': false, 'core-pls-liquidity': false,
             'core-shd-price': false, 'core-shd-mcap': false, 'core-shd-liquidity': false
         };
         const coreChangeLoaded = { pls: false, shd: false };
@@ -3994,6 +4114,12 @@
             return calls;
         }
 
+        // Real tokens use 0-36 decimals. ethers keeps only the low 8 bits when it decodes a uint8, so a
+        // misread slot can come back as a plausible-looking number like 49: refuse anything out of range.
+        function isSaneDecimals(d) {
+            return Number.isInteger(Number(d)) && Number(d) >= 0 && Number(d) <= 36;
+        }
+
         function decodeResult(name, result) {
             if (!result.success) return null;
             try {
@@ -4040,7 +4166,23 @@
             'shd-market-cap': false, 'shd-liquidity': false
         };
 
+        let onChainRefreshRunning = false;
+        let onChainRefreshQueued = false;
         async function fetchOnChainData() {
+            if (onChainRefreshRunning) { onChainRefreshQueued = true; return; }
+            onChainRefreshRunning = true;
+            try {
+                await fetchOnChainDataOnce();
+            } finally {
+                onChainRefreshRunning = false;
+                if (onChainRefreshQueued) {
+                    onChainRefreshQueued = false;
+                    fetchOnChainData();
+                }
+            }
+        }
+
+        async function fetchOnChainDataOnce() {
             try {
                 // Snapshot which core tokens already had a resolved quoteAddress
                 // BEFORE this round's calls are built. buildOnChainCalls() only
@@ -4053,11 +4195,21 @@
                 // misaligning every read after it.
                 const quoteAddressKnownBeforeBuild = {};
                 CORE_TOKENS.forEach(t => {
-                    quoteAddressKnownBeforeBuild[t.id] = coreTokenMeta[t.id].quoteAddress !== null;
+                    quoteAddressKnownBeforeBuild[t.id] = coreTokenMeta[t.id].quoteAddress !== null && coreTokenMeta[t.id].quoteDecimals === null;
+                });
+                // Same idea for every other one-time lookup: remember what THIS round asked for.
+                // Decoding must follow this list, not the live caches. The reads can take a while now
+                // (cross-checked), and if anything else fills a cache in the meantime, walking the
+                // results by the live state would read every later slot from the wrong place and
+                // produce garbage decimals (uint8 decoding silently keeps just the low 8 bits).
+                const plan = { v1: !poolToken0Cache.v1, v2: !poolToken0Cache.v2, pls: !poolToken0Cache.pls, core: {} };
+                CORE_TOKENS.forEach(t => {
+                    const m = coreTokenMeta[t.id];
+                    plan.core[t.id] = { t0: m.pairToken0 === null, t1: m.pairToken1 === null, dec: m.decimals === null };
                 });
 
                 const calls = buildOnChainCalls();
-                const results = await withRpcFallback((provider) => {
+                const results = await withRpcQuorum((provider) => {
                     const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
                     return multicall.callStatic.aggregate3(calls);
                 });
@@ -4072,17 +4224,17 @@
                 const snftMinted = decodeResult("totalMinted", results[i++]);
                 const snftPlsBalance = decodeResult("getEthBalance", results[i++]);
                 const totalSupply = decodeResult("totalSupply", results[i++]);
-                if (!poolToken0Cache.v1) {
+                if (plan.v1) {
                     const token0 = decodeResult("token0", results[i++]);
-                    if (token0) poolToken0Cache.v1 = token0[0];
+                    if (token0 && !poolToken0Cache.v1) poolToken0Cache.v1 = token0[0];
                 }
-                if (!poolToken0Cache.v2) {
+                if (plan.v2) {
                     const token0 = decodeResult("token0", results[i++]);
-                    if (token0) poolToken0Cache.v2 = token0[0];
+                    if (token0 && !poolToken0Cache.v2) poolToken0Cache.v2 = token0[0];
                 }
-                if (!poolToken0Cache.pls) {
+                if (plan.pls) {
                     const token0 = decodeResult("token0", results[i++]);
-                    if (token0) poolToken0Cache.pls = token0[0];
+                    if (token0 && !poolToken0Cache.pls) poolToken0Cache.pls = token0[0];
                 }
 
                 // --- PulseChain Core tokens: decode raw reserves/supply now,
@@ -4096,17 +4248,17 @@
                 });
                 CORE_TOKENS.forEach(t => {
                     const meta = coreTokenMeta[t.id];
-                    if (meta.pairToken0 === null) {
+                    if (plan.core[t.id].t0) {
                         const r = decodeResult("token0", results[i++]);
-                        if (r) meta.pairToken0 = r[0];
+                        if (r && meta.pairToken0 === null) meta.pairToken0 = r[0];
                     }
-                    if (meta.pairToken1 === null) {
+                    if (plan.core[t.id].t1) {
                         const r = decodeResult("token1", results[i++]);
-                        if (r) meta.pairToken1 = r[0];
+                        if (r && meta.pairToken1 === null) meta.pairToken1 = r[0];
                     }
-                    if (meta.decimals === null) {
+                    if (plan.core[t.id].dec) {
                         const dec = decodeResult("decimals", results[i++]);
-                        if (dec) meta.decimals = dec[0];
+                        if (dec && meta.decimals === null && isSaneDecimals(dec[0])) meta.decimals = dec[0];
                     }
                     // Derive which side is the core token and which is the
                     // quote from the actual pair-token addresses, rather than
@@ -4130,9 +4282,9 @@
                 });
                 CORE_TOKENS.forEach(t => {
                     const meta = coreTokenMeta[t.id];
-                    if (quoteAddressKnownBeforeBuild[t.id] && meta.quoteDecimals === null) {
+                    if (quoteAddressKnownBeforeBuild[t.id]) {
                         const dec = decodeResult("decimals", results[i++]);
-                        if (dec) meta.quoteDecimals = dec[0];
+                        if (dec && meta.quoteDecimals === null && isSaneDecimals(dec[0])) meta.quoteDecimals = dec[0];
                     }
                 });
 
@@ -4161,13 +4313,13 @@
                 });
                 if (pendingQuoteDecimalsCalls.length) {
                     try {
-                        const quoteDecResults = await withRpcFallback((provider) => {
+                        const quoteDecResults = await withRpcQuorum((provider) => {
                             const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
                             return multicall.callStatic.aggregate3(pendingQuoteDecimalsCalls);
                         });
                         pendingQuoteDecimalsTokenIds.forEach((id, idx) => {
                             const dec = decodeResult("decimals", quoteDecResults[idx]);
-                            if (dec) coreTokenMeta[id].quoteDecimals = dec[0];
+                            if (dec && coreTokenMeta[id].quoteDecimals === null && isSaneDecimals(dec[0])) coreTokenMeta[id].quoteDecimals = dec[0];
                         });
                     } catch (e) {
                         console.error("Quote decimals fetch error:", e);
@@ -4179,9 +4331,7 @@
                 if (rewardReserve) { document.getElementById('reward-reserve').textContent = formatTokenAmount(Number(ethers.utils.formatEther(rewardReserve[0]))) + " SHD"; onChainFieldLoaded['reward-reserve'] = true; }
 
                 // --- PLS and SHD USD prices, computed straight from pool reserves ---
-                // (DexScreener is still used elsewhere for 24h change/buys-sells/market
-                // cap, which aren't derivable from a single reserves snapshot, but the
-                // headline price numbers no longer depend on it or its rate limits.)
+                // (The 24h change is computed from Sync event history in updateChanges24h().)
                 let plsUsdPrice = null;
                 if (poolToken0Cache.pls) {
                     plsUsdPrice = reservesToPlsUsdPrice(plsReserves, poolToken0Cache.pls);
@@ -4203,15 +4353,6 @@
                         coreFieldLoaded['core-pls-liquidity'] = true;
                     }
 
-                    // PLS market cap, via PulseChain's explorer stats API -
-                    // there's no ERC20 totalSupply() to call since PLS is the
-                    // native coin, not a contract. plsTotalSupply may still be
-                    // null here on the very first call (it resolves slightly
-                    // later, over in fetchPlsTotalSupply) - renderPlsMarketCap()
-                    // no-ops in that case and fetchPlsTotalSupply paints the
-                    // cell itself as soon as it finishes, instead of this cell
-                    // being stuck until the next 60s on-chain poll.
-                    renderPlsMarketCap();
                 } else if (!plsPriceLoaded) {
                     const plsEl = document.getElementById('pls-price');
                     if (plsEl) plsEl.textContent = 'Unavailable';
@@ -4288,6 +4429,9 @@
                 if (snftMinted) { document.getElementById('snft-minted').textContent = `${snftMinted[0].toString()}/${SNFT_MAX_SUPPLY}`; onChainFieldLoaded['snft-minted'] = true; }
                 if (snftPlsBalance) { document.getElementById('snft-pls').textContent = formatTokenAmount(Number(ethers.utils.formatEther(snftPlsBalance[0]))) + " PLS"; onChainFieldLoaded['snft-pls'] = true; }
 
+                updateChanges24h();
+                updateBtcEth();
+
                 if (snftMinted) await fetchSnftHolders(Number(snftMinted[0]));
             } catch (err) {
                 console.error("Failed to load on-chain data:", err);
@@ -4325,7 +4469,7 @@
                         callData: ON_CHAIN_ABI.encodeFunctionData("ownerOf", [tokenId])
                     });
                 }
-                const ownerResults = await withRpcFallback((provider) => {
+                const ownerResults = await withRpcQuorum((provider) => {
                     const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
                     return multicall.callStatic.aggregate3(ownerCalls);
                 });
@@ -4620,12 +4764,22 @@
                 tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">No swaps or burns found in the recent block range.</td></tr>`;
                 return;
             }
+            // Only hex-shaped values may reach innerHTML: RPC logs aren't cross-checked
+            // and visitors can choose any custom RPC.
+            const isAddr = (v) => typeof v === 'string' && /^0x[0-9a-fA-F]{40}$/.test(v);
+            const isTxHash = (v) => typeof v === 'string' && /^0x[0-9a-fA-F]{64}$/.test(v);
+            txs = txs.filter(tx => isTxHash(tx.txHash) && Number.isFinite(tx.blockNumber));
+            if (!txs.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="tx-empty">No swaps or burns found in the recent block range.</td></tr>`;
+                return;
+            }
             tbody.innerHTML = txs.map(tx => {
+                const trader = isAddr(tx.trader) ? tx.trader : null;
                 const typeClass = tx.type === 'buy' ? 'buy' : tx.type === 'burn' ? 'burn' : 'sell';
                 const typeLabel = tx.type === 'buy' ? 'Buy' : tx.type === 'burn' ? '🔥 Burn' : 'Sell';
-                const explorerTx = `https://ipfs.scan.pulsechain.com/tx/${tx.txHash}`;
-                const explorerAddr = tx.trader
-                    ? `https://ipfs.scan.pulsechain.com/address/${tx.trader}`
+                const explorerTx = `${EXPLORER_URL}/tx/${tx.txHash}`;
+                const explorerAddr = trader
+                    ? `${EXPLORER_URL}/address/${trader}`
                     : '#';
                 const timeLabel = `#${tx.blockNumber.toLocaleString()}`;
                 return `<tr>
@@ -4635,7 +4789,7 @@
                     <td data-label="WPLS"><span class="tx-amount">${formatTxAmount(tx.wpls)}</span></td>
                     <td data-label="Price"><span class="tx-amount">${formatTxPrice(tx.priceUsd)}</span></td>
                     <td data-label="Pool"><span class="tx-pool ${tx.pool}">${tx.pool.toUpperCase()}</span></td>
-                    <td class="tx-addr" data-label="Trader"><a href="${explorerAddr}" target="_blank" rel="noopener noreferrer" title="${tx.trader || ''}">${truncateAddress(tx.trader)}</a></td>
+                    <td class="tx-addr" data-label="Trader"><a href="${explorerAddr}" target="_blank" rel="noopener noreferrer" title="${trader || ''}">${truncateAddress(trader)}</a></td>
                     <td class="tx-time" data-label="Block"><a href="${explorerTx}" target="_blank" rel="noopener noreferrer" style="color:inherit">${timeLabel}</a></td>
                 </tr>`;
             }).join('');
@@ -4692,7 +4846,7 @@
                         callData: ON_CHAIN_ABI.encodeFunctionData("balanceOf", [addr])
                     }))
                 ];
-                const results = await withRpcFallback((provider) => {
+                const results = await withRpcQuorum((provider) => {
                     const multicall = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
                     return multicall.callStatic.aggregate3(calls);
                 });
@@ -4720,48 +4874,23 @@
         }
 
         function startPolling() {
-            // Stagger the initial calls slightly instead of firing them all in the same
-            // instant, to avoid a burst of simultaneous requests on first load
-            // (which was tripping DexScreener's rate limiting and showing N/A/Unavailable
-            // before the retry logic could catch up).
-            fetchPrices();
+            // Initial load: on-chain stats (incl. prices), burn data and recent swaps.
             fetchOnChainData();
             fetchBurnData();
-            // fetchPlsTotalSupply hits PulseChain's explorer API, a different
-            // host from DexScreener/CoinGecko, so it doesn't contend with the
-            // rate-limit concern the other calls above are staggered for -
-            // starting it immediately (instead of after a delay) lets it race
-            // fetchOnChainData rather than lose to it by default. Whichever of
-            // the two finishes second now paints core-pls-mcap via
-            // renderPlsMarketCap(), so this no longer sits on "Loading..." /
-            // "Unavailable" for a full extra 60s poll cycle.
-            fetchPlsTotalSupply();
-            setTimeout(fetchShdHolderCount, 500);
-            // Transactions hit the blockchain RPC (a different host from the price
-            // APIs above), so there's no rate-limit reason to stagger it — starting
-            // immediately lets its multiple round trips (get block number, resolve
-            // pool token order, fetch logs) run in parallel with the price fetch
-            // instead of queued behind it. USD/price columns just show "—" for the
-            // rare case the price isn't ready yet on this exact first paint; the
-            // next 45s poll fills them in.
+            // Transactions also use the blockchain RPC; start them right away so their
+            // round trips run in parallel with the on-chain stats.
             fetchRecentTransactions();
-            priceInterval = setInterval(fetchPrices, 45000);
             onChainInterval = setInterval(fetchOnChainData, 60000);
             if (burnInterval) clearInterval(burnInterval);
             burnInterval = setInterval(fetchBurnData, 60000);
-            holderInterval = setInterval(fetchShdHolderCount, 90000);
-            plsSupplyInterval = setInterval(fetchPlsTotalSupply, 300000);
             if (txInterval) clearInterval(txInterval);
             txInterval = setInterval(fetchRecentTransactions, 45000);
         }
 
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                if (priceInterval) clearInterval(priceInterval);
                 if (onChainInterval) clearInterval(onChainInterval);
                 if (burnInterval) clearInterval(burnInterval);
-                if (holderInterval) clearInterval(holderInterval);
-                if (plsSupplyInterval) clearInterval(plsSupplyInterval);
                 if (txInterval) clearInterval(txInterval);
             } else {
                 startPolling();
@@ -4790,7 +4919,7 @@
         });
 
         function copyContract(btn) {
-            navigator.clipboard.writeText('0xb95bc84f9b6d0373642d586b81979b067572f7bc').then(() => {
+            navigator.clipboard.writeText(SHD_TOKEN_ADDRESS).then(() => {
                 const orig = btn.innerHTML;
                 btn.innerHTML = 'Copied!';
                 setTimeout(() => btn.innerHTML = orig, 2000);
@@ -4820,7 +4949,7 @@
             try {
                 await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
-                    params: [{ chainId: '0x171', chainName: 'PulseChain', nativeCurrency: { name: 'PulseChain', symbol: 'PLS', decimals: 18 }, rpcUrls: ['https://rpc.pulsechain.com'], blockExplorerUrls: ['https://ipfs.scan.pulsechain.com'] }]
+                    params: [{ chainId: '0x171', chainName: 'PulseChain', nativeCurrency: { name: 'PulseChain', symbol: 'PLS', decimals: 18 }, rpcUrls: rpcBuiltinUrls(), blockExplorerUrls: [EXPLORER_URL] }]
                 });
                 showToast("PulseChain network added successfully!");
             } catch (error) {
@@ -4833,7 +4962,7 @@
             try {
                 const wasAdded = await window.ethereum.request({
                     method: 'wallet_watchAsset',
-                    params: { type: 'ERC20', options: { address: '0xb95bc84f9b6d0373642d586b81979b067572f7bc', symbol: 'SHD', decimals: 18, image: 'https://raw.githubusercontent.com/PBaieck-group/SnipeHead/main/docs/Logo_200.png' } }
+                    params: { type: 'ERC20', options: { address: SHD_TOKEN_ADDRESS, symbol: 'SHD', decimals: 18, image: 'https://snipehead.xyz/Logo_200.png' } }
                 });
                 showToast(wasAdded ? "SHD token added to your wallet!" : "Token addition cancelled.");
             } catch (error) {
@@ -4841,6 +4970,5 @@
             }
         }
     </script>
-    <script data-goatcounter="https://mystati.snipehead.xyz/count" async src="https://mystati.snipehead.xyz/count.js"></script>
 </body>
 </html>
