@@ -1715,6 +1715,47 @@
         .tx-time {
             color: var(--text-muted);
             font-size: 0.75rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .tx-time a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .tx-time a:hover { color: var(--accent); }
+
+        /* Relative age ("3m ago"). Swaps from the last minute get a soft live dot. */
+        .tx-ago {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .tx-ago.fresh { color: var(--green); }
+        .tx-ago.fresh::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 0 0 var(--green-soft);
+            animation: tx-live-pulse 2s ease-out infinite;
+        }
+        @keyframes tx-live-pulse {
+            0%   { box-shadow: 0 0 0 0 var(--green-soft); }
+            70%  { box-shadow: 0 0 0 6px transparent; }
+            100% { box-shadow: 0 0 0 0 transparent; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .tx-ago.fresh::before { animation: none; }
+        }
+
+        /* Block number stays available, just quieter than the age */
+        .tx-block {
+            margin-left: 0.5rem;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            opacity: 0.65;
         }
 
         .tx-empty, .tx-loading {
@@ -2345,7 +2386,7 @@
                                         <th>Price</th>
                                         <th>Pool</th>
                                         <th>Trader</th>
-                                        <th>Block</th>
+                                        <th>Time</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tx-tbody">
@@ -2600,7 +2641,7 @@
                         <a href="https://gitlab.com/pbaieck-group/snipehead" target="_blank" rel="noopener noreferrer">GitLab</a>
                         <a href="https://x.com/SnipeHeadSHD" target="_blank" rel="noopener noreferrer">X</a>
                     </div>
-                    <p class="footer-version">v5.0.0</p>
+                    <p class="footer-version">v5.0.1</p>
                 </div>
             </footer>
         </div>
@@ -4667,6 +4708,68 @@
             };
         }
 
+        // ---------- Transaction age ("3m ago") ----------
+        // Swap/Transfer logs carry a block number but no time, so look up each
+        // block's timestamp. A mined block's time never changes, so results are
+        // cached and later refreshes only fetch blocks they haven't seen yet.
+        const TX_BLOCK_TIME_SEC = 10; // PulseChain block time; only used for the fallback estimate
+        const txBlockTimeCache = new Map(); // blockNumber -> unix seconds
+
+        async function attachTxTimestamps(provider, txs) {
+            const blocks = [...new Set(txs.map(t => t.blockNumber))];
+            await Promise.all(blocks.filter(b => !txBlockTimeCache.has(b)).map(async (b) => {
+                try {
+                    const blk = await provider.getBlock(b);
+                    if (blk && Number.isFinite(blk.timestamp)) txBlockTimeCache.set(b, blk.timestamp);
+                } catch (_) { /* fall back to an estimate below */ }
+            }));
+
+            // If a lookup failed, estimate from the nearest block whose time we do know.
+            const known = blocks.filter(b => txBlockTimeCache.has(b));
+            for (const tx of txs) {
+                if (txBlockTimeCache.has(tx.blockNumber)) {
+                    tx.timestamp = txBlockTimeCache.get(tx.blockNumber);
+                } else if (known.length) {
+                    const ref = known.reduce((a, b) =>
+                        Math.abs(b - tx.blockNumber) < Math.abs(a - tx.blockNumber) ? b : a);
+                    tx.timestamp = txBlockTimeCache.get(ref) + (tx.blockNumber - ref) * TX_BLOCK_TIME_SEC;
+                    tx.timestampEstimated = true;
+                }
+            }
+
+            // Keep the cache small: drop the oldest blocks.
+            if (txBlockTimeCache.size > 400) {
+                [...txBlockTimeCache.keys()].sort((a, b) => a - b)
+                    .slice(0, txBlockTimeCache.size - 200)
+                    .forEach(k => txBlockTimeCache.delete(k));
+            }
+        }
+
+        function formatTimeAgo(unixSec) {
+            const s = Math.max(0, Math.floor(Date.now() / 1000 - unixSec));
+            if (s < 10) return 'Just now';
+            if (s < 60) return `${s}s ago`;
+            const m = Math.floor(s / 60);
+            if (m < 60) return `${m}m ago`;
+            const h = Math.floor(m / 60);
+            if (h < 24) return `${h}h ago`;
+            return `${Math.floor(h / 24)}d ago`;
+        }
+
+        // Re-label every visible row from its stored timestamp (no network).
+        function updateTxAgo() {
+            if (document.hidden) return;
+            document.querySelectorAll('#tx-tbody .tx-ago[data-ts]').forEach(el => {
+                const ts = Number(el.dataset.ts);
+                if (!Number.isFinite(ts)) return;
+                const text = formatTimeAgo(ts);
+                if (el.textContent !== text) el.textContent = text;
+                el.classList.toggle('fresh', Date.now() / 1000 - ts < 60);
+            });
+        }
+        setInterval(updateTxAgo, 5000);
+        document.addEventListener('visibilitychange', updateTxAgo);
+
         async function fetchRecentTransactions() {
             if (document.hidden) return;
             const statusEl = document.getElementById('tx-status');
@@ -4730,6 +4833,13 @@
 
                 const top = decoded.slice(0, TX_DISPLAY_LIMIT);
 
+                // Add block times. Capped at 4s so a slow RPC can't hold up the table;
+                // rows without a time simply show their block number instead.
+                await Promise.race([
+                    attachTxTimestamps(provider, top).catch(() => {}),
+                    new Promise(resolve => setTimeout(resolve, 4000))
+                ]);
+
                 // Bail out if a newer fetch has already started (and possibly already
                 // rendered) while we were awaiting the calls above.
                 if (myToken !== txFetchToken) return;
@@ -4781,7 +4891,14 @@
                 const explorerAddr = trader
                     ? `${EXPLORER_URL}/address/${trader}`
                     : '#';
-                const timeLabel = `#${tx.blockNumber.toLocaleString()}`;
+                const blockLabel = `#${tx.blockNumber.toLocaleString()}`;
+                const hasTime = Number.isFinite(tx.timestamp);
+                const timeTitle = hasTime
+                    ? `${tx.timestampEstimated ? '≈ ' : ''}${new Date(tx.timestamp * 1000).toLocaleString()} · Block ${blockLabel}`
+                    : `Block ${blockLabel}`;
+                const timeHtml = hasTime
+                    ? `<span class="tx-ago" data-ts="${tx.timestamp}">${formatTimeAgo(tx.timestamp)}</span><span class="tx-block">${blockLabel}</span>`
+                    : `<span class="tx-ago">${blockLabel}</span>`;
                 return `<tr>
                     <td data-label="Type"><span class="tx-type ${typeClass}">${typeLabel}</span></td>
                     <td data-label="USD"><span class="tx-amount">${formatTxUsd(tx.usdValue)}</span></td>
@@ -4790,9 +4907,10 @@
                     <td data-label="Price"><span class="tx-amount">${formatTxPrice(tx.priceUsd)}</span></td>
                     <td data-label="Pool"><span class="tx-pool ${tx.pool}">${tx.pool.toUpperCase()}</span></td>
                     <td class="tx-addr" data-label="Trader"><a href="${explorerAddr}" target="_blank" rel="noopener noreferrer" title="${trader || ''}">${truncateAddress(trader)}</a></td>
-                    <td class="tx-time" data-label="Block"><a href="${explorerTx}" target="_blank" rel="noopener noreferrer" style="color:inherit">${timeLabel}</a></td>
+                    <td class="tx-time" data-label="Time"><a href="${explorerTx}" target="_blank" rel="noopener noreferrer" title="${timeTitle}">${timeHtml}</a></td>
                 </tr>`;
             }).join('');
+            updateTxAgo();
         }
 
         function manualReloadTransactions(btn) {
