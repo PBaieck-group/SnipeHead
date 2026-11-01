@@ -5,7 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SnipeHead NFT - ETH</title>
 <meta name="description" content="SnipeHeadNFT: a 35-unit NFT development, released one lot at a time, in order. Live on Ethereum Mainnet.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self'; font-src 'none';">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RxmnCJYIhzQeIhWtLoOruPF7HnF59sIA6TPRLVXtOGc=' 'sha256-9AGKUsYE2J6Bcs8dNjsGugR+kVcmbvhoZs24CAukjYw=' 'sha256-/eRRwaDDwcNxefj/NN8qfGZAVuGAPLBSD0du64TrLGo='; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self'; font-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none';">
+<!-- Anti-clickjacking. A <meta> CSP cannot carry frame-ancestors, so instead the page
+     stays hidden unless it is the top-level document. If it is framed it hides itself
+     and tries to break out; where the browser blocks that, it simply stays hidden. -->
+<style id="antiClickjack">html{display:none !important}</style>
+<script>
+(function(){
+  var s = document.getElementById('antiClickjack');
+  if (window.top === window.self) { s.parentNode.removeChild(s); return; }
+  try { window.top.location.href = window.self.location.href; } catch (e) { /* stays hidden */ }
+})();
+</script>
 <link rel="icon" type="image/png" href="Logo_200.png">
 <style>
   :root{
@@ -23,6 +35,7 @@
     --dust:#565f5d;
     --danger:#ff5470;
     --radius: 3px;
+    --mono: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, "Liberation Mono", Menlo, monospace;
   }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -127,6 +140,12 @@
   }
   .rpc-custom button:hover{ border-color:var(--scope); color:var(--scope); }
   .rpc-footnote{ font-size:10.5px; color:var(--muted); line-height:1.5; margin-top:10px; }
+  .rpc-chip.custom{ border-color:var(--danger); color:var(--danger); }
+  .rpc-item .rpc-host{ color:var(--dust); font-size:10px; }
+  .rpc-warning, .rpc-note{ display:none; font-size:11px; line-height:1.5; border-radius:6px; padding:8px 10px; }
+  .rpc-warning{ margin-bottom:10px; background:rgba(255,84,112,0.10); color:var(--danger); border:1px solid rgba(255,84,112,0.3); }
+  .rpc-note{ margin-top:10px; background:rgba(236,231,218,0.06); color:var(--paper); }
+  .rpc-warning.show, .rpc-note.show{ display:block; }
 
   button, .btn{
     font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -373,11 +392,13 @@
         <div class="rpc-dropdown" id="rpcDropdown">
           <div class="rpc-dropdown-title">Choose an RPC</div>
           <div class="rpc-list" id="rpcList"></div>
+          <div class="rpc-warning" id="rpcWarning">⚠ Custom RPC active. That server sees your wallet address and decides what this page displays (prices, owners, availability). Only use one you trust. Mint prices are re-checked through your wallet before sending.</div>
           <div class="rpc-custom">
             <input type="text" id="customRpcInput" placeholder="https://your-own-rpc.example">
             <button id="customRpcBtn">Use</button>
           </div>
-          <div class="rpc-footnote">SnipeHead reads the chain through whichever endpoint you pick — no single relay required.</div>
+          <div class="rpc-note" id="rpcNote" role="status"></div>
+          <div class="rpc-footnote">By default SnipeHead asks all three endpoints and only trusts an answer that a majority agree on. With a wallet connected, reads go through your wallet first.</div>
         </div>
       </div>
       <div class="net-badge"><span class="net-dot" id="netDot"></span><span id="netLabel">Ethereum</span></div>
@@ -389,6 +410,10 @@
   <div class="banner" id="wrongNetBanner">
     Wrong network detected. SnipeHead mints on Ethereum Mainnet (Chain ID 1).
     <button id="switchNetBtn">Switch network</button>
+  </div>
+  <div class="banner" id="chainErrorBanner" role="alert">
+    Couldn't read live data from the contract, so prices, availability and sold counts are hidden. Nothing can be claimed until it loads. Try again or pick a different RPC.
+    <button id="chainRetryBtn">Retry</button>
   </div>
 </header>
 
@@ -476,12 +501,12 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="left mono">SnipeHead NFT · <a href="https://ethereum.org" target="_blank" rel="noopener">Ethereum Mainnet · Chain ID 1</a></div>
-    <div style="margin-top:8px; font-size:11px; color:var(--muted); font-family:var(--mono); letter-spacing:.5px;">v1.1.2</div>
+    <div class="left mono">SnipeHead NFT · <a href="https://ethereum.org" target="_blank" rel="noopener noreferrer">Ethereum Mainnet · Chain ID 1</a></div>
+    <div style="margin-top:8px; font-size:11px; color:var(--muted); font-family:var(--mono); letter-spacing:.5px;">v2.0.0</div>
     <div class="links mono">
-      <a id="contractLink" href="#" target="_blank" rel="noopener">Contract</a>
-      <a href="https://opensea.io/collection/snipehead-nft" target="_blank" rel="noopener">Opensea</a>
-      <a href="https://github.com/PBaieck-group/SnipeHead-eth/blob/main/src/SnipeHeadNFT.sol" target="_blank" rel="noopener">Source</a>
+      <a id="contractLink" href="#" target="_blank" rel="noopener noreferrer">Contract</a>
+      <a href="https://opensea.io/collection/snipehead-nft" target="_blank" rel="noopener noreferrer">Opensea</a>
+      <a href="https://github.com/PBaieck-group/SnipeHead-eth/blob/main/src/SnipeHeadNFT.sol" target="_blank" rel="noopener noreferrer">Source</a>
     </div>
   </div>
 </footer>
@@ -494,15 +519,15 @@
     <h3>No wallet detected</h3>
     <p>You'll need a Web3 wallet to make an offer on a unit. Browsing stays open either way.</p>
     <div class="wallet-options">
-      <a class="wallet-option" href="https://metamask.io/download/" target="_blank" rel="noopener">
+      <a class="wallet-option" href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">
         <span class="ico"><img src="metamask.png" alt="MetaMask logo"></span>
         <span>Get MetaMask<small>Mask - Most widely used browser wallet</small></span>
       </a>
-      <a class="wallet-option" href="https://zkxwallet.com/" target="_blank" rel="noopener">
+      <a class="wallet-option" href="https://zkxwallet.com/" target="_blank" rel="noopener noreferrer">
         <span class="ico"><img src="zkx.png" alt="ZKX Wallet logo"></span>
         <span>Get ZKX Wallet<small>Privacy focused native Ethereum support</small></span>
       </a>
-      <a class="wallet-option" href="https://internetmoney.io/" target="_blank" rel="noopener">
+      <a class="wallet-option" href="https://internetmoney.io/" target="_blank" rel="noopener noreferrer">
         <span class="ico"><img src="IM.png" alt="Internet Money Wallet logo"></span>
         <span>Get Internet Money Wallet<small>Non-custodial, native Ethereum support</small></span>
       </a>
@@ -557,7 +582,7 @@ const CONFIG = {
   rpcEndpoints: [
     { label: 'PublicNode', url: 'https://ethereum.publicnode.com' },
     { label: '1RPC', url: 'https://1rpc.io/eth' },
-    { label: 'MEV Blocker', url: 'https://rpc.mevblocker.io' }
+    { label: '0xRPC', url: 'https://0xrpc.io/eth' }
   ]
 };
 
@@ -581,23 +606,122 @@ document.getElementById('contractLink').href = `${CONFIG.explorer}/token/${CONTR
 document.getElementById('netLabel').textContent = CONFIG.chainName;
 
 /* ================= STATE ================= */
-function loadSavedRpc(){
-  try{
-    const saved = JSON.parse(localStorage.getItem('snipehead:rpc') || 'null');
-    if(saved && saved.url) return saved;
-  }catch(e){ /* ignore */ }
-  return CONFIG.rpcEndpoints[0];
+// Pin the chain. ethers will not auto-detect (and silently accept) whatever
+// chain an endpoint claims to be: every provider below is locked to Ethereum.
+const ETH_NETWORK = new ethers.Network('mainnet', CONFIG.chainIdDec);
+
+// DEFAULT read path: ask ALL built-in endpoints and only accept an answer that
+// a majority of them agree on (2 of 3), so one lying or broken node cannot
+// control what this page displays. A single preset or a custom RPC is still
+// available from the selector as an explicit choice.
+const READ_QUORUM = Math.floor(CONFIG.rpcEndpoints.length / 2) + 1;
+function defaultQuorumRpc(){
+  return { label: `Quorum (${READ_QUORUM} of ${CONFIG.rpcEndpoints.length})`, url:null, quorum:true, custom:false };
 }
 
-let activeRpc = loadSavedRpc();       // { label, url }
-let readProvider = new ethers.JsonRpcProvider(activeRpc.url);
-let readContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, readProvider);
+// localStorage and sessionStorage are shared with every other page on this
+// origin (the whole snipehead.xyz domain, including the PulseChain page at
+// /snft/, or an entire IPFS path gateway), so NOTHING read back from them is
+// trusted:
+//   - a saved PRESET is only honoured if it still matches one of the built-in
+//     endpoints in CONFIG, and its label always comes from CONFIG;
+//   - a CUSTOM rpc is never written to localStorage. It lives in sessionStorage
+//     (this tab only; it survives the reloads the wallet triggers) and is
+//     re-validated and re-probed before it is used again.
+// The keys are Ethereum-specific on purpose: the PulseChain page keeps its own
+// keys, so the two pages never read, overwrite or delete each other's values.
+const RPC_KEY_PRESET = 'snipehead:eth:rpc';
+const RPC_KEY_CUSTOM = 'snipehead:eth:rpc:custom';
+
+// Returns a normalised https URL string, or null if the input is not safe.
+function parseRpcUrl(raw){
+  if(typeof raw !== 'string') return null;
+  const s = raw.trim();
+  if(!s || s.length > 300) return null;
+  if(/[\u0000-\u001f\u007f\s<>"'`\\]/.test(s)) return null;   // control chars, spaces, quotes, backslash
+  let u;
+  try{ u = new URL(s); }catch(e){ return null; }
+  if(u.protocol !== 'https:') return null;
+  if(u.username || u.password) return null;                   // no user:pass@host
+  if(!u.hostname) return null;
+  u.hash = '';
+  return u.href;
+}
+
+function presetForUrl(url){
+  const norm = parseRpcUrl(url);
+  if(!norm) return null;
+  return CONFIG.rpcEndpoints.find(ep => parseRpcUrl(ep.url) === norm) || null;
+}
+
+function loadSavedRpc(){
+  // 1) a custom RPC picked in THIS tab (session only)
+  try{
+    const raw = sessionStorage.getItem(RPC_KEY_CUSTOM);
+    if(raw){
+      const url = parseRpcUrl(raw);
+      if(url && !presetForUrl(url)) return { label:'Custom', url, custom:true };
+      sessionStorage.removeItem(RPC_KEY_CUSTOM);              // invalid or tampered
+    }
+  }catch(e){ /* storage unavailable */ }
+
+  // 2) a preset remembered from a previous visit
+  try{
+    const raw = localStorage.getItem(RPC_KEY_PRESET);
+    if(raw){
+      let saved = null;
+      try{ saved = JSON.parse(raw); }catch(e){ /* ignore */ }
+      const preset = (saved && typeof saved === 'object') ? presetForUrl(saved.url) : null;
+      if(preset) return { label: preset.label, url: preset.url, custom:false };
+      localStorage.removeItem(RPC_KEY_PRESET);                // invalid or tampered
+    }
+  }catch(e){ /* storage unavailable */ }
+
+  return defaultQuorumRpc();
+}
+
+function makeSingleProvider(url){
+  return new ethers.JsonRpcProvider(url, ETH_NETWORK, { staticNetwork: ETH_NETWORK });
+}
+
+// rpc = { quorum:true } -> FallbackProvider over every built-in endpoint,
+// equal weight, READ_QUORUM must agree. Otherwise a single endpoint (rpc.url).
+function makeReadProvider(rpc){
+  if(!rpc.quorum) return makeSingleProvider(rpc.url);
+  const backends = CONFIG.rpcEndpoints.map(ep => ({
+    provider: makeSingleProvider(ep.url),
+    priority: 1,
+    weight: 1,
+    stallTimeout: 1500
+  }));
+  return new ethers.FallbackProvider(backends, ETH_NETWORK, { quorum: READ_QUORUM });
+}
+
+let activeRpc = loadSavedRpc();       // { label, url, custom, quorum }
+let readProvider = makeReadProvider(activeRpc);
+let rpcReadContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, readProvider);
+
+// When a wallet is connected (and on Ethereum mainnet), reads go through the
+// wallet's own provider first. If that read throws, it falls back to the
+// RPC / quorum contract above. Every call site keeps using `readContract`.
+let walletReadContract = null;
+const readContract = new Proxy({}, {
+  get(_target, name){
+    if(typeof name !== 'string' || name === 'then') return undefined;
+    return async (...args)=>{
+      if(walletReadContract){
+        try{ return await walletReadContract[name](...args); }
+        catch(e){ /* wallet read failed: fall through to the RPC read */ }
+      }
+      return rpcReadContract[name](...args);
+    };
+  }
+});
 
 let browserProvider = null;   // ethers BrowserProvider once wallet connects
 let signer = null;
 let writeContract = null;
 let connectedAddress = null;
-let onCorrectNetwork = true;  // becomes false once a connected wallet is confirmed on the wrong chain
 
 let chainState = {
   maxSupply: CONFIG.fallbackMaxSupply,
@@ -606,7 +730,9 @@ let chainState = {
   mintPriceWei: 0n,
   mintingActive: false,
   yourMinted: 0,
-  yourBalance: 0
+  yourBalance: 0,
+  ok: false,      // true only after a COMPLETE, validated read of the contract
+  error: null     // message from the last failed read (null when ok)
 };
 
 let listings = [];      // {id, name, desc, attrs, owner|null}
@@ -628,7 +754,16 @@ function fmtEth(wei){
     // Show up to 8 decimals instead, trimming trailing zeros.
     let fixed = num.toFixed(8).replace(/0+$/,'').replace(/\.$/,'');
     return fixed;
-  }catch(e){ return '0'; }
+  }catch(e){ return '–'; }   // never show a made-up 0 when formatting fails
+}
+
+function escapeHtml(v){
+  return String(v == null ? '' : v)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 
 async function fetchMetadata(id){
@@ -648,53 +783,193 @@ async function fetchMetadata(id){
 }
 
 /* ================= LOAD CHAIN STATE ================= */
-async function loadChainState(){
-  try{
-    const [maxSupply, maxPerWallet, totalMinted, mintPriceWei, mintingActive] = await Promise.all([
-      readContract.MAX_SUPPLY().catch(()=>CONFIG.fallbackMaxSupply),
-      readContract.MAX_PER_WALLET().catch(()=>2),
-      readContract.totalMinted().catch(()=>0),
-      readContract.mintPrice().catch(()=>0n),
-      readContract.mintingActive().catch(()=>false),
-    ]);
-    chainState.maxSupply = Number(maxSupply);
-    chainState.maxPerWallet = Number(maxPerWallet);
-    chainState.totalMinted = Number(totalMinted);
-    chainState.mintPriceWei = BigInt(mintPriceWei);
-    chainState.mintingActive = Boolean(mintingActive);
+// ---- Multicall3: batch contract reads into ONE eth_call (public RPCs rate-limit).
+// Canonical Multicall3 address (identical on Ethereum, chain 1).
+const MULTICALL3_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
+const MULTICALL3_ABI = [
+  "function aggregate3((address target, bool allowFailure, bytes callData)[] calls) payable returns ((bool success, bytes returnData)[] returnData)"
+];
+const NFT_IFACE = new ethers.Interface(ABI);
+const MULTICALL_CHUNK = 100;               // calls per eth_call
+const FALLBACK_CONCURRENCY = 5;            // only used if Multicall3 is unreachable on the chosen RPC
+const OWNER_PREFETCH = CONFIG.fallbackMaxSupply;   // owners 1..N ride along with the state read
+const STATE_FNS = ['MAX_SUPPLY','MAX_PER_WALLET','totalMinted','mintPrice','mintingActive'];
+const ADDR_FNS  = ['mintedPerWallet','balanceOf'];   // per-wallet reads (only when a wallet is connected)
 
-    if(connectedAddress){
-      // mintedPerWallet = public-mint slots used (for enforcing the 2-per-wallet cap).
-      // balanceOf = actual units currently held (includes owner mints, transfers, secondary buys).
-      const [minted, balance] = await Promise.all([
-        readContract.mintedPerWallet(connectedAddress).catch(()=>0),
-        readContract.balanceOf(connectedAddress).catch(()=>0)
-      ]);
-      chainState.yourMinted = Number(minted);
-      chainState.yourBalance = Number(balance);
-    }
-  }catch(e){
-    console.error('Failed reading contract state', e);
+// Sends raw callData (all aimed at the NFT contract) through Multicall3.
+// Returns [{success, data}] in order. Throws only if the multicall itself could
+// not be executed (transport error / Multicall3 missing on this RPC).
+// Mirrors readContract: wallet provider first, then the selected RPC / quorum.
+async function multicall(callDatas){
+  const runners = [];
+  if(walletReadContract) runners.push(walletReadContract.runner);
+  runners.push(rpcReadContract.runner);
+  let lastErr = null;
+  for(const runner of runners){
+    try{
+      const mc = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, runner);
+      const out = [];
+      for(let i=0; i<callDatas.length; i+=MULTICALL_CHUNK){
+        const calls = callDatas.slice(i, i+MULTICALL_CHUNK).map(callData=>({
+          target: CONTRACT_ADDRESS, allowFailure: true, callData
+        }));
+        const res = await mc.aggregate3.staticCall(calls);
+        if(res.length !== calls.length) throw new Error('multicall result length mismatch');
+        res.forEach(r=>out.push({ success: r.success, data: r.returnData }));
+      }
+      return out;
+    }catch(e){ lastErr = e; }
   }
+  throw lastErr;
 }
+
+function ownersViaMulticall(ids){
+  return multicall(ids.map(id=>NFT_IFACE.encodeFunctionData('ownerOf', [id])));
+}
+
+// State + the first OWNER_PREFETCH owners in a SINGLE eth_call (one block, one
+// round trip). Returns { values, owners } or null if Multicall3 can't run here.
+// A reverted state call is authoritative and throws (no fallback).
+async function readStateBatched(addr){
+  const names = addr ? STATE_FNS.concat(ADDR_FNS) : STATE_FNS.slice();
+  const callDatas = names.map(n=>NFT_IFACE.encodeFunctionData(n, ADDR_FNS.includes(n) ? [addr] : []));
+  for(let id=1; id<=OWNER_PREFETCH; id++) callDatas.push(NFT_IFACE.encodeFunctionData('ownerOf', [id]));
+  let res;
+  try{ res = await multicall(callDatas); }
+  catch(e){ console.warn('Multicall3 unavailable on this RPC, reading state with individual calls', e); return null; }
+  const values = names.map((n, k)=>{
+    if(!res[k].success) throw new Error(`${n}() reverted`);
+    return NFT_IFACE.decodeFunctionResult(n, res[k].data)[0];
+  });
+  return { values, owners: res.slice(names.length) };
+}
+
+// Fallback: the original one-call-per-value path (still all-or-nothing).
+async function readStateIndividually(addr){
+  const reads = [
+    readContract.MAX_SUPPLY(),
+    readContract.MAX_PER_WALLET(),
+    readContract.totalMinted(),
+    readContract.mintPrice(),
+    readContract.mintingActive(),
+  ];
+  if(addr){
+    reads.push(readContract.mintedPerWallet(addr));
+    reads.push(readContract.balanceOf(addr));
+  }
+  return { values: await Promise.all(reads), owners: null };
+}
+
+let ownerBatch = null;   // { total, results } owners fetched in the same call as the state
+
+let chainLoadSeq = 0;
+function setChainErrorBanner(show){
+  document.getElementById('chainErrorBanner').classList.toggle('show', !!show);
+}
+
+// Reads the contract state ALL-OR-NOTHING. If any read fails, or a value is
+// implausible, chainState.ok becomes false and the UI shows an error state.
+// Failed reads are never replaced with 0 / 0n / false / default values.
+async function loadChainState(){
+  const seq = ++chainLoadSeq;
+  const addr = connectedAddress;
+  try{
+    ownerBatch = null;
+    let batch = await readStateBatched(addr);          // 1 eth_call: state + owners
+    if(!batch) batch = await readStateIndividually(addr);
+    const r = batch.values;
+    if(seq !== chainLoadSeq) return;   // a newer load started (e.g. RPC switch); let it decide
+
+    const next = {
+      maxSupply: Number(r[0]),
+      maxPerWallet: Number(r[1]),
+      totalMinted: Number(r[2]),
+      mintPriceWei: BigInt(r[3]),
+      mintingActive: r[4]
+    };
+    if(typeof next.mintingActive !== 'boolean') throw new Error('mintingActive was not a boolean');
+    if(!Number.isSafeInteger(next.maxSupply) || next.maxSupply <= 0) throw new Error('invalid MAX_SUPPLY');
+    if(!Number.isSafeInteger(next.maxPerWallet) || next.maxPerWallet <= 0) throw new Error('invalid MAX_PER_WALLET');
+    if(!Number.isSafeInteger(next.totalMinted) || next.totalMinted < 0 || next.totalMinted > next.maxSupply) throw new Error('invalid totalMinted');
+    if(next.mintPriceWei < 0n) throw new Error('invalid mintPrice');
+    if(addr){
+      // mintedPerWallet = public-mint slots used (enforces the 2-per-wallet cap).
+      // balanceOf = units actually held (includes owner mints, transfers, secondary buys).
+      next.yourMinted = Number(r[5]);
+      next.yourBalance = Number(r[6]);
+      if(!Number.isSafeInteger(next.yourMinted) || next.yourMinted < 0) throw new Error('invalid mintedPerWallet');
+      if(!Number.isSafeInteger(next.yourBalance) || next.yourBalance < 0) throw new Error('invalid balanceOf');
+    }
+
+    Object.assign(chainState, next, { ok:true, error:null });   // commit only when everything succeeded
+    ownerBatch = batch.owners ? { total: next.totalMinted, results: batch.owners } : null;
+  }catch(e){
+    if(seq !== chainLoadSeq) return;
+    console.error('Failed reading contract state', e);
+    ownerBatch = null;
+    chainState.ok = false;
+    chainState.error = (e && (e.shortMessage || e.message)) || 'unknown error';
+  }
+  if(!chainState.ok) setChainErrorBanner(true);   // on success, the owners step decides when to hide it
+}
+
+// Owner lookups are ALL-OR-NOTHING. Every id 1..totalMinted must have an owner
+// (the contract has no burn), so any failed lookup means the sold/unsold picture
+// and the holder count are unknown. Returns { ok:false } and never a partial map.
+let holdersOk = false;
+function listingsOk(){ return chainState.ok && holdersOk; }
+function syncErrorBanner(){ setChainErrorBanner(!listingsOk()); }
 
 async function loadHolders(){
   const total = chainState.totalMinted;
+  const ids = Array.from({length: total}, (_, k)=>k+1);
   const owners = new Set();
   const perTokenOwner = {};
-  const calls = [];
-  for(let i=1;i<=total;i++){
-    calls.push(
-      readContract.ownerOf(i).then(o=>{ owners.add(o.toLowerCase()); perTokenOwner[i]=o; }).catch(()=>{})
-    );
-  }
-  await Promise.all(calls);
-  return { holderCount: owners.size, perTokenOwner };
-}
+  const record = (id, o)=>{
+    if(typeof o !== 'string' || !ethers.isAddress(o)) throw new Error(`invalid owner for token ${id}`);
+    owners.add(o.toLowerCase());
+    perTokenOwner[id] = o;
+  };
+  const decodeRecord = (id, r)=>{
+    if(!r.success) throw new Error(`ownerOf(${id}) reverted`);   // authoritative: no fallback
+    record(id, NFT_IFACE.decodeFunctionResult('ownerOf', r.data)[0]);
+  };
 
+  // Owners that came back with the state read cost ZERO extra RPC calls.
+  let have = [];
+  const batch = ownerBatch; ownerBatch = null;
+  if(batch && batch.total === total) have = batch.results.slice(0, total);
+  const missing = ids.slice(have.length);     // only if totalMinted > OWNER_PREFETCH
+
+  let extra = null;
+  if(missing.length){
+    try{ extra = await ownersViaMulticall(missing); }
+    catch(e){ console.warn('Multicall3 unavailable on this RPC, falling back to individual ownerOf calls', e); }
+  }
+
+  try{
+    have.forEach((r, k)=>decodeRecord(ids[k], r));
+    if(missing.length){
+      if(extra){
+        extra.forEach((r, k)=>decodeRecord(missing[k], r));
+      } else {
+        for(let i=0; i<missing.length; i+=FALLBACK_CONCURRENCY){
+          await Promise.all(missing.slice(i, i+FALLBACK_CONCURRENCY).map(async id=>{
+            record(id, await readContract.ownerOf(id));
+          }));
+        }
+      }
+    }
+  }catch(e){
+    console.error('Failed reading token owners', e);
+    return { ok:false, holderCount:null, perTokenOwner:{} };
+  }
+  return { ok:true, holderCount: owners.size, perTokenOwner };
+}
 /* ================= BUILD LISTINGS ================= */
 async function buildListings(){
-  const { perTokenOwner } = await loadHolders();
+  const holders = chainState.ok ? await loadHolders() : { ok:false, holderCount:null, perTokenOwner:{} };
+  const { perTokenOwner } = holders;
   const max = chainState.maxSupply || CONFIG.fallbackMaxSupply;
   const metaPromises = [];
   for(let i=1;i<=max;i++){ metaPromises.push(fetchMetadata(i)); }
@@ -710,9 +985,11 @@ async function buildListings(){
       owner: perTokenOwner[id] || null
     };
   });
+  return holders;
 }
 
 function statusOf(listing){
+  if(!listingsOk()) return 'unknown';
   const nextId = chainState.totalMinted + 1;
   if(listing.owner) return 'sold';
   if(chainState.totalMinted >= chainState.maxSupply) return 'sold-out';
@@ -722,6 +999,13 @@ function statusOf(listing){
 
 /* ================= RENDER ================= */
 function renderStats(){
+  if(!chainState.ok){
+    document.getElementById('statMinted').textContent = '–';
+    document.getElementById('statAvailable').textContent = '–';
+    document.getElementById('statPrice').innerHTML = `–<span class="unit">ETH</span>`;
+    document.getElementById('statYours').textContent = '–';
+    return;
+  }
   document.getElementById('statMinted').innerHTML = `${chainState.totalMinted}<span class="unit">/ ${chainState.maxSupply}</span>`;
   const avail = chainState.mintingActive ? Math.min(1, chainState.maxSupply - chainState.totalMinted) : 0;
   document.getElementById('statAvailable').textContent = chainState.totalMinted >= chainState.maxSupply ? 'SOLD OUT' : (chainState.mintingActive ? avail : '0 (closed)');
@@ -730,10 +1014,11 @@ function renderStats(){
 }
 
 function renderHolderStat(count){
-  document.getElementById('statHolders').textContent = count;
+  document.getElementById('statHolders').textContent = (holdersOk && count != null) ? count : '–';
 }
 
 function ribbonHtml(status, listing){
+  if(status==='unknown') return `<div class="ribbon locked">⚠ DATA UNAVAILABLE</div>`;
   if(status==='available') return `<div class="ribbon available">● AVAILABLE</div>`;
   if(status==='sold') return `<div class="ribbon sold">SOLD${listing.owner ? ' · '+shortAddr(listing.owner) : ''}</div>`;
   if(status==='sold-out') return `<div class="ribbon locked">SOLD OUT</div>`;
@@ -760,6 +1045,7 @@ function renderGrid(){
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   const filtered = listings.filter(l=>{
+    if(!listingsOk()) return currentFilter==='all';
     const s = statusOf(l);
     if(currentFilter==='all') return true;
     if(currentFilter==='available') return s==='available';
@@ -770,7 +1056,9 @@ function renderGrid(){
   });
 
   if(filtered.length===0){
-    if(currentFilter==='mine'){
+    if(!listingsOk()){
+      grid.innerHTML = `<div class="empty-state">Live contract data is unavailable right now. Use Retry above.</div>`;
+    } else if(currentFilter==='mine'){
       const nextId = chainState.totalMinted + 1;
       grid.innerHTML = `<div class="empty-state">You don't own any SnipeHead NFT's yet.${chainState.mintingActive ? ` Unit ${pad3(nextId)} is available now.` : ''}</div>`;
     } else {
@@ -786,7 +1074,7 @@ function renderGrid(){
     card.dataset.id = l.id;
     card.innerHTML = `
       <div class="thumb-wrap">
-        <img src="${CONFIG.thumbsFolder}${pad3(l.id)}.webp" alt="${l.name}" loading="lazy">
+        <img src="${CONFIG.thumbsFolder}${pad3(l.id)}.webp" alt="${escapeHtml(l.name)}" loading="lazy">
         ${isMine(l) ? `<div class="ribbon mine">★ YOU OWN THIS</div>` : ribbonHtml(status, l)}
         <svg class="reticle" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="20" cy="20" r="13" stroke="#38f2c4" stroke-width="2"/>
@@ -798,9 +1086,9 @@ function renderGrid(){
       </div>
       <div class="card-body">
         <div class="unit-no mono">UNIT NO. ${pad3(l.id)}</div>
-        <div class="unit-name">${l.name}</div>
+        <div class="unit-name">${escapeHtml(l.name)}</div>
         <div class="price-row">
-          <span class="price mono">${fmtEth(chainState.mintPriceWei)} ETH</span>
+          <span class="price mono">${chainState.ok ? fmtEth(chainState.mintPriceWei) + ' ETH' : '–'}</span>
           <span class="status-text">${status==='available' ? 'View & Claim' : (status==='sold' ? 'View details' : 'View details')}</span>
         </div>
       </div>
@@ -844,14 +1132,15 @@ function openListingModal(id){
 
   const dot = document.getElementById('modalStatusDot');
   const txt = document.getElementById('modalStatusText');
-  if(status==='sold'){ dot.style.background='#8b9591'; txt.textContent = `Sold to ${shortAddr(l.owner)}`; }
+  if(status==='unknown'){ dot.style.background='#565f5d'; dot.style.boxShadow='none'; txt.textContent='Live data unavailable'; }
+  else if(status==='sold'){ dot.style.background='#8b9591'; txt.textContent = `Sold to ${shortAddr(l.owner)}`; }
   else if(status==='available'){ dot.style.background='#38f2c4'; dot.style.boxShadow='0 0 8px #38f2c4'; txt.textContent='Available now — next in the sequence'; }
   else if(status==='sold-out'){ dot.style.background='#8b9591'; txt.textContent='Collection sold out'; }
   else { dot.style.background='#565f5d'; dot.style.boxShadow='none'; txt.textContent=`Unlocks after Unit ${pad3(chainState.totalMinted+1)} sells`; }
 
   const specWrap = document.getElementById('modalSpecs');
   specWrap.innerHTML = l.attrs.length
-    ? l.attrs.map(a=>`<div class="spec-row"><span class="k">${a.trait_type||''}</span><span class="v">${a.value!==undefined?a.value:''}</span></div>`).join('')
+    ? l.attrs.map(a=>`<div class="spec-row"><span class="k">${escapeHtml(a.trait_type)}</span><span class="v">${escapeHtml(a.value)}</span></div>`).join('')
     : `<div class="spec-row"><span class="k">Token ID</span><span class="v">#${pad3(id)}</span></div>`;
 
   currentQty = 1;
@@ -862,10 +1151,15 @@ function openListingModal(id){
 function renderMintArea(l, status){
   const area = document.getElementById('modalMintArea');
 
+  if(status==='unknown'){
+    area.innerHTML = `<div class="locked-note">⚠ Couldn't read live data from the contract, so this unit can't be claimed right now. Use Retry at the top of the page or choose a different RPC.</div>`;
+    return;
+  }
+
   if(status==='sold'){
     area.innerHTML = `
       <div class="price-block"><span class="label mono">SOLD</span></div>
-      <div class="sold-note">🏷️ This unit already has an owner. <a href="${CONFIG.explorer}/address/${l.owner}" target="_blank" rel="noopener">View owner on the explorer →</a></div>
+      <div class="sold-note">🏷️ This unit already has an owner. <a href="${CONFIG.explorer}/address/${l.owner}" target="_blank" rel="noopener noreferrer">View owner on the explorer →</a></div>
     `;
     return;
   }
@@ -896,8 +1190,9 @@ function renderMintArea(l, status){
         <span class="label mono">LISTING PRICE</span>
         <span class="amount">${fmtEth(chainState.mintPriceWei)} ETH</span>
       </div>
-      <button class="btn btn-signal" style="width:100%" onclick="requestWalletConnect()">Connect Wallet to Claim</button>
+      <button class="btn btn-signal" style="width:100%" id="connectToClaimBtn">Connect Wallet to Claim</button>
     `;
+    document.getElementById('connectToClaimBtn').addEventListener('click', requestWalletConnect);
     return;
   }
 
@@ -921,7 +1216,7 @@ function renderMintArea(l, status){
       <span class="amount" id="totalPrice">${fmtEth(chainState.mintPriceWei)} ETH</span>
     </div>
     <div class="mint-action">
-      <button class="btn btn-signal" style="width:100%" id="mintBtn" ${onCorrectNetwork ? '' : 'disabled'}>${onCorrectNetwork ? 'Claim This Unit' : 'Switch to Ethereum to Claim'}</button>
+      <button class="btn btn-signal" style="width:100%" id="mintBtn">Claim This Unit</button>
     </div>
   `;
 
@@ -933,10 +1228,7 @@ function renderMintArea(l, status){
   document.getElementById('qtyPlus').addEventListener('click', ()=>{
     if(currentQty<maxQty){ currentQty++; syncQtyUI(maxQty); }
   });
-  document.getElementById('mintBtn').addEventListener('click', ()=>{
-    if(!onCorrectNetwork){ ensureCorrectNetwork(); return; }
-    doMint(currentQty);
-  });
+  document.getElementById('mintBtn').addEventListener('click', ()=>doMint(currentQty));
 }
 
 function updateQtyNote(maxQty){
@@ -956,38 +1248,136 @@ function syncQtyUI(maxQty){
 }
 
 function showMintMsg(type, text){
-  const el = document.getElementById('mintMsg');
-  if(!el) return;
+  let el = document.getElementById('mintMsg');
+  if(!el){
+    // The mint form may have just been replaced (e.g. the unit is no longer
+    // claimable). Still show the reason instead of failing silently.
+    const area = document.getElementById('modalMintArea');
+    if(!area) return;
+    el = document.createElement('div');
+    el.id = 'mintMsg';
+    area.prepend(el);
+  }
   el.className = `mint-msg show ${type}`;
   el.textContent = text;
 }
 
 async function doMint(qty){
   if(!writeContract){ requestWalletConnect(); return; }
-  if(!onCorrectNetwork){ showMintMsg('error', 'Wrong network — switch to Ethereum Mainnet to claim.'); await ensureCorrectNetwork(); return; }
   const btn = document.getElementById('mintBtn');
+  if(!listingsOk()){
+    showMintMsg('error', 'Live contract data is not loaded, so the price and availability are unknown. Nothing was sent.');
+    return;
+  }
   btn.disabled = true;
-  showMintMsg('pending', 'Checking balance…');
 
-  const value = chainState.mintPriceWei * BigInt(qty);
+  // SECURITY: never send a mint transaction unless the wallet is confirmed to
+  // be on Ethereum Mainnet (chain 1) RIGHT NOW. The chain is asked fresh from
+  // the wallet every time, never taken from a cached flag.
+  showMintMsg('pending', 'Checking network…');
+  if(!(await walletOnCorrectChain())){
+    setNetworkBanner(false);
+    showMintMsg('error', `Wrong network. Switch your wallet to ${CONFIG.chainName} Mainnet (Chain ID ${CONFIG.chainIdDec}) and try again. Nothing was sent.`);
+    btn.disabled = false;
+    await ensureCorrectNetwork();   // pops the wallet's own "switch network" prompt
+    return;
+  }
 
-  // Pre-flight balance check. This is what actually fixes the "missing
-  // revert data" issue: when a wallet doesn't have enough ETH, gas
+  // SECURITY: the price shown on this page was read through the selected RPC,
+  // which may be wrong or malicious. Re-read it through the wallet's own
+  // provider and refuse to send if the two disagree.
+  showMintMsg('pending', 'Verifying price with your wallet…');
+  let verifiedPrice;
+  try{
+    verifiedPrice = BigInt(await writeContract.mintPrice());
+  }catch(err){
+    console.error('Price verification failed', err);
+    showMintMsg('error', 'Could not verify the mint price through your wallet. Nothing was sent.');
+    btn.disabled = false;
+    return;
+  }
+  if(verifiedPrice !== chainState.mintPriceWei){
+    const shown = fmtEth(chainState.mintPriceWei);
+    const real = fmtEth(verifiedPrice);
+    chainState.mintPriceWei = verifiedPrice;   // adopt the wallet-verified price
+    renderStats();
+    renderGrid();
+    const l = listings.find(x=>x.id===activeListingId);
+    if(l){
+      currentQty = 1;
+      renderMintArea(l, statusOf(l));
+    }
+    showMintMsg('error', `Price mismatch: the page showed ${shown} ETH but your wallet reports ${real} ETH. Nothing was sent. Review the updated price and try again.`);
+    return;
+  }
+
+  // Units sell strictly in order, so the unit shown in this modal and the chosen
+  // quantity must still be valid RIGHT NOW. Someone else may have minted since
+  // the page last loaded. Re-read the live state through the wallet's own
+  // provider and refuse to send if the unit or quantity is no longer valid.
+  showMintMsg('pending', 'Checking the unit is still available…');
+  let fresh;
+  try{
+    const [fTotal, fMax, fPerWallet, fActive, fMine] = await Promise.all([
+      writeContract.totalMinted(),
+      writeContract.MAX_SUPPLY(),
+      writeContract.MAX_PER_WALLET(),
+      writeContract.mintingActive(),
+      writeContract.mintedPerWallet(connectedAddress)
+    ]);
+    fresh = {
+      totalMinted: Number(fTotal),
+      maxSupply: Number(fMax),
+      maxPerWallet: Number(fPerWallet),
+      mintingActive: fActive,
+      yourMinted: Number(fMine)
+    };
+    if(typeof fresh.mintingActive !== 'boolean') throw new Error('mintingActive was not a boolean');
+    if(!Number.isSafeInteger(fresh.maxSupply) || fresh.maxSupply <= 0) throw new Error('invalid MAX_SUPPLY');
+    if(!Number.isSafeInteger(fresh.maxPerWallet) || fresh.maxPerWallet <= 0) throw new Error('invalid MAX_PER_WALLET');
+    if(!Number.isSafeInteger(fresh.totalMinted) || fresh.totalMinted < 0 || fresh.totalMinted > fresh.maxSupply) throw new Error('invalid totalMinted');
+    if(!Number.isSafeInteger(fresh.yourMinted) || fresh.yourMinted < 0) throw new Error('invalid mintedPerWallet');
+  }catch(err){
+    console.error('Fresh state check failed', err);
+    showMintMsg('error', 'Could not confirm the unit is still available through your wallet. Nothing was sent.');
+    btn.disabled = false;
+    return;
+  }
+  const freshMaxQty = Math.max(0, Math.min(2, fresh.maxPerWallet - fresh.yourMinted, fresh.maxSupply - fresh.totalMinted));
+  const stillNext = (fresh.totalMinted + 1) === activeListingId;
+  if(!fresh.mintingActive || !stillNext || !Number.isInteger(qty) || qty < 1 || qty > freshMaxQty){
+    let why;
+    if(!fresh.mintingActive) why = 'Minting is no longer open.';
+    else if(fresh.totalMinted >= fresh.maxSupply) why = 'The collection has sold out.';
+    else if(!stillNext) why = `Unit ${pad3(activeListingId)} is no longer the next unit. The next available is Unit ${pad3(fresh.totalMinted+1)}.`;
+    else why = `You can now claim at most ${freshMaxQty} unit${freshMaxQty===1?'':'s'}.`;
+    Object.assign(chainState, fresh);   // adopt the wallet-verified state
+    try{ await refreshAll(); }catch(e){ console.error(e); renderStats(); renderGrid(); }
+    if(listings.find(x=>x.id===activeListingId)) openListingModal(activeListingId);
+    showMintMsg('error', `${why} Nothing was sent. Review the updated listing and try again.`);
+    return;
+  }
+
+  // Always the wallet-verified price, never the page's cached one.
+  const value = verifiedPrice * BigInt(qty);
+
+  // Pre-flight balance check. When a wallet doesn't have enough ETH, gas
   // estimation itself can fail in an ambiguous way (different wallets/RPCs
-  // report it differently, sometimes inconsistently between attempts).
-  // Checking the balance ourselves first means the user always gets a
-  // clear, accurate message on the very first click.
+  // report it differently, sometimes inconsistently between attempts), which
+  // surfaces as a confusing "missing revert data". Checking the balance
+  // ourselves first gives a clear, accurate message on the very first click.
+  showMintMsg('pending', 'Checking balance…');
   try{
     const balance = await browserProvider.getBalance(connectedAddress);
     if(balance < value){
-      showMintMsg('error', `Insufficient ETH balance. This costs ${fmtEth(value)} ETH — your wallet has ${fmtEth(balance)} ETH.`);
+      showMintMsg('error', `Insufficient ETH balance. This costs ${fmtEth(value)} ETH — your wallet has ${fmtEth(balance)} ETH. Nothing was sent.`);
       btn.disabled = false;
       return;
     }
   }catch(balErr){
     console.error('Balance check failed', balErr);
-    // Don't block the user just because our pre-check failed; fall through
-    // to the normal send attempt.
+    // Don't block the user just because our pre-check failed; the wallet will
+    // still simulate and show the real outcome before anything is signed.
   }
 
   showMintMsg('pending', 'Confirm the transaction in your wallet…');
@@ -1001,12 +1391,10 @@ async function doMint(qty){
   }catch(err){
     console.error(err);
     let msg;
-    if(err && (err.code === 'INSUFFICIENT_FUNDS' || (err.info && err.info.error && err.info.error.code === -32000))){
+    if(err && err.code === 'INSUFFICIENT_FUNDS'){
       msg = 'Insufficient ETH balance to cover this mint.';
     } else if(err && err.code === 'ACTION_REJECTED'){
       msg = 'Transaction rejected in wallet.';
-    } else if(err && (err.shortMessage||'').toLowerCase().includes('missing revert data')){
-      msg = "Transaction couldn't be simulated — this usually means insufficient ETH balance to cover this mint.";
     } else {
       msg = (err && err.shortMessage) ? err.shortMessage : (err && err.reason) ? err.reason : 'Transaction failed or was rejected.';
     }
@@ -1040,7 +1428,8 @@ async function connectWallet(){
     connectedAddress = await signer.getAddress();
     writeContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
-    await ensureCorrectNetwork();
+    const onEth = await ensureCorrectNetwork();
+    walletReadContract = onEth ? new ethers.Contract(CONTRACT_ADDRESS, ABI, browserProvider) : null;
     updateWalletUI();
     await refreshAll();
 
@@ -1058,29 +1447,31 @@ async function connectWallet(){
   }
 }
 
+// Asks the wallet which chain it is on RIGHT NOW (never cached) and compares
+// numerically, so formats like '0x1' / '0x01' are both handled.
+async function walletOnCorrectChain(){
+  try{
+    if(!window.ethereum) return false;
+    const id = await window.ethereum.request({ method:'eth_chainId' });
+    return BigInt(id) === BigInt(CONFIG.chainIdDec);
+  }catch(e){ return false; }
+}
+
+function setNetworkBanner(ok){
+  document.getElementById('wrongNetBanner').classList.toggle('show', !ok);
+  document.getElementById('netDot').classList.toggle('off', !ok);
+}
+
+// Returns true only if the wallet is confirmed to be on Ethereum (chain 1)
+// after the attempt. The banner reflects the real, re-checked state.
 async function ensureCorrectNetwork(){
   if(!window.ethereum) return false;
-  const banner = document.getElementById('wrongNetBanner');
-  const netDot = document.getElementById('netDot');
-
-  const isOnCorrectChain = async ()=>{
-    const id = await window.ethereum.request({ method:'eth_chainId' });
-    return id && id.toLowerCase() === CONFIG.chainIdHex;
-  };
-
   try{
-    if(await isOnCorrectChain()){
-      banner.classList.remove('show');
-      netDot.classList.remove('off');
-      onCorrectNetwork = true;
-      if(listingOverlay.classList.contains('open') && activeListingId) renderMintArea(listings.find(x=>x.id===activeListingId), statusOf(listings.find(x=>x.id===activeListingId)));
-      return true;
-    }
+    if(await walletOnCorrectChain()){ setNetworkBanner(true); return true; }
+    setNetworkBanner(false);
 
     // Wrong network: ask the wallet to switch (this is what pops MetaMask's
     // native "Switch network" prompt for the user to approve).
-    banner.classList.add('show');
-    netDot.classList.add('off');
     try{
       await window.ethereum.request({
         method:'wallet_switchEthereumChain',
@@ -1088,8 +1479,7 @@ async function ensureCorrectNetwork(){
       });
     }catch(switchErr){
       if(switchErr && switchErr.code === 4902){
-        // Chain isn't registered in the wallet yet — offer to add it, which
-        // itself prompts the user, then try switching again.
+        // Chain isn't registered in the wallet yet: offer to add it.
         try{
           await window.ethereum.request({
             method:'wallet_addEthereumChain',
@@ -1109,25 +1499,12 @@ async function ensureCorrectNetwork(){
         console.error('Switch chain failed or was rejected', switchErr);
       }
     }
-
-    // Re-check for real instead of assuming the switch worked — the user
-    // may have rejected the prompt, or the wallet may not support the RPC
-    // methods above at all.
-    if(await isOnCorrectChain()){
-      banner.classList.remove('show');
-      netDot.classList.remove('off');
-      onCorrectNetwork = true;
-      if(listingOverlay.classList.contains('open') && activeListingId) renderMintArea(listings.find(x=>x.id===activeListingId), statusOf(listings.find(x=>x.id===activeListingId)));
-      return true;
-    }
-
-    banner.classList.add('show');
-    netDot.classList.add('off');
-    onCorrectNetwork = false;
-    if(listingOverlay.classList.contains('open') && activeListingId) renderMintArea(listings.find(x=>x.id===activeListingId), statusOf(listings.find(x=>x.id===activeListingId)));
-    return false;
+    const ok = await walletOnCorrectChain();   // trust the re-check, not the attempt
+    setNetworkBanner(ok);
+    return ok;
   }catch(e){
     console.error(e);
+    setNetworkBanner(false);
     return false;
   }
 }
@@ -1153,7 +1530,9 @@ function shortRpcHost(url){
   try{ return new URL(url).hostname; }catch(e){ return url; }
 }
 
-async function pingRpc(url){
+// Asks the endpoint for eth_chainId and reports one of:
+//   { state:'ok', ms }  |  { state:'wrongchain', ms, chainId }  |  { state:'down' }
+async function probeRpc(url){
   const controller = new AbortController();
   const timeout = setTimeout(()=>controller.abort(), 4000);
   const started = performance.now();
@@ -1161,65 +1540,183 @@ async function pingRpc(url){
     const res = await fetch(url, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ jsonrpc:'2.0', id:1, method:'eth_blockNumber', params:[] }),
-      signal: controller.signal
+      body: JSON.stringify({ jsonrpc:'2.0', id:1, method:'eth_chainId', params:[] }),
+      signal: controller.signal,
+      credentials:'omit'
     });
-    clearTimeout(timeout);
-    if(!res.ok) return null;
+    if(!res.ok) return { state:'down' };
     const json = await res.json();
-    if(!json || json.error) return null;
-    return Math.round(performance.now() - started);
+    if(!json || json.error || typeof json.result !== 'string') return { state:'down' };
+    let id;
+    try{ id = BigInt(json.result); }catch(e){ return { state:'down' }; }
+    const ms = Math.round(performance.now() - started);
+    return id === BigInt(CONFIG.chainIdDec)
+      ? { state:'ok', ms }
+      : { state:'wrongchain', ms, chainId: id.toString() };
   }catch(e){
+    return { state:'down' };
+  }finally{
     clearTimeout(timeout);
-    return null;
   }
 }
 
+function showRpcNote(text){
+  const el = document.getElementById('rpcNote');
+  el.textContent = text || '';
+  el.classList.toggle('show', !!text);
+}
+
+function updateRpcChrome(){
+  rpcChipLabel.textContent = activeRpc.custom ? '⚠ Custom RPC' : activeRpc.label;
+  rpcChipBtn.classList.toggle('custom', !!activeRpc.custom);
+  document.getElementById('rpcWarning').classList.toggle('show', !!activeRpc.custom);
+}
+
+// Built with DOM APIs + textContent only: no endpoint URL or label is ever
+// parsed as HTML, so nothing can break out of an attribute.
 function renderRpcList(){
-  const known = CONFIG.rpcEndpoints.some(e=>e.url === activeRpc.url);
-  const all = known ? CONFIG.rpcEndpoints : [...CONFIG.rpcEndpoints, { label:'Custom', url: activeRpc.url }];
+  const items = [
+    { label: defaultQuorumRpc().label, url:null, quorum:true, custom:false },
+    ...CONFIG.rpcEndpoints.map(ep => ({ label: ep.label, url: ep.url, custom:false }))
+  ];
+  if(activeRpc.custom) items.push({ label:'Custom', url: activeRpc.url, custom:true });
+  let quorumUi = null;
+  const probePromises = [];
 
-  rpcList.innerHTML = all.map(ep=>`
-    <div class="rpc-item ${ep.url===activeRpc.url ? 'selected' : ''}" data-url="${ep.url}" data-label="${ep.label}">
-      <span class="rpc-dot" data-url="${ep.url}"></span>
-      <span class="rpc-name">${ep.label}<br><span style="color:var(--dust);font-size:10px;">${shortRpcHost(ep.url)}</span></span>
-      <span class="rpc-ping" data-ping="${ep.url}">…</span>
-    </div>
-  `).join('');
+  rpcList.replaceChildren();
+  items.forEach(ep=>{
+    const item = document.createElement('div');
+    item.className = 'rpc-item' + (ep.url === activeRpc.url ? ' selected' : '');
 
-  rpcList.querySelectorAll('.rpc-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-      switchRpc(item.dataset.url, item.dataset.label);
-      rpcDropdown.classList.remove('open');
+    const dot = document.createElement('span');
+    dot.className = 'rpc-dot';
+
+    const name = document.createElement('span');
+    name.className = 'rpc-name';
+    const host = document.createElement('span');
+    host.className = 'rpc-host';
+    host.textContent = ep.quorum ? 'all endpoints · majority must agree' : shortRpcHost(ep.url);
+    name.append(ep.custom ? '⚠ Custom' : ep.label, document.createElement('br'), host);
+
+    const ping = document.createElement('span');
+    ping.className = 'rpc-ping';
+    ping.textContent = '…';
+
+    item.append(dot, name, ping);
+    item.addEventListener('click', async ()=>{
+      if(ep.url === activeRpc.url){ rpcDropdown.classList.remove('open'); return; }
+      showRpcNote('Checking RPC…');
+      const r = ep.quorum ? await switchToQuorum() : await switchRpc(ep.url);
+      if(r.superseded) return;
+      if(r.ok){ showRpcNote(''); rpcDropdown.classList.remove('open'); }
+      else{ showRpcNote(r.reason); }
     });
-  });
+    rpcList.append(item);
 
-  all.forEach(ep=>{
-    pingRpc(ep.url).then(ms=>{
-      const dotEls = rpcList.querySelectorAll(`.rpc-dot[data-url="${CSS.escape(ep.url)}"]`);
-      const pingEls = rpcList.querySelectorAll(`.rpc-ping[data-ping="${CSS.escape(ep.url)}"]`);
-      dotEls.forEach(d=>d.classList.add(ms!==null ? 'good' : 'bad'));
-      pingEls.forEach(p=>p.textContent = ms!==null ? `${ms}ms` : 'down');
+    if(ep.quorum){ quorumUi = { dot, ping }; return; }   // filled in once the endpoint probes finish
+    const probe = probeRpc(ep.url).then(r=>{
+      dot.classList.add(r.state === 'ok' ? 'good' : 'bad');
+      ping.textContent = r.state === 'ok' ? `${r.ms}ms` : (r.state === 'wrongchain' ? 'wrong chain' : 'down');
       if(ep.url === activeRpc.url){
         rpcChipDot.classList.remove('good','bad');
-        rpcChipDot.classList.add(ms!==null ? 'good' : 'bad');
+        rpcChipDot.classList.add(r.state === 'ok' ? 'good' : 'bad');
       }
+      return r.state === 'ok';
     });
+    if(!ep.custom) probePromises.push(probe);
+  });
+
+  // Quorum row is healthy when at least READ_QUORUM built-in endpoints answer.
+  Promise.all(probePromises).then(states=>{
+    if(!quorumUi) return;
+    const up = states.filter(Boolean).length;
+    const good = up >= READ_QUORUM;
+    quorumUi.dot.classList.add(good ? 'good' : 'bad');
+    quorumUi.ping.textContent = `${up}/${states.length} up`;
+    if(activeRpc.quorum){
+      rpcChipDot.classList.remove('good','bad');
+      rpcChipDot.classList.add(good ? 'good' : 'bad');
+    }
   });
 }
 
-async function switchRpc(url, label){
-  activeRpc = { label: label || 'Custom', url };
-  try{ localStorage.setItem('snipehead:rpc', JSON.stringify(activeRpc)); }catch(e){ /* ignore */ }
+function replaceReadProvider(){
+  const old = readProvider;
+  readProvider = makeReadProvider(activeRpc);
+  rpcReadContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, readProvider);
+  try{ Promise.resolve(old.destroy()).catch(()=>{}); }catch(e){ /* ignore */ }
+}
 
-  readProvider = new ethers.JsonRpcProvider(url);
-  readContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, readProvider);
+// Validates the URL, verifies it really is Ethereum mainnet (chain 1), and only
+// then adopts it. Returns { ok:true } or { ok:false, reason }.
+let rpcSwitchSeq = 0;
+async function switchRpc(url){
+  const norm = parseRpcUrl(url);
+  if(!norm) return { ok:false, reason:'Invalid RPC URL. Use a plain https:// address (no username or password).' };
 
-  rpcChipLabel.textContent = label || shortRpcHost(url);
+  const seq = ++rpcSwitchSeq;
+  const probe = await probeRpc(norm);
+  if(seq !== rpcSwitchSeq) return { ok:false, superseded:true, reason:'' };
+  if(probe.state === 'wrongchain') return { ok:false, reason:`That RPC is on chain ${probe.chainId}, not Ethereum (${CONFIG.chainIdDec}). Nothing was changed.` };
+  if(probe.state !== 'ok')         return { ok:false, reason:'That RPC did not respond. Nothing was changed.' };
+
+  const preset = presetForUrl(norm);
+  activeRpc = preset
+    ? { label: preset.label, url: preset.url, custom:false }
+    : { label:'Custom', url: norm, custom:true };
+
+  try{
+    if(preset){
+      localStorage.setItem(RPC_KEY_PRESET, JSON.stringify({ url: preset.url }));
+      sessionStorage.removeItem(RPC_KEY_CUSTOM);
+    }else{
+      sessionStorage.setItem(RPC_KEY_CUSTOM, norm);     // never localStorage
+    }
+  }catch(e){ /* storage unavailable: still works for this page view */ }
+
+  replaceReadProvider();
+
+  updateRpcChrome();
   rpcChipDot.classList.remove('good','bad');
-
+  rpcChipDot.classList.add('good');
   await refreshAll();
   renderRpcList();
+  return { ok:true };
+}
+
+// Back to the default: read through all built-in endpoints with a majority quorum.
+async function switchToQuorum(){
+  ++rpcSwitchSeq;                                   // cancel any pending single-RPC switch
+  activeRpc = defaultQuorumRpc();
+  try{
+    localStorage.removeItem(RPC_KEY_PRESET);
+    sessionStorage.removeItem(RPC_KEY_CUSTOM);
+  }catch(e){ /* storage unavailable */ }
+
+  replaceReadProvider();
+
+  updateRpcChrome();
+  rpcChipDot.classList.remove('good','bad');
+  await refreshAll();
+  renderRpcList();
+  return { ok:true };
+}
+
+// A custom RPC restored from sessionStorage is re-verified before the page
+// reads anything from it. If it fails, fall back to the default endpoint.
+async function verifyCustomRpcAtStartup(){
+  if(!activeRpc.custom) return;
+  const probe = await probeRpc(activeRpc.url);
+  if(probe.state === 'ok') return;
+  const why = probe.state === 'wrongchain'
+    ? `The custom RPC reports chain ${probe.chainId}, not Ethereum (${CONFIG.chainIdDec}).`
+    : 'The custom RPC did not respond.';
+  try{ sessionStorage.removeItem(RPC_KEY_CUSTOM); }catch(e){ /* ignore */ }
+  activeRpc = defaultQuorumRpc();
+  replaceReadProvider();
+  updateRpcChrome();
+  renderRpcList();
+  showRpcNote(`${why} Switched back to ${activeRpc.label}.`);
 }
 
 rpcChipBtn.addEventListener('click', (e)=>{
@@ -1232,38 +1729,66 @@ document.addEventListener('click', (e)=>{
     rpcDropdown.classList.remove('open');
   }
 });
-document.getElementById('customRpcBtn').addEventListener('click', ()=>{
+const customRpcBtn = document.getElementById('customRpcBtn');
+customRpcBtn.addEventListener('click', async ()=>{
   const input = document.getElementById('customRpcInput');
-  const val = input.value.trim();
-  if(!/^https?:\/\/.+/i.test(val)){
+  input.style.borderColor = '';
+  const norm = parseRpcUrl(input.value);
+  if(!norm){
     input.style.borderColor = 'var(--danger)';
+    showRpcNote('Invalid RPC URL. Use a plain https:// address (no username or password).');
     return;
   }
-  switchRpc(val, 'Custom');
-  rpcDropdown.classList.remove('open');
-  input.value = '';
+  if(!presetForUrl(norm)){
+    const hostname = new URL(norm).hostname;
+    const ok = window.confirm(
+      `Use a custom RPC?\n\nHost: ${hostname}\n\n` +
+      `This server will see your wallet address and decides what this page shows ` +
+      `(prices, owners, availability). Only continue if you trust it.`
+    );
+    if(!ok) return;
+  }
+  customRpcBtn.disabled = true;
+  showRpcNote('Checking RPC…');
+  const r = await switchRpc(norm);
+  customRpcBtn.disabled = false;
+  if(r.superseded) return;
+  if(r.ok){
+    input.value = '';
+    showRpcNote('');
+    rpcDropdown.classList.remove('open');
+  }else{
+    input.style.borderColor = 'var(--danger)';
+    showRpcNote(r.reason);
+  }
 });
 
-rpcChipLabel.textContent = activeRpc.label;
+updateRpcChrome();
 renderRpcList();
 
 /* ================= REFRESH / INIT ================= */
+document.getElementById('chainRetryBtn').addEventListener('click', ()=>{ refreshAll(); });
+
 async function refreshAll(){
   await loadChainState();
   renderStats();
-  const { holderCount, perTokenOwner } = await loadHolders();
-  renderHolderStat(holderCount);
-  listings.forEach(l=>{ l.owner = perTokenOwner[l.id] || null; });
+  const h = chainState.ok ? await loadHolders() : { ok:false, holderCount:null, perTokenOwner:{} };
+  holdersOk = h.ok;
+  if(h.ok) listings.forEach(l=>{ l.owner = h.perTokenOwner[l.id] || null; });
+  renderHolderStat(h.holderCount);
+  syncErrorBanner();
   renderGrid();
 }
 
 async function init(){
   document.getElementById('netDot').classList.remove('off');
+  await verifyCustomRpcAtStartup();   // never read from an unverified custom RPC
   await loadChainState();
   renderStats();
-  await buildListings();
-  const { holderCount } = await loadHolders();
-  renderHolderStat(holderCount);
+  const h = await buildListings();
+  holdersOk = h.ok;
+  renderHolderStat(h.holderCount);
+  syncErrorBanner();
   renderGrid();
 
   // Passive check: if a wallet is already authorized, connect silently.
