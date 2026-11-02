@@ -1,4 +1,4 @@
-# SnipeHead (SHD) - V2
+# SnipeHead (SHD) 
 
 **SnipeHead V2** is the next evolution of the original SnipeHead token on PulseChain — rebuilt with improved tokenomics, stronger foundations, and a focus on sustainable, community-driven growth.
 
